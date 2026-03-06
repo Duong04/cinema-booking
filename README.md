@@ -212,7 +212,7 @@ docker volumes
 
 # 👨‍💻 Author
 
-Developed by **Nguyen Tinh**
+Developed by **Nguyen Thanh Duong (SugarDev)**
 
 Tech stack:
 
