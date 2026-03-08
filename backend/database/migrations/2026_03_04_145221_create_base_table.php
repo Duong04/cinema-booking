@@ -199,6 +199,7 @@ return new class extends Migration {
             $table->string('trailer_url')->nullable();
 
             $table->text('description')->nullable();
+            $table->mediumText('content')->nullable();
 
             $table->date('release_date')->nullable();
 
