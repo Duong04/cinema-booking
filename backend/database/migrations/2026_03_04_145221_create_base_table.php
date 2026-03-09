@@ -35,13 +35,55 @@ return new class extends Migration {
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('email_verify_token')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-
-            $table->boolean('is_status')->default(false);
+            $table->string('avatar')->default('https://diskimageshq.nyc3.digitaloceanspaces.com/laravel-app/avatar/mwWv7ME6Lho1dBcmI0vS4hLwyj1xdkXxPspQU9Av.png')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->enum('gender', ['male','female','other'])->nullable();
+            $table->boolean('is_active')->default(false);
 
             $table->timestamps();
+        });
+
+        Schema::create('social_accounts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignUuid('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+
+            $table->string('provider'); 
+            $table->string('provider_id');
+
+            $table->timestamps();
+
+            $table->unique(['provider','provider_id']);
+        });
+
+        Schema::create('ip_details', function (Blueprint $table) {
+            $table->id();
+            $table->string('ip')->nullable();
+            $table->string('city')->nullable();
+            $table->string('region')->nullable();
+            $table->string('country')->nullable();
+            $table->string('loc')->nullable();
+            $table->string('org')->nullable();
+            $table->string('timezone')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('login_histories', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('ip_id');
+            $table->timestamp('login_at')->nullable();
+            $table->string('user_agent')->nullable();
+            $table->string('device')->nullable();
+            $table->string('browser')->nullable();
+            $table->string('platform')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+
+            $table->foreignUuid('user_id')->constrained('users');
+            $table->foreign('ip_id')->references('id')->on('ip_details')->onDelete('cascade');
         });
 
 
