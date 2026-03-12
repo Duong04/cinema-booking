@@ -40,7 +40,7 @@
                 <p style="margin-top: 15px; font-size: 16px">
                     Để kích hoạt tài khoản vui lòng click .
                 </p>
-                <a href="/api/auth/verify-email/{{$user->email_verify_token}}"
+                <a href="{{ url('/api/v1/auth/verify-email/'.$user->email_verify_token) }}"
                     style="
                   display: inline-block;
                   color: #2579f2;

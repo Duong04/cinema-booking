@@ -11,4 +11,14 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         $this->model = $model;
     }
+
+    public function getByToken(string $token, array $columns = ['*']) {
+        return $this->model->where('email_verify_token', $token)
+                ->first($columns);
+    }
+
+    public function getByEmail(string $email, array $columns = ['*']) {
+        return $this->model->where('email', $email)
+                ->first($columns);
+    }
 }

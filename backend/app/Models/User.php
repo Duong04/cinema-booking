@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Traits\UsesUuidV7;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, UsesUuidV7;
+    use HasFactory, Notifiable, UsesUuidV7, HasApiTokens;
 
     protected $table = 'users';
     /**
@@ -30,6 +31,7 @@ class User extends Authenticatable
         'role_id',
         'email_verify_token',
         'email_verified_at',
+        'token_expired_at'
     ];
 
     /**
