@@ -2,11 +2,11 @@
 namespace App\Services;
 
 use App\Mail\VerifyEmailMail;
-use App\Repositories\UserRepository\UserRepositoryInterface;
+use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\Facades\Mail;
 use Str;
 use Auth;
-use function PHPUnit\Framework\throwException;
+
 class AuthService {
     private $userRepository;
     public function __construct(UserRepositoryInterface $userRepository)

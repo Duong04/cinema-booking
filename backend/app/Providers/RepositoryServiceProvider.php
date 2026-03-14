@@ -3,8 +3,14 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\UserRepository\UserRepositoryInterface;
-use App\Repositories\UserRepository\UserRepository;
+use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
+use App\Repositories\Role\RoleRepository;
+use App\Repositories\Role\RoleRepositoryInterface;
+use App\Repositories\Action\ActionRepository;
+use App\Repositories\Action\ActionRepositoryInterface;
+use App\Repositories\Permission\PermissionRepository;
+use App\Repositories\Permission\PermissionRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -14,6 +20,9 @@ class RepositoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
+        $this->app->bind(ActionRepositoryInterface::class, ActionRepository::class);
+        $this->app->bind(PermissionRepositoryInterface::class, PermissionRepository::class);
     }
 
     /**

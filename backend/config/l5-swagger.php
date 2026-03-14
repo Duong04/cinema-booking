@@ -315,4 +315,8 @@ return [
             'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
         ],
     ],
+    'requestInterceptor' => "function(request) {
+        request.headers['X-CSRF-TOKEN'] = document.cookie.match('XSRF-TOKEN=(.*?)(;|$)')[1];
+        return request;
+    }",
 ];
