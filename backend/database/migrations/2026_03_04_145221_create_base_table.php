@@ -43,7 +43,8 @@ return new class extends Migration {
             $table->date('date_of_birth')->nullable();
             $table->enum('gender', ['male','female','other'])->nullable();
             $table->boolean('is_active')->default(false);
-
+            
+            $table->rememberToken();
             $table->timestamps();
         });
 

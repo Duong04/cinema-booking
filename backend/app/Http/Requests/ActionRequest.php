@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ActionRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class ActionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,27 @@ class ActionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+        $rules = [
+            'name' => ['required', Rule::unique('actions', 'name')],
+            'key' => ['required', Rule::unique('actions', 'key')],
+            'permissions' => ['nullable', 'array'],
         ];
+
+        if ($this->method() === 'PUT') {
+            $id = $this->route('id');
+            $rules['name'] = [
+                'sometimes',
+                'required',
+                Rule::unique('actions', 'key')->ignore($id),
+            ];
+
+            $rules['key'] = [
+                'sometimes',
+                'required',
+                Rule::unique('actions', 'key')->ignore($id),
+            ];
+        }
+
+        return $rules;
     }
 }

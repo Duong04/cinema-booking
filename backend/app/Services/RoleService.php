@@ -16,8 +16,8 @@ class RoleService {
         return $roles;
     }
 
-    public function create($date) {
-        $role = $this->roleRepository->create($date);
+    public function create($data) {
+        $role = $this->roleRepository->create($data);
 
         return $role;
     }

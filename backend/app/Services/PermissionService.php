@@ -2,12 +2,14 @@
 namespace App\Services;
 
 use App\Repositories\Permission\PermissionRepositoryInterface;
+use App\Repositories\PermissionAction\PermissionActionRepositoryInterface;
 
 class PermissionService {
     private $permissionRepository;
-
-    public function __construct(PermissionRepositoryInterface $permissionRepository) {
+    private $permissionActionRepository;
+    public function __construct(PermissionRepositoryInterface $permissionRepository, PermissionActionRepositoryInterface $permissionActionRepository) {
         $this->permissionRepository = $permissionRepository;
+        $this->permissionActionRepository = $permissionActionRepository;
     }
 
     public function paginate($limit) {
@@ -16,9 +18,17 @@ class PermissionService {
         return $permissions;
     }
 
-    public function create($date) {
-        $permission = $this->permissionRepository->create($date);
+    public function create($data) {
+        $permission = $this->permissionRepository->create($data);
 
+        if (isset($data['actions'])) {
+            foreach ($data['actions'] as $item) {
+                $this->permissionActionRepository->create([
+                    'permission_id' => $permission->id,
+                    'action_id' => $item['action_id'],
+                ]);
+            }
+        }
         return $permission;
     }
 
@@ -30,6 +40,17 @@ class PermissionService {
 
     public function update($id, $data) {
         $permission = $this->permissionRepository->update($id, $data);
+
+        $permission = $this->permissionRepository->update($id, $data);
+        if (isset($data['actions'])) {
+            $this->permissionActionRepository->deleteByCol('permission_id', $id);
+            foreach ($data['actions'] as $item) {
+                $this->permissionActionRepository->create([
+                    'permission_id' => $id,
+                    'action_id' => $item['action_id'],
+                ]);
+            }
+        }
 
         return $permission;
     }

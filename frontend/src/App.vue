@@ -1,21 +1,37 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import axios from "./plugins/axios"
+
+const testLogin = async () => {
+  try {
+    await axios.get('/api/csrf-cookie')
+    const res = await axios.post('/api/v1/auth/login', {
+      email: 'tinhabc3009@gmail.com',
+      password: 'tinh3092004'
+    })
+    console.log('Login:', res.data)
+
+    const profile = await axios.get('/api/v1/auth/profile')
+    console.log('Profile:', profile.data)
+  } catch (error: any) {
+    console.error('Error:', error.response?.data)
+  }
+}
+
+const getProfile = async () => {
+  try {
+    const profile = await axios.get('/api/v1/auth/profile')
+    console.log('Profile:', profile.data)
+  } catch (error: any) {
+    console.error('Error:', error.response?.data)
+  }
+}
+
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
+  <button @click="testLogin">Test Login</button>
+  <button @click="getProfile">Test profile</button>
 
   <RouterView />
 </template>
