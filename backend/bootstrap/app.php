@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Illuminate\Session\Middleware\StartSession;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,11 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        $middleware->append(StartSession::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Validation error
         $exceptions->render(function (ValidationException $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Validation error',
@@ -33,7 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Chưa đăng nhập
         $exceptions->render(function (AuthenticationException $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthenticated'
@@ -43,7 +45,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Không tìm thấy model
         $exceptions->render(function (ModelNotFoundException $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Resource not found'
+                ], 404);
+            }
+        });
+
+        $exceptions->render(function (NotFoundHttpException $e, $request) {
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Resource not found'
@@ -53,7 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // HTTP exception (403, 404...)
         $exceptions->render(function (HttpExceptionInterface $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => $e->getMessage() ?: 'Http error'
@@ -63,13 +74,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Lỗi chung
         $exceptions->render(function (\Throwable $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => config('app.debug')
                         ? $e->getMessage()
                         : 'Server error'
-                ], $e->getMessage() ? 400 : 500);
+                ], 500);
             }
         });
 

@@ -11,4 +11,6 @@ class PermissionAction extends Model
         'permission_id',
         'action_id',
     ];
+    public $timestamps = false;
+
 }

@@ -26,7 +26,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/', 'create');
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
-        Route::post('/{id}', 'delete');
+        Route::delete('/{id}', 'delete');
     });
 
     Route::prefix('actions')->controller(ActionController::class)->middleware('auth:sanctum')->group(function () {
@@ -34,7 +34,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/', 'create');
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
-        Route::post('/{id}', 'delete');
+        Route::delete('/{id}', 'delete');
     });
 
     Route::prefix('permissions')->controller(PermissionController::class)->middleware('auth:sanctum')->group(function () {
@@ -42,7 +42,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/', 'create');
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
-        Route::post('/{id}', 'delete');
+        Route::delete('/{id}', 'delete');
     });
 
 });

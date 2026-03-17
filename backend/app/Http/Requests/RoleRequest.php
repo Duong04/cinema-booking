@@ -25,9 +25,11 @@ class RoleRequest extends FormRequest
         $rules = [
             'name' => ['required', Rule::unique('roles', 'name')],
             'description' => ['nullable'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*.id' => ['nullable', 'integer'],
-            'permissions.*.actions' => ['nullable', 'array'],
+            'permissions' => ['sometimes', 'array'],
+            'permissions.*.id' => ['required', 'exists:permissions,id'],
+
+            'permissions.*.actions' => ['sometimes', 'array'],
+            'permissions.*.actions.*.id' => ['required', 'exists:actions,id'],
         ];
 
         if ($this->method() === 'PUT') {

@@ -14,4 +14,8 @@ class Action extends Model
         'name',
         'key'
     ];
+
+    public function permissionActions() {
+        return $this->hasMany(PermissionAction::class, 'action_id');
+    }
 }

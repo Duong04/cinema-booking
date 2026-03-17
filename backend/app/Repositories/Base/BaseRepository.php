@@ -16,7 +16,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     public function find(string $id, array $columns = ['*'])
     {
-        return $this->model->find($id, $columns);
+        return $this->model->findOrFail($id, $columns);
     }
 
     public function create(array $data)
@@ -26,7 +26,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     public function update(string $id, array $data)
     {
-        $model = $this->find($id);
+        $model = $this->model->findOrFail($id);
 
         $model->update($data);
 

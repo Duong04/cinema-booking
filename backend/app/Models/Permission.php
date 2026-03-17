@@ -14,4 +14,13 @@ class Permission extends Model
         'name',
         'key'
     ];
+
+    public function permissionActions() {
+        return $this->hasMany(PermissionAction::class, 'permission_id');
+    }
+
+    public function actions()
+    {
+        return $this->belongsToMany(Action::class, 'role_permissions', 'permission_id', 'action_id')->withPivot('role_id', 'permission_id','action_id');
+    }
 }

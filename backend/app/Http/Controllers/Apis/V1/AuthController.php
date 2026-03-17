@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use App\Traits\ResponseHelper;
@@ -67,7 +68,7 @@ class AuthController extends Controller
             new OA\Parameter(name: "password", in: "query", required: true, schema: new OA\Schema(type: "string")),
         ],
         responses: [
-            new OA\Response(response: 201, description: "Người dùng đã đăng nhập thành công!"),
+            new OA\Response(response: 200, description: "Người dùng đã đăng nhập thành công!"),
             new OA\Response(response: 422, description: "Validation errors"),
         ]
     )]
@@ -88,31 +89,83 @@ class AuthController extends Controller
         tags: ["Auth"],
         security: [["sanctum" => []]],
         responses: [
+
             new OA\Response(
                 response: 200,
                 description: "Profile retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
+
                         new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: ""),
+                        new OA\Property(property: "message", type: "string", example: "Success"),
+
                         new OA\Property(
                             property: "data",
                             type: "object",
                             properties: [
-                                new OA\Property(property: "id", type: "string", example: "01927..."),
-                                new OA\Property(property: "name", type: "string", example: "John Doe"),
-                                new OA\Property(property: "email", type: "string", example: "john@example.com"),
+
+                                new OA\Property(property: "name", type: "string", example: "Sugar"),
+                                new OA\Property(property: "email", type: "string", example: "tinhabc3009@gmail.com"),
+                                new OA\Property(property: "phone", type: "string", nullable: true, example: null),
+                                new OA\Property(property: "avatar", type: "string", example: "https://...png"),
+                                new OA\Property(property: "date_of_birth", type: "string", nullable: true, example: null),
+                                new OA\Property(property: "gender", type: "string", nullable: true, example: null),
+                                new OA\Property(property: "is_active", type: "integer", example: 1),
+
+                                new OA\Property(
+                                    property: "role",
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(property: "id", type: "string", example: "019cd38b-7fd5-726c-8ab0-81e7c17fabc5"),
+                                        new OA\Property(property: "name", type: "string", example: "customer"),
+                                        new OA\Property(property: "description", type: "string", example: "customer"),
+
+                                        new OA\Property(
+                                            property: "permissions",
+                                            type: "array",
+                                            items: new OA\Items(
+                                                properties: [
+                                                    new OA\Property(property: "id", type: "string", example: "019cfc0b-11f1-727d-a417-25a604446b3e"),
+                                                    new OA\Property(property: "name", type: "string", example: "Post Management"),
+                                                    new OA\Property(property: "key", type: "string", example: "post_management"),
+
+                                                    new OA\Property(
+                                                        property: "actions",
+                                                        type: "array",
+                                                        items: new OA\Items(
+                                                            properties: [
+                                                                new OA\Property(property: "id", type: "string", example: "019cfc04-566e-734e-91f6-8d2470bfba30"),
+                                                                new OA\Property(property: "name", type: "string", example: "Update"),
+                                                                new OA\Property(property: "key", type: "string", example: "update"),
+                                                            ]
+                                                        )
+                                                    ),
+                                                ]
+                                            )
+                                        ),
+                                    ]
+                                ),
                             ]
                         ),
                     ]
                 )
             ),
-            new OA\Response(response: 401, description: "Unauthenticated"),
+
+            new OA\Response(
+                response: 401,
+                description: "Unauthenticated",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Unauthenticated"),
+                    ]
+                )
+            ),
         ]
     )]
     public function profile(Request $request)
     {
-        return $this->success($request->user());
+        return $this->success(new UserResource($request->user()));
     }
 
     #[OA\Post(
