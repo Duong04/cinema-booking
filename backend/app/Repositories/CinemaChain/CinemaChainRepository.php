@@ -1,13 +1,13 @@
 <?php 
-namespace App\Repositories\Role;
+namespace App\Repositories\CinemaChain;
 
 use App\Repositories\Base\BaseRepository;
-use App\Models\Role;
-use App\Repositories\Role\RoleRepositoryInterface;
+use App\Models\CinemaChain;
+use App\Repositories\CinemaChain\CinemaChainRepositoryInterface;
 
-class RoleRepository extends BaseRepository implements RoleRepositoryInterface
+class CinemaChainRepository extends BaseRepository implements CinemaChainRepositoryInterface
 {
-    public function __construct(Role $model)
+    public function __construct(CinemaChain $model)
     {
         $this->model = $model;
     }

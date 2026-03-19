@@ -1,13 +1,13 @@
 <?php 
-namespace App\Repositories\Role;
+namespace App\Repositories\City;
 
 use App\Repositories\Base\BaseRepository;
-use App\Models\Role;
-use App\Repositories\Role\RoleRepositoryInterface;
+use App\Models\City;
+use App\Repositories\City\CityRepositoryInterface;
 
-class RoleRepository extends BaseRepository implements RoleRepositoryInterface
+class CityRepository extends BaseRepository implements CityRepositoryInterface
 {
-    public function __construct(Role $model)
+    public function __construct(City $model)
     {
         $this->model = $model;
     }

@@ -15,6 +15,14 @@ use App\Repositories\PermissionAction\PermissionActionRepository;
 use App\Repositories\PermissionAction\PermissionActionRepositoryInterface;
 use App\Repositories\RolePermission\RolePermissionRepository;
 use App\Repositories\RolePermission\RolePermissionRepositoryInterface;
+use App\Repositories\City\CityRepository;
+use App\Repositories\City\CityRepositoryInterface;
+use App\Repositories\Cinema\CinemaRepository;
+use App\Repositories\Cinema\CinemaRepositoryInterface;
+use App\Repositories\CinemaChain\CinemaChainRepository;
+use App\Repositories\CinemaChain\CinemaChainRepositoryInterface;
+use App\Repositories\Room\RoomRepository;
+use App\Repositories\Room\RoomRepositoryInterface;
 
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -30,6 +38,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PermissionRepositoryInterface::class, PermissionRepository::class);
         $this->app->bind(PermissionActionRepositoryInterface::class, PermissionActionRepository::class);
         $this->app->bind(RolePermissionRepositoryInterface::class, RolePermissionRepository::class);
+        $this->app->bind(CityRepositoryInterface::class, CityRepository::class);
+        $this->app->bind(CinemaRepositoryInterface::class, CinemaRepository::class);
+        $this->app->bind(CinemaChainRepositoryInterface::class, CinemaChainRepository::class);
+        $this->app->bind(RoomRepositoryInterface::class, RoomRepository::class);
     }
 
     /**

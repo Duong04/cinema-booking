@@ -1,13 +1,13 @@
 <?php 
-namespace App\Repositories\Role;
+namespace App\Repositories\Room;
 
 use App\Repositories\Base\BaseRepository;
-use App\Models\Role;
-use App\Repositories\Role\RoleRepositoryInterface;
+use App\Models\Room;
+use App\Repositories\Room\RoomRepositoryInterface;
 
-class RoleRepository extends BaseRepository implements RoleRepositoryInterface
+class RoomRepository extends BaseRepository implements RoomRepositoryInterface
 {
-    public function __construct(Role $model)
+    public function __construct(Room $model)
     {
         $this->model = $model;
     }

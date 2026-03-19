@@ -2,8 +2,12 @@
 
 use App\Http\Controllers\Apis\V1\ActionController;
 use App\Http\Controllers\Apis\V1\AuthController;
+use App\Http\Controllers\Apis\V1\CinemaChainController;
+use App\Http\Controllers\Apis\V1\CinemaController;
+use App\Http\Controllers\Apis\V1\CityController;
 use App\Http\Controllers\Apis\V1\PermissionController;
 use App\Http\Controllers\Apis\V1\RoleController;
+use App\Http\Controllers\Apis\V1\RoomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +42,38 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('permissions')->controller(PermissionController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('cities')->controller(CityController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('cinemas')->controller(CinemaController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('cinema-chains')->controller(CinemaChainController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('rooms')->controller(RoomController::class)->middleware('auth:sanctum')->group(function () {
         Route::get('/', 'paginate');
         Route::post('/', 'create');
         Route::get('/{id}', 'show');

@@ -11,7 +11,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     public function all(int $limit = 15)
     {
-        return $this->model->paginate($limit);
+        return $this->model->orderByDesc('created_at')->paginate($limit);
     }
 
     public function find(string $id, array $columns = ['*'])
