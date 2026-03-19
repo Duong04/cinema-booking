@@ -49,7 +49,7 @@ return new class extends Migration {
         });
 
         Schema::create('social_accounts', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignUuid('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
@@ -63,7 +63,7 @@ return new class extends Migration {
         });
 
         Schema::create('ip_details', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('ip')->nullable();
             $table->string('city')->nullable();
             $table->string('region')->nullable();
@@ -75,8 +75,7 @@ return new class extends Migration {
         });
 
         Schema::create('login_histories', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('ip_id');
+            $table->uuid('id')->primary();
             $table->timestamp('login_at')->nullable();
             $table->string('user_agent')->nullable();
             $table->string('device')->nullable();
@@ -85,7 +84,7 @@ return new class extends Migration {
             $table->timestamp('created_at')->useCurrent();
 
             $table->foreignUuid('user_id')->constrained('users');
-            $table->foreign('ip_id')->references('id')->on('ip_details')->onDelete('cascade');
+            $table->foreignUuid('ip_id')->constrained('ip_details')->cascadeOnDelete();
         });
 
 
@@ -187,7 +186,7 @@ return new class extends Migration {
             $table->foreignUuid('cinema_id')->constrained('cinemas');
 
             $table->string('name');
-            $table->string('type');
+            $table->enum('type', ['2D', '3D', 'IMAX', '4DX', 'VIP'])->default('2D');
 
             $table->timestamps();
             $table->softDeletes();
@@ -250,7 +249,7 @@ return new class extends Migration {
             $table->string('rating')->nullable();
             $table->string('language')->nullable();
 
-            $table->string('status');
+            $table->enum('status', ['coming_soon', 'now_showing', 'ended', 'cancelled']);
 
             $table->timestamps();
             $table->softDeletes();
@@ -259,6 +258,7 @@ return new class extends Migration {
         Schema::create('genres', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->timestamps();
         });
 
         Schema::create('movie_genres', function (Blueprint $table) {
@@ -293,7 +293,7 @@ return new class extends Migration {
 
             $table->decimal('base_price', 10, 2);
 
-            $table->string('status');
+            $table->enum('status', ['scheduled', 'ongoing', 'completed', 'cancelled']);
 
             $table->text('cancelled_reason')->nullable();
             $table->foreignUuid('cancelled_by')->nullable()->constrained('users');
@@ -336,7 +336,7 @@ return new class extends Migration {
 
             $table->decimal('total_amount', 10, 2);
 
-            $table->string('status');
+            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'expired', 'refunded']);
 
             $table->text('cancellation_reason')->nullable();
             $table->dateTime('cancelled_at')->nullable();
@@ -357,15 +357,14 @@ return new class extends Migration {
             $table->foreignUuid('seat_id')->constrained('seats');
 
             $table->decimal('price', 10, 2);
-
+            $table->string('seat_type_name');
             $table->string('movie_title');
             $table->string('room_name');
             $table->string('seat_label');
 
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
 
             $table->unique(['booking_id', 'seat_id']);
-            $table->unique(['seat_id', 'showtime_id']);
         });
 
         Schema::create('booking_status_logs', function (Blueprint $table) {
@@ -401,7 +400,7 @@ return new class extends Migration {
 
             $table->dateTime('expired_at');
 
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
 
             $table->unique(['seat_id', 'showtime_id']);
         });
@@ -424,16 +423,16 @@ return new class extends Migration {
 
             $table->decimal('amount', 10, 2);
 
-            $table->string('status');
+            $table->enum('status', ['pending', 'paid', 'failed', 'refunded', 'partially_refunded']);
 
             $table->dateTime('paid_at')->nullable();
 
             $table->string('idempotency_key')->nullable();
 
             $table->decimal('refunded_amount', 10, 2)->nullable();
-            $table->string('refund_status')->nullable();
+            $table->enum('refund_status', ['pending', 'processing', 'completed', 'failed'])->nullable();
 
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
 
             $table->unique(['provider', 'transaction_code']);
         });
@@ -449,7 +448,7 @@ return new class extends Migration {
             $table->text('request_payload')->nullable();
             $table->text('response_payload')->nullable();
 
-            $table->string('status');
+            $table->enum('status', ['pending', 'success', 'failed', 'timeout']);
 
             $table->timestamp('created_at')->useCurrent();
 
@@ -473,7 +472,7 @@ return new class extends Migration {
 
             $table->decimal('price', 10, 2);
 
-            $table->string('status');
+            $table->enum('status', ['active', 'inactive']);
 
             $table->timestamps();
             $table->softDeletes();
@@ -492,7 +491,7 @@ return new class extends Migration {
             $table->decimal('unit_price', 10, 2);
             $table->decimal('total_price', 10, 2);
 
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
 
             $table->unique(['booking_id', 'combo_id']);
         });
@@ -510,7 +509,7 @@ return new class extends Migration {
 
             $table->string('code')->unique();
 
-            $table->string('discount_type');
+            $table->enum('discount_type', ['percentage', 'fixed_amount']);
             $table->decimal('discount_value', 10, 2);
 
             $table->dateTime('start_date');
@@ -519,6 +518,8 @@ return new class extends Migration {
             $table->integer('usage_limit')->nullable();
             $table->integer('per_user_limit')->nullable();
 
+            $table->string('applicable_to')->nullable();
+            $table->enum('status', ['active', 'paused', 'expired'])->default('active');
             $table->timestamps();
         });
 
@@ -558,10 +559,10 @@ return new class extends Migration {
 
             $table->foreignUuid('user_id')->constrained('users');
 
-            $table->string('tier');
+            $table->enum('tier', ['bronze', 'silver', 'gold', 'platinum']);
             $table->integer('points');
 
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
         });
 
 
@@ -583,14 +584,15 @@ return new class extends Migration {
             $table->uuid('entity_id');
 
             $table->text('metadata')->nullable();
+            $table->index(['entity_type', 'entity_id']);
 
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
         });
 
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->foreignUuid('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
