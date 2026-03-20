@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CityRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class CityRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,22 @@ class CityRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+       $rules = [
+            'name'            => ['required', 'string', 'max:255', Rule::unique('cities', 'name')],
         ];
+
+        if ($this->method() === 'PUT') {
+            $id = $this->route('id');
+
+            $rules['name'] = [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cities', 'name')->ignore($id),
+            ];
+        }
+
+        return $rules;
     }
 }

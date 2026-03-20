@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CinemaChainRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class CinemaChainRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,29 @@ class CinemaChainRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+       $rules = [
+            'name'            => ['required', 'string', 'max:255', Rule::unique('cinema_chains', 'name')],
+            'logo'         => ['required', 'string'],
         ];
+
+        if ($this->method() === 'PUT') {
+            $id = $this->route('id');
+
+            $rules['name'] = [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cinema_chains', 'name')->ignore($id),
+            ];
+
+            $rules['logo'] = [
+                'sometimes',
+                'required',
+                'string',
+            ];
+        }
+
+        return $rules;
     }
 }

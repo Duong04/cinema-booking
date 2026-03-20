@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CinemaRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class CinemaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,46 @@ class CinemaRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+        $rules = [
+            'name'            => ['required', 'string', 'max:255', Rule::unique('cinemas', 'name')],
+            'address'         => ['required', 'string', 'max:500'],
+            'city_id'         => ['required', 'uuid', 'exists:cities,id'],
+            'cinema_chain_id' => ['required', 'uuid', 'exists:cinema_chains,id'],
         ];
+
+        if ($this->method() === 'PUT') {
+            $id = $this->route('id');
+
+            $rules['name'] = [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('cinemas', 'name')->ignore($id),
+            ];
+
+            $rules['address'] = [
+                'sometimes',
+                'required',
+                'string',
+                'max:500',
+            ];
+
+            $rules['city_id'] = [
+                'sometimes',
+                'required',
+                'uuid',
+                'exists:cities,id',
+            ];
+
+            $rules['cinema_chain_id'] = [
+                'sometimes',
+                'required',
+                'uuid',
+                'exists:cinema_chains,id',
+            ];
+        }
+
+        return $rules;
     }
 }
