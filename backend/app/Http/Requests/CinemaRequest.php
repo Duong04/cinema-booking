@@ -23,9 +23,9 @@ class CinemaRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name'            => ['required', 'string', 'max:255', Rule::unique('cinemas', 'name')],
-            'address'         => ['required', 'string', 'max:500'],
-            'city_id'         => ['required', 'uuid', 'exists:cities,id'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('cinemas', 'name')],
+            'address' => ['required', 'string', 'max:500'],
+            'city_id' => ['required', 'uuid', 'exists:cities,id'],
             'cinema_chain_id' => ['required', 'uuid', 'exists:cinema_chains,id'],
         ];
 

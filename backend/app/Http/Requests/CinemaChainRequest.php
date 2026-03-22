@@ -22,9 +22,9 @@ class CinemaChainRequest extends FormRequest
      */
     public function rules(): array
     {
-       $rules = [
-            'name'            => ['required', 'string', 'max:255', Rule::unique('cinema_chains', 'name')],
-            'logo'         => ['required', 'string'],
+        $rules = [
+            'name' => ['required', 'string', 'max:255', Rule::unique('cinema_chains', 'name')],
+            'logo' => ['required', 'string'],
         ];
 
         if ($this->method() === 'PUT') {

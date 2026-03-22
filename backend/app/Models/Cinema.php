@@ -16,4 +16,12 @@ class Cinema extends Model
         'city_id',
         'cinema_chain_id'
     ];
+
+    public function city() {
+        return $this->belongsTo(City::class);
+    }
+
+    public function cinemaChain() {
+        return $this->belongsTo(CinemaChain::class);
+    }
 }

@@ -22,8 +22,8 @@ class CityRequest extends FormRequest
      */
     public function rules(): array
     {
-       $rules = [
-            'name'            => ['required', 'string', 'max:255', Rule::unique('cities', 'name')],
+        $rules = [
+            'name' => ['required', 'string', 'max:255', Rule::unique('cities', 'name')],
         ];
 
         if ($this->method() === 'PUT') {

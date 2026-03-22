@@ -14,6 +14,7 @@ class CinemaRepository extends BaseRepository implements CinemaRepositoryInterfa
 
     public function paginate($limit = 15, $q) {
         $roles = $this->model
+                ->with(['city:id,name', 'cinemaChain:id,name,logo'])
                 ->when($q, fn ($query) => $query
                     ->where('name', 'like', "%$q%")
                     ->orWhere('address', 'like', "%$q%")
@@ -21,6 +22,5 @@ class CinemaRepository extends BaseRepository implements CinemaRepositoryInterfa
 
         return $roles->orderByDesc('created_at')->paginate($limit);
     }
-
 
 }

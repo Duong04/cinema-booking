@@ -23,7 +23,7 @@ class RoomRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => ['required', Rule::unique('rooms', 'name')],
+            'name' => ['required', 'string'],
             'type' => ['required', Rule::in(['2D', '3D', 'IMAX', '4DX', 'VIP'])],
             'cinema_id' => ['required', 'exists:cinemas,id'],
         ];
@@ -34,7 +34,7 @@ class RoomRequest extends FormRequest
             $rules['name'] = [
                 'sometimes',
                 'required',
-                Rule::unique('rooms', 'name')->ignore($id),
+                'string'
             ];
 
             $rules['type'] = [

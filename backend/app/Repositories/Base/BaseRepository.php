@@ -9,14 +9,14 @@ abstract class BaseRepository implements BaseRepositoryInterface
 {
     protected Model $model;
 
-    public function all(int $limit = 15)
+    public function all(int $limit = 15, array $with = [])
     {
-        return $this->model->orderByDesc('created_at')->paginate($limit);
+        return $this->model->with($with)->orderByDesc('created_at')->paginate($limit);
     }
 
-    public function find(string $id, array $columns = ['*'])
+    public function find(string $id, array $columns = ['*'], array $with = [])
     {
-        return $this->model->findOrFail($id, $columns);
+        return $this->model->with($with)->findOrFail($id, $columns);
     }
 
     public function create(array $data)
