@@ -18,5 +18,4 @@ class RoomRepository extends BaseRepository implements RoomRepositoryInterface
         return $roles->orderByDesc('created_at')->paginate($limit);
     }
 
-
 }

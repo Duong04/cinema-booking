@@ -23,6 +23,10 @@ use App\Repositories\CinemaChain\CinemaChainRepository;
 use App\Repositories\CinemaChain\CinemaChainRepositoryInterface;
 use App\Repositories\Room\RoomRepository;
 use App\Repositories\Room\RoomRepositoryInterface;
+use App\Repositories\SeatType\SeatTypeRepository;
+use App\Repositories\SeatType\SeatTypeRepositoryInterface;
+use App\Repositories\Seat\SeatRepository;
+use App\Repositories\Seat\SeatRepositoryInterface;
 
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -42,6 +46,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CinemaRepositoryInterface::class, CinemaRepository::class);
         $this->app->bind(CinemaChainRepositoryInterface::class, CinemaChainRepository::class);
         $this->app->bind(RoomRepositoryInterface::class, RoomRepository::class);
+        $this->app->bind(SeatTypeRepositoryInterface::class, SeatTypeRepository::class);
+        $this->app->bind(SeatRepositoryInterface::class, SeatRepository::class);
     }
 
     /**

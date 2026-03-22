@@ -8,6 +8,8 @@ use App\Http\Controllers\Apis\V1\CityController;
 use App\Http\Controllers\Apis\V1\PermissionController;
 use App\Http\Controllers\Apis\V1\RoleController;
 use App\Http\Controllers\Apis\V1\RoomController;
+use App\Http\Controllers\Apis\V1\SeatController;
+use App\Http\Controllers\Apis\V1\SeatTypeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -81,4 +83,16 @@ Route::prefix('v1')->group(function () {
         Route::delete('/{id}', 'delete');
     });
 
+    Route::prefix('seat-types')->controller(SeatTypeController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('rooms')->controller(SeatController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/{id}/seats', 'getSeatByRoom');
+        Route::post('/{id}/seats', 'create');
+    });
 });
