@@ -3,27 +3,28 @@
 namespace App\Http\Controllers\Apis\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GenreRequest;
 use App\Http\Requests\QueryRequest;
-use App\Http\Requests\SeatTypeRequest;
-use App\Services\SeatTypeService;
+use App\Services\GenreService;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
-class SeatTypeController extends Controller
+class GenreController extends Controller
 {
     use ResponseHelper;
 
-    private $seatTypeService;
+    private $genreTypeService;
 
-    public function __construct(SeatTypeService $seatTypeService)
+    public function __construct(GenreService $genreTypeService)
     {
-        $this->seatTypeService = $seatTypeService;
+        $this->genreTypeService = $genreTypeService;
     }
+
     #[OA\Get(
-        path: "/api/v1/seat-types",
-        summary: "Get list of seat types",
-        tags: ["Seat Type"],
+        path: "/api/v1/genres",
+        summary: "Get list of genres",
+        tags: ["Genre"],
         parameters: [
             new OA\Parameter(
                 name: "limit",
@@ -42,7 +43,7 @@ class SeatTypeController extends Controller
                 in: "query",
                 description: "Search by name",
                 required: false,
-                schema: new OA\Schema(type: "string", example: "Standard")
+                schema: new OA\Schema(type: "string", example: "Tình cảm gia đình")
             ),
         ],
         responses: [
@@ -58,11 +59,10 @@ class SeatTypeController extends Controller
                             type: "array",
                             items: new OA\Items(
                                 properties: [
-                                    new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1666-27cd-7089-8240-8d92a425dfd1"),
-                                    new OA\Property(property: "name", type: "string", example: "Standard"),
-                                    new OA\Property(property: "base_multiplier", type: "string", example: "1.00"),
-                                    new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-22T16:34:47.000000Z"),
-                                    new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-22T16:36:34.000000Z"),
+                                    new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1b0b-9e90-72ed-8527-f1f966e2a279"),
+                                    new OA\Property(property: "name", type: "string", example: "Tình cảm gia đình"),
+                                    new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
+                                    new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
                                 ]
                             )
                         ),
@@ -74,9 +74,9 @@ class SeatTypeController extends Controller
                                 new OA\Property(property: "per_page", type: "integer", example: 15),
                                 new OA\Property(property: "current_page", type: "integer", example: 1),
                                 new OA\Property(property: "last_page", type: "integer", example: 1),
-                                new OA\Property(property: "current_page_url", type: "string", format: "uri", example: "http://localhost/api/v1/seat-types?page=1"),
-                                new OA\Property(property: "first_page_url", type: "string", format: "uri", example: "http://localhost/api/v1/seat-types?page=1"),
-                                new OA\Property(property: "last_page_url", type: "string", format: "uri", example: "http://localhost/api/v1/seat-types?page=1"),
+                                new OA\Property(property: "current_page_url", type: "string", format: "uri", example: "http://localhost/api/v1/genres?page=1"),
+                                new OA\Property(property: "first_page_url", type: "string", format: "uri", example: "http://localhost/api/v1/genres?page=1"),
+                                new OA\Property(property: "last_page_url", type: "string", format: "uri", example: "http://localhost/api/v1/genres?page=1"),
                                 new OA\Property(property: "next_page_url", type: "string", format: "uri", nullable: true, example: null),
                                 new OA\Property(property: "prev_page_url", type: "string", format: "uri", nullable: true, example: null),
                             ]
@@ -92,51 +92,50 @@ class SeatTypeController extends Controller
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 
-        $seatTypes = $this->seatTypeService->paginate($limit, $q);
+        $genres = $this->genreTypeService->paginate($limit, $q);
 
-        return $this->successList($seatTypes->items(), [
-            'total' => $seatTypes->total(),
-            'per_page' => $seatTypes->perPage(),
-            'current_page' => $seatTypes->currentPage(),
-            'last_page' => $seatTypes->lastPage(),
-            'current_page_url' => $seatTypes->url($seatTypes->currentPage()),
-            'first_page_url' => $seatTypes->url(1),
-            'last_page_url' => $seatTypes->url($seatTypes->lastPage()),
-            'next_page_url' => $seatTypes->nextPageUrl(),
-            'prev_page_url' => $seatTypes->previousPageUrl(),
+        return $this->successList($genres->items(), [
+            'total' => $genres->total(),
+            'per_page' => $genres->perPage(),
+            'current_page' => $genres->currentPage(),
+            'last_page' => $genres->lastPage(),
+            'current_page_url' => $genres->url($genres->currentPage()),
+            'first_page_url' => $genres->url(1),
+            'last_page_url' => $genres->url($genres->lastPage()),
+            'next_page_url' => $genres->nextPageUrl(),
+            'prev_page_url' => $genres->previousPageUrl(),
         ]);
     }
+
     #[OA\Post(
-        path: "/api/v1/seat-types",
-        summary: "Create a new seat type",
-        tags: ["Seat Type"],
+        path: "/api/v1/genres",
+        summary: "Create a new genre",
+        tags: ["Genre"],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["name", "base_multiplier"],
+                required: ["name"],
                 properties: [
-                    new OA\Property(property: "name", type: "string", example: "VIP"),
-                    new OA\Property(property: "base_multiplier", type: "number", format: "float", example: 1.0),
+                    new OA\Property(property: "name", type: "string", example: "Tình cảm gia đình"),
                 ]
             )
         ),
         responses: [
             new OA\Response(
                 response: 201,
-                description: "Seat type created successfully",
+                description: "Genre created successfully",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Tạo loại ghế thành công!"),
+                        new OA\Property(property: "message", type: "string", example: "Tạo thể loại phim thành công!"),
                         new OA\Property(
                             property: "data",
                             type: "object",
                             properties: [
-                                new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1666-27cd-7089-8240-8d92a425dfd1"),
-                                new OA\Property(property: "name", type: "string", example: "VIP"),
-                                new OA\Property(property: "base_multiplier", type: "string", example: "1.00"),
-                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-22T16:34:47.000000Z"),
-                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-22T16:34:47.000000Z"),
+                                new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1b0b-9e90-72ed-8527-f1f966e2a279"),
+                                new OA\Property(property: "name", type: "string", example: "Tình cảm gia đình"),
+                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
+                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
                             ]
                         ),
                     ]
@@ -154,7 +153,6 @@ class SeatTypeController extends Controller
                             type: "object",
                             properties: [
                                 new OA\Property(property: "name", type: "array", items: new OA\Items(type: "string", example: "The name field is required.")),
-                                new OA\Property(property: "base_multiplier", type: "array", items: new OA\Items(type: "string", example: "The base multiplier field is required.")),
                             ]
                         ),
                     ]
@@ -162,31 +160,32 @@ class SeatTypeController extends Controller
             ),
         ]
     )]
-    public function create(SeatTypeRequest $request)
+    public function create(GenreRequest $request)
     {
         $data = $request->validated();
 
-        $seatType = $this->seatTypeService->create($data);
+        $genre = $this->genreTypeService->create($data);
 
-        return $this->success($seatType, 'Tạo loại ghế thành công!', 201);
+        return $this->success($genre, 'Tạo thể loại phim thành công!', 201);
     }
+
     #[OA\Get(
-        path: "/api/v1/seat-types/{id}",
-        summary: "Get seat type by ID",
-        tags: ["Seat Type"],
+        path: "/api/v1/genres/{id}",
+        summary: "Get genre by ID",
+        tags: ["Genre"],
         parameters: [
             new OA\Parameter(
                 name: "id",
                 in: "path",
                 required: true,
-                description: "Seat Type ID",
-                schema: new OA\Schema(type: "string", format: "uuid", example: "019d1666-27cd-7089-8240-8d92a425dfd1")
+                description: "Genre ID",
+                schema: new OA\Schema(type: "string", format: "uuid", example: "019d1b0b-9e90-72ed-8527-f1f966e2a279")
             ),
         ],
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Seat type retrieved successfully",
+                description: "Genre retrieved successfully",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: true),
@@ -195,11 +194,10 @@ class SeatTypeController extends Controller
                             property: "data",
                             type: "object",
                             properties: [
-                                new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1666-27cd-7089-8240-8d92a425dfd1"),
-                                new OA\Property(property: "name", type: "string", example: "Standard"),
-                                new OA\Property(property: "base_multiplier", type: "string", example: "1.00"),
-                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-22T16:34:47.000000Z"),
-                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-22T16:36:34.000000Z"),
+                                new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1b0b-9e90-72ed-8527-f1f966e2a279"),
+                                new OA\Property(property: "name", type: "string", example: "Tình cảm gia đình"),
+                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
+                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
                             ]
                         ),
                     ]
@@ -207,11 +205,11 @@ class SeatTypeController extends Controller
             ),
             new OA\Response(
                 response: 404,
-                description: "Seat type not found",
+                description: "Genre not found",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy loại ghế!"),
+                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy thể loại phim!"),
                     ]
                 )
             ),
@@ -219,50 +217,49 @@ class SeatTypeController extends Controller
     )]
     public function show($id)
     {
-        $seatType = $this->seatTypeService->find($id);
+        $genre = $this->genreTypeService->find($id);
 
-        return $this->success($seatType);
+        return $this->success($genre);
     }
+
     #[OA\Put(
-        path: "/api/v1/seat-types/{id}",
-        summary: "Update seat type by ID",
-        tags: ["Seat Type"],
+        path: "/api/v1/genres/{id}",
+        summary: "Update genre by ID",
+        tags: ["Genre"],
         parameters: [
             new OA\Parameter(
                 name: "id",
                 in: "path",
                 required: true,
-                description: "Seat Type ID",
-                schema: new OA\Schema(type: "string", format: "uuid", example: "019d1666-27cd-7089-8240-8d92a425dfd1")
+                description: "Genre ID",
+                schema: new OA\Schema(type: "string", format: "uuid", example: "019d1b0b-9e90-72ed-8527-f1f966e2a279")
             ),
         ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["name", "base_multiplier"],
+                required: ["name"],
                 properties: [
-                    new OA\Property(property: "name", type: "string", example: "VIP"),
-                    new OA\Property(property: "base_multiplier", type: "number", format: "float", example: 1.0),
+                    new OA\Property(property: "name", type: "string", example: "Tình cảm gia đình"),
                 ]
             )
         ),
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Seat type updated successfully",
+                description: "Genre updated successfully",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Cập nhật loại ghế thành công!"),
+                        new OA\Property(property: "message", type: "string", example: "Cập nhật thể loại phim thành công!"),
                         new OA\Property(
                             property: "data",
                             type: "object",
                             properties: [
-                                new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1666-27cd-7089-8240-8d92a425dfd1"),
-                                new OA\Property(property: "name", type: "string", example: "VIP"),
-                                new OA\Property(property: "base_multiplier", type: "string", example: "1.00"),
-                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-22T16:34:47.000000Z"),
-                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-22T16:36:34.000000Z"),
+                                new OA\Property(property: "id", type: "string", format: "uuid", example: "019d1b0b-9e90-72ed-8527-f1f966e2a279"),
+                                new OA\Property(property: "name", type: "string", example: "Tình cảm gia đình"),
+                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
+                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2026-03-23T14:13:59.000000Z"),
                             ]
                         ),
                     ]
@@ -270,11 +267,11 @@ class SeatTypeController extends Controller
             ),
             new OA\Response(
                 response: 404,
-                description: "Seat type not found",
+                description: "Genre not found",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy loại ghế!"),
+                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy thể loại phim!"),
                     ]
                 )
             ),
@@ -290,7 +287,6 @@ class SeatTypeController extends Controller
                             type: "object",
                             properties: [
                                 new OA\Property(property: "name", type: "array", items: new OA\Items(type: "string", example: "The name field is required.")),
-                                new OA\Property(property: "base_multiplier", type: "array", items: new OA\Items(type: "string", example: "The base multiplier field is required.")),
                             ]
                         ),
                     ]
@@ -298,46 +294,47 @@ class SeatTypeController extends Controller
             ),
         ]
     )]
-    public function update(SeatTypeRequest $request, $id)
+    public function update(GenreRequest $request, $id)
     {
         $data = $request->validated();
 
-        $seatType = $this->seatTypeService->update($id, $data);
+        $genre = $this->genreTypeService->update($id, $data);
 
-        return $this->success($seatType, 'Cập nhật loại ghế thành công!', 200);
+        return $this->success($genre, 'Cập nhật thể loại phim thành công!', 200);
     }
+
     #[OA\Delete(
-        path: "/api/v1/seat-types/{id}",
-        summary: "Delete seat type by ID",
-        tags: ["Seat Type"],
+        path: "/api/v1/genres/{id}",
+        summary: "Delete genre by ID",
+        tags: ["Genre"],
         parameters: [
             new OA\Parameter(
                 name: "id",
                 in: "path",
                 required: true,
-                description: "Seat Type ID",
-                schema: new OA\Schema(type: "string", format: "uuid", example: "019d1666-27cd-7089-8240-8d92a425dfd1")
+                description: "Genre ID",
+                schema: new OA\Schema(type: "string", format: "uuid", example: "019d1b0b-9e90-72ed-8527-f1f966e2a279")
             ),
         ],
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Seat type deleted successfully",
+                description: "Genre deleted successfully",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Xóa loại ghế thành công!"),
+                        new OA\Property(property: "message", type: "string", example: "Xóa thể loại phim thành công!"),
                         new OA\Property(property: "data", type: "null", example: null),
                     ]
                 )
             ),
             new OA\Response(
                 response: 404,
-                description: "Seat type not found",
+                description: "Genre not found",
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy loại ghế!"),
+                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy thể loại phim!"),
                     ]
                 )
             ),
@@ -345,8 +342,8 @@ class SeatTypeController extends Controller
     )]
     public function delete($id)
     {
-        $this->seatTypeService->delete($id);
+        $this->genreTypeService->delete($id);
 
-        return $this->success(null, 'Xóa loại ghế thành công!');
+        return $this->success(null, 'Xóa thể loại phim thành công!');
     }
 }

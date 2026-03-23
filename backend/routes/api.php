@@ -5,6 +5,8 @@ use App\Http\Controllers\Apis\V1\AuthController;
 use App\Http\Controllers\Apis\V1\CinemaChainController;
 use App\Http\Controllers\Apis\V1\CinemaController;
 use App\Http\Controllers\Apis\V1\CityController;
+use App\Http\Controllers\Apis\V1\GenreController;
+use App\Http\Controllers\Apis\V1\MovieController;
 use App\Http\Controllers\Apis\V1\PermissionController;
 use App\Http\Controllers\Apis\V1\RoleController;
 use App\Http\Controllers\Apis\V1\RoomController;
@@ -94,5 +96,21 @@ Route::prefix('v1')->group(function () {
     Route::prefix('rooms')->controller(SeatController::class)->middleware('auth:sanctum')->group(function () {
         Route::get('/{id}/seats', 'getSeatByRoom');
         Route::post('/{id}/seats', 'create');
+    });
+
+    Route::prefix('movies')->controller(MovieController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('genres')->controller(GenreController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
     });
 });

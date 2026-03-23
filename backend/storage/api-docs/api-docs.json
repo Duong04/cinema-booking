@@ -2343,6 +2343,1609 @@
                 }
             }
         },
+        "/api/v1/genres": {
+            "get": {
+                "tags": [
+                    "Genre"
+                ],
+                "summary": "Get list of genres",
+                "operationId": "8e7463a60b9737ccc958968c1d4df3bd",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Tình cảm gia đình"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Tình cảm gia đình"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-23T14:13:59.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-23T14:13:59.000000Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/genres?page=1"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/genres?page=1"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/genres?page=1"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Genre"
+                ],
+                "summary": "Create a new genre",
+                "operationId": "7e2fe037997e304366b254a5064ca21e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Tình cảm gia đình"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Genre created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo thể loại phim thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Tình cảm gia đình"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:13:59.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:13:59.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The name field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/genres/{id}": {
+            "get": {
+                "tags": [
+                    "Genre"
+                ],
+                "summary": "Get genre by ID",
+                "operationId": "ef31257c31b72275500c953e57710b7e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Genre ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Genre retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Tình cảm gia đình"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:13:59.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:13:59.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Genre not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy thể loại phim!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Genre"
+                ],
+                "summary": "Update genre by ID",
+                "operationId": "69ae9466e3d96d51cffe6fa031951e87",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Genre ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Tình cảm gia đình"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Genre updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật thể loại phim thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Tình cảm gia đình"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:13:59.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:13:59.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Genre not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy thể loại phim!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The name field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Genre"
+                ],
+                "summary": "Delete genre by ID",
+                "operationId": "11e4f5703fed4ea0926d185059a688ab",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Genre ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Genre deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa thể loại phim thành công!"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Genre not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy thể loại phim!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/movies": {
+            "get": {
+                "tags": [
+                    "Movie"
+                ],
+                "summary": "Get list of movies",
+                "operationId": "9abd3d39e2c232cd76908981f4213ed3",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by title",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Báu vật trời cho"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "coming_soon",
+                            "enum": [
+                                "coming_soon",
+                                "now_showing",
+                                "ended"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Báu vật trời cho"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "bau-vat-troi-cho"
+                                                    },
+                                                    "duration_minutes": {
+                                                        "type": "integer",
+                                                        "example": 198
+                                                    },
+                                                    "poster_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                                    },
+                                                    "trailer_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Mô tả"
+                                                    },
+                                                    "content": {
+                                                        "type": "string",
+                                                        "example": "Nội dung"
+                                                    },
+                                                    "release_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "rating": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "language": {
+                                                        "type": "string",
+                                                        "example": "Tiếng việt"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "coming_soon",
+                                                        "enum": [
+                                                            "coming_soon",
+                                                            "now_showing",
+                                                            "ended"
+                                                        ]
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-23T14:24:19.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-23T14:24:19.000000Z"
+                                                    },
+                                                    "deleted_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "genres": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid",
+                                                                    "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Tình cảm gia đình"
+                                                                },
+                                                                "pivot": {
+                                                                    "properties": {
+                                                                        "movie_id": {
+                                                                            "type": "string",
+                                                                            "format": "uuid",
+                                                                            "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                                        },
+                                                                        "genre_id": {
+                                                                            "type": "string",
+                                                                            "format": "uuid",
+                                                                            "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/movies?page=1"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/movies?page=1"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/movies?page=1"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Movie"
+                ],
+                "summary": "Create a new movie",
+                "operationId": "c012826b85324598e2fb549cee4bb31f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "duration_minutes",
+                                    "poster_url",
+                                    "trailer_url",
+                                    "description",
+                                    "content",
+                                    "language",
+                                    "status",
+                                    "genres"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Báu vật trời cho"
+                                    },
+                                    "duration_minutes": {
+                                        "type": "integer",
+                                        "example": 198
+                                    },
+                                    "poster_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                    },
+                                    "trailer_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Mô tả"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Nội dung"
+                                    },
+                                    "release_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-08",
+                                        "nullable": true
+                                    },
+                                    "language": {
+                                        "type": "string",
+                                        "example": "Tiếng việt"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "coming_soon",
+                                        "enum": [
+                                            "coming_soon",
+                                            "now_showing",
+                                            "ended"
+                                        ]
+                                    },
+                                    "genres": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid",
+                                            "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Movie created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo phim thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Báu vật trời cho"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "bau-vat-troi-cho"
+                                                },
+                                                "duration_minutes": {
+                                                    "type": "integer",
+                                                    "example": 198
+                                                },
+                                                "poster_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                                },
+                                                "trailer_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Mô tả"
+                                                },
+                                                "content": {
+                                                    "type": "string",
+                                                    "example": "Nội dung"
+                                                },
+                                                "release_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-08-08",
+                                                    "nullable": true
+                                                },
+                                                "rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "language": {
+                                                    "type": "string",
+                                                    "example": "Tiếng việt"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "coming_soon",
+                                                    "enum": [
+                                                        "coming_soon",
+                                                        "now_showing",
+                                                        "ended"
+                                                    ]
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:24:19.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:24:19.000000Z"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "genres": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Tình cảm gia đình"
+                                                            },
+                                                            "pivot": {
+                                                                "properties": {
+                                                                    "movie_id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                                    },
+                                                                    "genre_id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "title": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The title field is required."
+                                                    }
+                                                },
+                                                "duration_minutes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The duration minutes field is required."
+                                                    }
+                                                },
+                                                "poster_url": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The poster url field is required."
+                                                    }
+                                                },
+                                                "status": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The status field is required."
+                                                    }
+                                                },
+                                                "genres": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The genres field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/movies/{id}": {
+            "get": {
+                "tags": [
+                    "Movie"
+                ],
+                "summary": "Get movie by ID",
+                "operationId": "61a6a1ed6b52a8a7ca668deeba5ca486",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Movie ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movie retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Báu vật trời cho"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "bau-vat-troi-cho"
+                                                },
+                                                "duration_minutes": {
+                                                    "type": "integer",
+                                                    "example": 198
+                                                },
+                                                "poster_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                                },
+                                                "trailer_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Mô tả"
+                                                },
+                                                "content": {
+                                                    "type": "string",
+                                                    "example": "Nội dung"
+                                                },
+                                                "release_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "language": {
+                                                    "type": "string",
+                                                    "example": "Tiếng việt"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "coming_soon",
+                                                    "enum": [
+                                                        "coming_soon",
+                                                        "now_showing",
+                                                        "ended"
+                                                    ]
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:24:19.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:24:19.000000Z"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "genres": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Tình cảm gia đình"
+                                                            },
+                                                            "pivot": {
+                                                                "properties": {
+                                                                    "movie_id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                                    },
+                                                                    "genre_id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Movie not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy phim!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Movie"
+                ],
+                "summary": "Update movie by ID",
+                "operationId": "13514ed50de7f32c6f44651589b8cc64",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Movie ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "duration_minutes",
+                                    "poster_url",
+                                    "trailer_url",
+                                    "description",
+                                    "content",
+                                    "language",
+                                    "status",
+                                    "genres"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Báu vật trời cho"
+                                    },
+                                    "duration_minutes": {
+                                        "type": "integer",
+                                        "example": 198
+                                    },
+                                    "poster_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                    },
+                                    "trailer_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Mô tả"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Nội dung"
+                                    },
+                                    "release_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-08",
+                                        "nullable": true
+                                    },
+                                    "language": {
+                                        "type": "string",
+                                        "example": "Tiếng việt"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "coming_soon",
+                                        "enum": [
+                                            "coming_soon",
+                                            "now_showing",
+                                            "ended"
+                                        ]
+                                    },
+                                    "genres": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid",
+                                            "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Movie updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật phim thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Báu vật trời cho"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "bau-vat-troi-cho"
+                                                },
+                                                "duration_minutes": {
+                                                    "type": "integer",
+                                                    "example": 198
+                                                },
+                                                "poster_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                                },
+                                                "trailer_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Mô tả"
+                                                },
+                                                "content": {
+                                                    "type": "string",
+                                                    "example": "Nội dung"
+                                                },
+                                                "release_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-08-08",
+                                                    "nullable": true
+                                                },
+                                                "rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "language": {
+                                                    "type": "string",
+                                                    "example": "Tiếng việt"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "coming_soon",
+                                                    "enum": [
+                                                        "coming_soon",
+                                                        "now_showing",
+                                                        "ended"
+                                                    ]
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:24:19.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-23T14:24:19.000000Z"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "genres": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Tình cảm gia đình"
+                                                            },
+                                                            "pivot": {
+                                                                "properties": {
+                                                                    "movie_id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                                    },
+                                                                    "genre_id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Movie not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy phim!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "title": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The title field is required."
+                                                    }
+                                                },
+                                                "duration_minutes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The duration minutes field is required."
+                                                    }
+                                                },
+                                                "poster_url": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The poster url field is required."
+                                                    }
+                                                },
+                                                "status": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The status field is required."
+                                                    }
+                                                },
+                                                "genres": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The genres field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Movie"
+                ],
+                "summary": "Delete movie by ID",
+                "operationId": "6ca43918dfcd29593b930a4efb012100",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Movie ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movie deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa phim thành công!"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Movie not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy phim!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/permissions": {
             "get": {
                 "tags": [
@@ -3794,6 +5397,957 @@
                     }
                 }
             }
+        },
+        "/api/v1/rooms/{id}/seats": {
+            "get": {
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "Get seats of a room grouped by row",
+                "operationId": "35d4d4cbef0e269e4dc891fe89050ca0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d150a-1172-7282-867e-c9a1ba9b3e7a"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Seats retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "description": "Seats grouped by row label (A, B, C, ...)",
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d1690-1002-7017-807f-64d347458d4e"
+                                                        },
+                                                        "room_id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d150a-1172-7282-867e-c9a1ba9b3e7a"
+                                                        },
+                                                        "seat_type_id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                        },
+                                                        "row_label": {
+                                                            "type": "string",
+                                                            "example": "A"
+                                                        },
+                                                        "seat_number": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-22T17:20:32.000000Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-22T17:20:32.000000Z"
+                                                        },
+                                                        "seat_type": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid",
+                                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Standard"
+                                                                },
+                                                                "base_multiplier": {
+                                                                    "type": "string",
+                                                                    "example": "1.00"
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2026-03-22T16:34:47.000000Z"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2026-03-22T16:36:34.000000Z"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Room not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy phòng chiếu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "Create seats for a room",
+                "operationId": "4e21f11552073fb3efa18db532ad4d8a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d150a-1172-7282-867e-c9a1ba9b3e7a"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "rows"
+                                ],
+                                "properties": {
+                                    "rows": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "label",
+                                                "seats_per_row",
+                                                "seat_type_id"
+                                            ],
+                                            "properties": {
+                                                "label": {
+                                                    "type": "string",
+                                                    "example": "A"
+                                                },
+                                                "seats_per_row": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "seat_type_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "label": "A",
+                                                "seats_per_row": 10,
+                                                "seat_type_id": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                            },
+                                            {
+                                                "label": "B",
+                                                "seats_per_row": 8,
+                                                "seat_type_id": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Seats created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo ghế thành công!"
+                                        },
+                                        "data": {
+                                            "description": "Seats grouped by row label (A, B, C, ...)",
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d1690-1002-7017-807f-64d347458d4e"
+                                                        },
+                                                        "room_id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d150a-1172-7282-867e-c9a1ba9b3e7a"
+                                                        },
+                                                        "seat_type_id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                        },
+                                                        "row_label": {
+                                                            "type": "string",
+                                                            "example": "A"
+                                                        },
+                                                        "seat_number": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-22T17:20:32.000000Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-22T17:20:32.000000Z"
+                                                        },
+                                                        "seat_type": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid",
+                                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Standard"
+                                                                },
+                                                                "base_multiplier": {
+                                                                    "type": "string",
+                                                                    "example": "1.00"
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2026-03-22T16:34:47.000000Z"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2026-03-22T16:36:34.000000Z"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Room not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy phòng chiếu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "rows": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The rows field is required."
+                                                    }
+                                                },
+                                                "rows.0.label": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The rows.0.label field is required."
+                                                    }
+                                                },
+                                                "rows.0.seats_per_row": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The rows.0.seats_per_row field is required."
+                                                    }
+                                                },
+                                                "rows.0.seat_type_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The rows.0.seat_type_id field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seat-types": {
+            "get": {
+                "tags": [
+                    "Seat Type"
+                ],
+                "summary": "Get list of seat types",
+                "operationId": "7fbc1ee59c21c63770f2c1cef5aa5560",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Standard"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Standard"
+                                                    },
+                                                    "base_multiplier": {
+                                                        "type": "string",
+                                                        "example": "1.00"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-22T16:34:47.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-22T16:36:34.000000Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/seat-types?page=1"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/seat-types?page=1"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/seat-types?page=1"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Seat Type"
+                ],
+                "summary": "Create a new seat type",
+                "operationId": "fe336e82bb5c069dbf3da0e603d8993f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "base_multiplier"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "VIP"
+                                    },
+                                    "base_multiplier": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Seat type created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo loại ghế thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "VIP"
+                                                },
+                                                "base_multiplier": {
+                                                    "type": "string",
+                                                    "example": "1.00"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-22T16:34:47.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-22T16:34:47.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The name field is required."
+                                                    }
+                                                },
+                                                "base_multiplier": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The base multiplier field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/seat-types/{id}": {
+            "get": {
+                "tags": [
+                    "Seat Type"
+                ],
+                "summary": "Get seat type by ID",
+                "operationId": "c5ee530b3ac616611a8f7f98086f85c1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Seat Type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Seat type retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Standard"
+                                                },
+                                                "base_multiplier": {
+                                                    "type": "string",
+                                                    "example": "1.00"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-22T16:34:47.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-22T16:36:34.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Seat type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy loại ghế!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Seat Type"
+                ],
+                "summary": "Update seat type by ID",
+                "operationId": "8ccbfc405aef6b4bfe180dca1920aea0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Seat Type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "base_multiplier"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "VIP"
+                                    },
+                                    "base_multiplier": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Seat type updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật loại ghế thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "VIP"
+                                                },
+                                                "base_multiplier": {
+                                                    "type": "string",
+                                                    "example": "1.00"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-22T16:34:47.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-22T16:36:34.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Seat type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy loại ghế!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The name field is required."
+                                                    }
+                                                },
+                                                "base_multiplier": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The base multiplier field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Seat Type"
+                ],
+                "summary": "Delete seat type by ID",
+                "operationId": "8a098615d44245044e720b622cd8895f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Seat Type ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Seat type deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa loại ghế thành công!"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Seat type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy loại ghế!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -3822,6 +6376,14 @@
             "description": "Cities"
         },
         {
+            "name": "Genre",
+            "description": "Genre"
+        },
+        {
+            "name": "Movie",
+            "description": "Movie"
+        },
+        {
             "name": "Permission",
             "description": "Permission"
         },
@@ -3832,6 +6394,14 @@
         {
             "name": "Room",
             "description": "Room"
+        },
+        {
+            "name": "Seat",
+            "description": "Seat"
+        },
+        {
+            "name": "Seat Type",
+            "description": "Seat Type"
         }
     ]
 }

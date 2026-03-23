@@ -27,6 +27,12 @@ use App\Repositories\SeatType\SeatTypeRepository;
 use App\Repositories\SeatType\SeatTypeRepositoryInterface;
 use App\Repositories\Seat\SeatRepository;
 use App\Repositories\Seat\SeatRepositoryInterface;
+use App\Repositories\Movie\MovieRepository;
+use App\Repositories\Movie\MovieRepositoryInterface;
+use App\Repositories\Genre\GenreRepository;
+use App\Repositories\Genre\GenreRepositoryInterface;
+use App\Repositories\MovieGenre\MovieGenreRepository;
+use App\Repositories\MovieGenre\MovieGenreRepositoryInterface;
 
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -48,6 +54,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(RoomRepositoryInterface::class, RoomRepository::class);
         $this->app->bind(SeatTypeRepositoryInterface::class, SeatTypeRepository::class);
         $this->app->bind(SeatRepositoryInterface::class, SeatRepository::class);
+        $this->app->bind(MovieRepositoryInterface::class, MovieRepository::class);
+        $this->app->bind(GenreRepositoryInterface::class, GenreRepository::class);
+        $this->app->bind(MovieGenreRepositoryInterface::class, MovieGenreRepository::class);
     }
 
     /**
