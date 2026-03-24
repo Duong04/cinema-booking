@@ -13,9 +13,9 @@ class MovieRepository extends BaseRepository implements MovieRepositoryInterface
     }
 
     public function paginate($limit = 15, $q) {
-        $roles = $this->model->with('genres:id,name')->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+        $movies = $this->model->with('genres:id,name')->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
 
-        return $roles->orderByDesc('created_at')->paginate($limit);
+        return $movies->orderByDesc('created_at')->paginate($limit);
     }
 
 }

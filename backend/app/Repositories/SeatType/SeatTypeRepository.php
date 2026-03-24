@@ -13,9 +13,9 @@ class SeatTypeRepository extends BaseRepository implements SeatTypeRepositoryInt
     }
 
     public function paginate($limit = 15, $q) {
-        $roles = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+        $seatTypes = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
 
-        return $roles->orderByDesc('created_at')->paginate($limit);
+        return $seatTypes->orderByDesc('created_at')->paginate($limit);
     }
 
 }

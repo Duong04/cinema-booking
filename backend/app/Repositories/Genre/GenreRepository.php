@@ -13,9 +13,9 @@ class GenreRepository extends BaseRepository implements GenreRepositoryInterface
     }
 
     public function paginate($limit = 15, $q) {
-        $roles = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+        $genres = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
 
-        return $roles->orderByDesc('created_at')->paginate($limit);
+        return $genres->orderByDesc('created_at')->paginate($limit);
     }
 
 }

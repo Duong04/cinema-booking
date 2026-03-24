@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class QueryRequest extends FormRequest
+class CancelShowtimeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -22,11 +22,7 @@ class QueryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'limit' => 'nullable|integer|min:1|max:100',
-            'q' => 'nullable|string|max:255',
-            'room_id' => 'nullable|uuid|exists:rooms,id',
-            'movie_id' => 'nullable|uuid|exists:movies,id',
-            'show_date' => 'nullable|date',
+            //
         ];
     }
 }

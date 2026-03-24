@@ -13,9 +13,9 @@ class CinemaChainRepository extends BaseRepository implements CinemaChainReposit
     }
 
     public function paginate($limit = 15, $q) {
-        $roles = $this->model->with(['cinemas:id,name,address,cinema_chain_id,city_id', 'cinemas.city:id,name'])->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+        $cinemaChains = $this->model->with(['cinemas:id,name,address,cinema_chain_id,city_id', 'cinemas.city:id,name'])->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
 
-        return $roles->orderByDesc('created_at')->paginate($limit);
+        return $cinemaChains->orderByDesc('created_at')->paginate($limit);
     }
 
 

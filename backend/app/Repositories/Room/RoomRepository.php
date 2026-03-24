@@ -13,9 +13,9 @@ class RoomRepository extends BaseRepository implements RoomRepositoryInterface
     }
 
     public function paginate($limit = 15, $q) {
-        $roles = $this->model->with(['cinema:id,name,address'])->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+        $rooms = $this->model->with(['cinema:id,name,address'])->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
 
-        return $roles->orderByDesc('created_at')->paginate($limit);
+        return $rooms->orderByDesc('created_at')->paginate($limit);
     }
 
 }

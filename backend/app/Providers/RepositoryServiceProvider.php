@@ -33,7 +33,10 @@ use App\Repositories\Genre\GenreRepository;
 use App\Repositories\Genre\GenreRepositoryInterface;
 use App\Repositories\MovieGenre\MovieGenreRepository;
 use App\Repositories\MovieGenre\MovieGenreRepositoryInterface;
-
+use App\Repositories\Showtime\ShowtimeRepository;
+use App\Repositories\Showtime\ShowtimeRepositoryInterface;
+use App\Repositories\ShowtimePrice\ShowtimePriceRepository;
+use App\Repositories\ShowtimePrice\ShowtimePriceRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -57,6 +60,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MovieRepositoryInterface::class, MovieRepository::class);
         $this->app->bind(GenreRepositoryInterface::class, GenreRepository::class);
         $this->app->bind(MovieGenreRepositoryInterface::class, MovieGenreRepository::class);
+        $this->app->bind(ShowtimeRepositoryInterface::class, ShowtimeRepository::class);
+        $this->app->bind(ShowtimePriceRepositoryInterface::class, ShowtimePriceRepository::class);
     }
 
     /**

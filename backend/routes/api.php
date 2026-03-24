@@ -12,6 +12,7 @@ use App\Http\Controllers\Apis\V1\RoleController;
 use App\Http\Controllers\Apis\V1\RoomController;
 use App\Http\Controllers\Apis\V1\SeatController;
 use App\Http\Controllers\Apis\V1\SeatTypeController;
+use App\Http\Controllers\Apis\V1\ShowtimeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -107,6 +108,14 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('genres')->controller(GenreController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('showtimes')->controller(ShowtimeController::class)->middleware('auth:sanctum')->group(function () {
         Route::get('/', 'paginate');
         Route::post('/', 'create');
         Route::get('/{id}', 'show');

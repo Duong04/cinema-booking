@@ -13,9 +13,9 @@ class SeatRepository extends BaseRepository implements SeatRepositoryInterface
     }
 
     public function paginate($limit = 15, $q) {
-        $roles = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+        $seats = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
 
-        return $roles->orderByDesc('created_at')->paginate($limit);
+        return $seats->orderByDesc('created_at')->paginate($limit);
     }
 
     public function getSeatByRoom($roomId) {

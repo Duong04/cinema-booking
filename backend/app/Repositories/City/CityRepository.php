@@ -13,9 +13,9 @@ class CityRepository extends BaseRepository implements CityRepositoryInterface
     }
 
     public function paginate($limit = 15, $q) {
-        $roles = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+        $cities = $this->model->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
 
-        return $roles->orderByDesc('created_at')->paginate($limit);
+        return $cities->orderByDesc('created_at')->paginate($limit);
     }
 
 
