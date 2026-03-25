@@ -6348,6 +6348,1377 @@
                     }
                 }
             }
+        },
+        "/api/v1/showtimes": {
+            "get": {
+                "tags": [
+                    "Showtime"
+                ],
+                "summary": "Get list of showtimes",
+                "operationId": "4e0032f424f5c7b1a974b627594c341f",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "movie_id",
+                        "in": "query",
+                        "description": "Filter by movie",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                        }
+                    },
+                    {
+                        "name": "room_id",
+                        "in": "query",
+                        "description": "Filter by room",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                        }
+                    },
+                    {
+                        "name": "show_date",
+                        "in": "query",
+                        "description": "Filter by show date (Y-m-d)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-04-04"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "scheduled",
+                            "enum": [
+                                "scheduled",
+                                "ongoing",
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                    },
+                                                    "movie_id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                    },
+                                                    "room_id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                                                    },
+                                                    "show_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-04-04"
+                                                    },
+                                                    "start_time": {
+                                                        "type": "string",
+                                                        "example": "2026-04-04 10:00:00"
+                                                    },
+                                                    "end_time": {
+                                                        "type": "string",
+                                                        "example": "2026-04-04 13:18:00"
+                                                    },
+                                                    "base_price": {
+                                                        "type": "string",
+                                                        "example": "100000.00"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "scheduled",
+                                                        "enum": [
+                                                            "scheduled",
+                                                            "ongoing",
+                                                            "completed",
+                                                            "cancelled"
+                                                        ]
+                                                    },
+                                                    "cancelled_reason": {
+                                                        "type": "string",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "cancelled_by": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "cancelled_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-24T16:58:42.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-03-24T16:58:42.000000Z"
+                                                    },
+                                                    "deleted_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "movie": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Báu vật trời cho 2"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "bau-vat-troi-cho"
+                                                            },
+                                                            "duration_minutes": {
+                                                                "type": "integer",
+                                                                "example": 198
+                                                            },
+                                                            "poster_url": {
+                                                                "type": "string",
+                                                                "format": "uri",
+                                                                "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                                            },
+                                                            "trailer_url": {
+                                                                "type": "string",
+                                                                "format": "uri",
+                                                                "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Mô tả"
+                                                            },
+                                                            "content": {
+                                                                "type": "string",
+                                                                "example": "Nội dung"
+                                                            },
+                                                            "release_date": {
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "rating": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "language": {
+                                                                "type": "string",
+                                                                "example": "Tiếng việt"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "coming_soon"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-03-23T14:24:19.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-03-23T14:47:48.000000Z"
+                                                            },
+                                                            "deleted_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "room": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                                                            },
+                                                            "cinema_id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1501-2b7e-7386-8e76-79a7470c3a2c"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "ROOM 1"
+                                                            },
+                                                            "type": {
+                                                                "type": "string",
+                                                                "example": "2D"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-03-22T10:10:32.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-03-22T10:14:08.000000Z"
+                                                            },
+                                                            "deleted_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "prices": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid",
+                                                                    "example": "019d20c8-c8b5-73e7-a71b-830902dcb82f"
+                                                                },
+                                                                "showtime_id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid",
+                                                                    "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                                },
+                                                                "seat_type_id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid",
+                                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                                },
+                                                                "price": {
+                                                                    "type": "string",
+                                                                    "example": "100000.00"
+                                                                },
+                                                                "seat_type": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string",
+                                                                            "format": "uuid",
+                                                                            "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string",
+                                                                            "example": "Standard"
+                                                                        },
+                                                                        "base_multiplier": {
+                                                                            "type": "string",
+                                                                            "example": "1.00"
+                                                                        },
+                                                                        "created_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-03-22T16:34:47.000000Z"
+                                                                        },
+                                                                        "updated_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time",
+                                                                            "example": "2026-03-22T16:36:34.000000Z"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/showtimes?page=1"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/showtimes?page=1"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "http://localhost/api/v1/showtimes?page=1"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": null,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Showtime"
+                ],
+                "summary": "Create a new showtime",
+                "operationId": "d0e323fc5e2ea42bcb9c30bccabbaead",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "movie_id",
+                                    "room_id",
+                                    "show_date",
+                                    "start_time",
+                                    "base_price",
+                                    "prices"
+                                ],
+                                "properties": {
+                                    "movie_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                    },
+                                    "room_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                                    },
+                                    "show_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-04-04"
+                                    },
+                                    "start_time": {
+                                        "description": "Format: Y-m-d H:i:s",
+                                        "type": "string",
+                                        "example": "2026-04-04 10:00:00"
+                                    },
+                                    "base_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100000
+                                    },
+                                    "prices": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "seat_type_id",
+                                                "price"
+                                            ],
+                                            "properties": {
+                                                "seat_type_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100000
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Showtime created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo suất chiếu thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                },
+                                                "movie_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                },
+                                                "room_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                                                },
+                                                "show_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-04-04"
+                                                },
+                                                "start_time": {
+                                                    "type": "string",
+                                                    "example": "2026-04-04 10:00:00"
+                                                },
+                                                "end_time": {
+                                                    "type": "string",
+                                                    "example": "2026-04-04 13:18:00"
+                                                },
+                                                "base_price": {
+                                                    "type": "string",
+                                                    "example": "100000.00"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "scheduled"
+                                                },
+                                                "cancelled_reason": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "cancelled_by": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "cancelled_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-24T16:58:42.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-24T16:58:42.000000Z"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "prices": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d20c8-c8b5-73e7-a71b-830902dcb82f"
+                                                            },
+                                                            "showtime_id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                            },
+                                                            "seat_type_id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                            },
+                                                            "price": {
+                                                                "type": "string",
+                                                                "example": "100000.00"
+                                                            },
+                                                            "seat_type": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Standard"
+                                                                    },
+                                                                    "base_multiplier": {
+                                                                        "type": "string",
+                                                                        "example": "1.00"
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-03-22T16:34:47.000000Z"
+                                                                    },
+                                                                    "updated_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-03-22T16:36:34.000000Z"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "movie_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The movie id field is required."
+                                                    }
+                                                },
+                                                "room_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The room id field is required."
+                                                    }
+                                                },
+                                                "show_date": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The show date must be a date after or equal to today."
+                                                    }
+                                                },
+                                                "start_time": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The start time does not match the format Y-m-d H:i:s."
+                                                    }
+                                                },
+                                                "base_price": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The base price field is required."
+                                                    }
+                                                },
+                                                "prices": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The prices field is required."
+                                                    }
+                                                },
+                                                "prices.0.seat_type_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The prices.0.seat_type_id field is required."
+                                                    }
+                                                },
+                                                "prices.0.price": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The prices.0.price field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/showtimes/{id}": {
+            "get": {
+                "tags": [
+                    "Showtime"
+                ],
+                "summary": "Get showtime by ID",
+                "operationId": "40116753fcf98cef197cffe897e2f490",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Showtime ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Showtime retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                },
+                                                "movie_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                },
+                                                "room_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                                                },
+                                                "show_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-04-04"
+                                                },
+                                                "start_time": {
+                                                    "type": "string",
+                                                    "example": "2026-04-04 10:00:00"
+                                                },
+                                                "end_time": {
+                                                    "type": "string",
+                                                    "example": "2026-04-04 13:18:00"
+                                                },
+                                                "base_price": {
+                                                    "type": "string",
+                                                    "example": "100000.00"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "scheduled",
+                                                    "enum": [
+                                                        "scheduled",
+                                                        "ongoing",
+                                                        "completed",
+                                                        "cancelled"
+                                                    ]
+                                                },
+                                                "cancelled_reason": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "cancelled_by": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "cancelled_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-24T16:58:42.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-24T16:58:42.000000Z"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "movie": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                        },
+                                                        "title": {
+                                                            "type": "string",
+                                                            "example": "Báu vật trời cho 2"
+                                                        },
+                                                        "slug": {
+                                                            "type": "string",
+                                                            "example": "bau-vat-troi-cho"
+                                                        },
+                                                        "duration_minutes": {
+                                                            "type": "integer",
+                                                            "example": 198
+                                                        },
+                                                        "poster_url": {
+                                                            "type": "string",
+                                                            "format": "uri",
+                                                            "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                                        },
+                                                        "trailer_url": {
+                                                            "type": "string",
+                                                            "format": "uri",
+                                                            "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "example": "Mô tả"
+                                                        },
+                                                        "content": {
+                                                            "type": "string",
+                                                            "example": "Nội dung"
+                                                        },
+                                                        "release_date": {
+                                                            "type": "string",
+                                                            "format": "date",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "rating": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "language": {
+                                                            "type": "string",
+                                                            "example": "Tiếng việt"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "coming_soon"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-23T14:24:19.000000Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-23T14:47:48.000000Z"
+                                                        },
+                                                        "deleted_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "room": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                                                        },
+                                                        "cinema_id": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "example": "019d1501-2b7e-7386-8e76-79a7470c3a2c"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "ROOM 1"
+                                                        },
+                                                        "type": {
+                                                            "type": "string",
+                                                            "example": "2D"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-22T10:10:32.000000Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-03-22T10:14:08.000000Z"
+                                                        },
+                                                        "deleted_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "prices": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d20c8-c8b5-73e7-a71b-830902dcb82f"
+                                                            },
+                                                            "showtime_id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                            },
+                                                            "seat_type_id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                            },
+                                                            "price": {
+                                                                "type": "string",
+                                                                "example": "100000.00"
+                                                            },
+                                                            "seat_type": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Standard"
+                                                                    },
+                                                                    "base_multiplier": {
+                                                                        "type": "string",
+                                                                        "example": "1.00"
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-03-22T16:34:47.000000Z"
+                                                                    },
+                                                                    "updated_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-03-22T16:36:34.000000Z"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Showtime not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy suất chiếu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Showtime"
+                ],
+                "summary": "Update showtime by ID",
+                "description": "Chỉ cho phép cập nhật base_price và prices. Không thể chỉnh movie, room, show_date, start_time sau khi tạo.",
+                "operationId": "df614004fde6b82a5102f10e0b2c947a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Showtime ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "base_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 120000
+                                    },
+                                    "prices": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "seat_type_id",
+                                                "price"
+                                            ],
+                                            "properties": {
+                                                "seat_type_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 120000
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Showtime updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật suất chiếu thành công!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                },
+                                                "movie_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                },
+                                                "room_id": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019d1506-609d-70cf-8bbe-3d3d21f36a66"
+                                                },
+                                                "show_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-04-04"
+                                                },
+                                                "start_time": {
+                                                    "type": "string",
+                                                    "example": "2026-04-04 10:00:00"
+                                                },
+                                                "end_time": {
+                                                    "type": "string",
+                                                    "example": "2026-04-04 13:18:00"
+                                                },
+                                                "base_price": {
+                                                    "type": "string",
+                                                    "example": "120000.00"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "scheduled"
+                                                },
+                                                "cancelled_reason": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "cancelled_by": {
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "cancelled_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-24T16:58:42.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-03-24T16:58:42.000000Z"
+                                                },
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "prices": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d20c8-c8b5-73e7-a71b-830902dcb82f"
+                                                            },
+                                                            "showtime_id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                                                            },
+                                                            "seat_type_id": {
+                                                                "type": "string",
+                                                                "format": "uuid",
+                                                                "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                            },
+                                                            "price": {
+                                                                "type": "string",
+                                                                "example": "120000.00"
+                                                            },
+                                                            "seat_type": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid",
+                                                                        "example": "019d1666-27cd-7089-8240-8d92a425dfd1"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Standard"
+                                                                    },
+                                                                    "base_multiplier": {
+                                                                        "type": "string",
+                                                                        "example": "1.00"
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-03-22T16:34:47.000000Z"
+                                                                    },
+                                                                    "updated_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "example": "2026-03-22T16:36:34.000000Z"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Showtime not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy suất chiếu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "base_price": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The base price must be a number."
+                                                    }
+                                                },
+                                                "prices": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The prices must be an array."
+                                                    }
+                                                },
+                                                "prices.0.seat_type_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The prices.0.seat_type_id field is required."
+                                                    }
+                                                },
+                                                "prices.0.price": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The prices.0.price field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Showtime"
+                ],
+                "summary": "Delete showtime by ID",
+                "operationId": "6091073f67daad9334360e4c6af4767d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Showtime ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Showtime deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa suất chiếu thành công!"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Showtime not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy suất chiếu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -6402,6 +7773,10 @@
         {
             "name": "Seat Type",
             "description": "Seat Type"
+        },
+        {
+            "name": "Showtime",
+            "description": "Showtime"
         }
     ]
 }
