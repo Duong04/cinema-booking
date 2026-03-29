@@ -99,7 +99,10 @@ const promos = [
               </div>
 
               <!-- GIỮ NGUYÊN -->
-              <router-link :to="`/movie/${movie.id}`" class="relative z-10 block">
+              <router-link :to="{
+                  name: 'movie-detail',
+                  params: { id: movie.id }
+                }" class="relative z-10 block">
                 <div
                   class="movie-card relative aspect-[2/3] rounded-3xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group-hover:border-red-600/50 transition-all duration-500"
                 >

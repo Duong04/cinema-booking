@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { useLanguageStore } from "@/stores/shared/language";
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useLanguageStore } from '@/stores/shared/language'
 import {
   Film,
   Search,
@@ -13,32 +13,32 @@ import {
   Menu,
   X,
   ChevronRight,
-} from "lucide-vue-next";
-import { useRoute } from "vue-router";
+} from 'lucide-vue-next'
+import { useRoute } from 'vue-router'
 
-const languageStore = useLanguageStore();
-const route = useRoute();
-const isMobileMenuOpen = ref(false);
-const isScrolled = ref(false);
+const languageStore = useLanguageStore()
+const route = useRoute()
+const isMobileMenuOpen = ref(false)
+const isScrolled = ref(false)
 
 const navItems = [
-  { name: "nav.home", path: "/", icon: Film },
-  { name: "nav.movies", path: "/movies", icon: Film },
-  { name: "nav.cinemas", path: "/cinemas", icon: MapPin },
-  { name: "nav.schedule", path: "/schedule", icon: Calendar },
-];
+  { name: 'nav.home', namepath: 'home', icon: Film },
+  { name: 'nav.movies', namepath: 'movies', icon: Film },
+  { name: 'nav.cinemas', namepath: 'cinemas', icon: MapPin },
+  { name: 'nav.schedule', namepath: 'schedule', icon: Calendar },
+]
 
 const handleScroll = () => {
-  isScrolled.value = window.scrollY > 20;
-};
+  isScrolled.value = window.scrollY > 20
+}
 
 onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
-});
+  window.addEventListener('scroll', handleScroll)
+})
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
 
 <template>
@@ -64,8 +64,7 @@ onUnmounted(() => {
             >
               <Film class="text-white w-6 h-6" />
             </div>
-            <span
-              class="text-2xl font-black text-white tracking-tighter uppercase italic"
+            <span class="text-2xl font-black text-white tracking-tighter uppercase italic"
               >CINEMAX</span
             >
           </router-link>
@@ -74,22 +73,18 @@ onUnmounted(() => {
           <div class="hidden lg:flex items-center gap-8">
             <router-link
               v-for="item in navItems"
-              :key="item.path"
-              :to="item.path"
+              :key="item.namepath"
+              :to="{ name: item.namepath }"
               class="relative text-xs font-black uppercase tracking-widest transition-all duration-300 group"
               :class="
-                route.path === item.path
-                  ? 'text-white'
-                  : 'text-gray-400 hover:text-white'
+                route.name === item.namepath ? 'text-white' : 'text-gray-400 hover:text-white'
               "
             >
               {{ languageStore.t(item.name) }}
               <span
                 :class="[
                   'absolute -bottom-2 left-0 h-0.5 bg-red-600 transition-all duration-500',
-                  route.path === item.path
-                    ? 'w-full'
-                    : 'w-0 group-hover:w-full',
+                  route.name === item.namepath ? 'w-full' : 'w-0 group-hover:w-full',
                 ]"
               />
             </router-link>
@@ -101,9 +96,7 @@ onUnmounted(() => {
           <!-- Search (Desktop) -->
           <div
             :class="[
-              isScrolled
-                ? 'border-white/10 bg-white/5'
-                : 'border-white bg-white/10',
+              isScrolled ? 'border-white/10 bg-white/5' : 'border-white bg-white/10',
               'hidden md:flex items-center border rounded-2xl px-4 py-2 focus-within:border-red-600/50 transition-all group',
             ]"
           >
@@ -112,11 +105,7 @@ onUnmounted(() => {
             />
             <input
               type="text"
-              :placeholder="
-                languageStore.language === 'en'
-                  ? 'Search movies...'
-                  : 'Tìm phim...'
-              "
+              :placeholder="languageStore.language === 'en' ? 'Search movies...' : 'Tìm phim...'"
               :class="[
                 isScrolled
                   ? 'placeholder:text-gray-500 text-white'
@@ -131,9 +120,7 @@ onUnmounted(() => {
             <router-link
               to="/wishlist"
               :class="[
-                isScrolled
-                  ? 'text-gray-400 hover:bg-white/5'
-                  : 'text-white hover:bg-white/10',
+                isScrolled ? 'text-gray-400 hover:bg-white/5' : 'text-white hover:bg-white/10',
                 'p-2.5 rounded-xl hover:text-red-500 transition-all',
               ]"
             >
@@ -143,9 +130,7 @@ onUnmounted(() => {
             <router-link
               to="/notifications"
               :class="[
-                isScrolled
-                  ? 'text-gray-400 hover:bg-white/5'
-                  : 'text-white hover:bg-white/10',
+                isScrolled ? 'text-gray-400 hover:bg-white/5' : 'text-white hover:bg-white/10',
                 'p-2.5 rounded-xl hover:text-red-500 transition-all relative',
               ]"
             >
@@ -158,11 +143,7 @@ onUnmounted(() => {
 
           <!-- Language -->
           <button
-            @click="
-              languageStore.setLanguage(
-                languageStore.language === 'en' ? 'vi' : 'en'
-              )
-            "
+            @click="languageStore.setLanguage(languageStore.language === 'en' ? 'vi' : 'en')"
             :class="[
               isScrolled
                 ? 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
@@ -171,7 +152,7 @@ onUnmounted(() => {
             ]"
           >
             <Globe class="w-3.5 h-3.5" />
-            {{ languageStore.language === "en" ? "EN" : "VI" }}
+            {{ languageStore.language === 'en' ? 'EN' : 'VI' }}
           </button>
 
           <!-- User -->
@@ -180,7 +161,7 @@ onUnmounted(() => {
             class="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all transform active:scale-95 shadow-xl shadow-red-600/20"
           >
             <User class="w-4 h-4" />
-            {{ languageStore.language === "en" ? "Sign In" : "Đăng nhập" }}
+            {{ languageStore.language === 'en' ? 'Sign In' : 'Đăng nhập' }}
           </router-link>
 
           <!-- Mobile Menu Toggle -->
@@ -211,12 +192,12 @@ onUnmounted(() => {
         <div class="max-w-7xl mx-auto px-4 py-8 space-y-4">
           <router-link
             v-for="item in navItems"
-            :key="item.path"
-            :to="item.path"
+            :key="item.namepath"
+            :to="{ name: item.namepath }"
             @click="isMobileMenuOpen = false"
             class="flex items-center justify-between px-6 py-4 rounded-2xl text-sm font-black uppercase tracking-widest transition-all"
             :class="
-              route.path === item.path
+              route.name === item.namepath
                 ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
                 : 'text-gray-400 hover:bg-white/5 hover:text-white'
             "
@@ -225,10 +206,7 @@ onUnmounted(() => {
               <component :is="item.icon" class="w-5 h-5" />
               {{ languageStore.t(item.name) }}
             </div>
-            <ChevronRight
-              v-if="route.path !== item.path"
-              class="w-4 h-4 opacity-50"
-            />
+            <ChevronRight v-if="route.name !== item.namepath" class="w-4 h-4 opacity-50" />
           </router-link>
 
           <div class="pt-6 mt-6 border-t border-white/5 space-y-4">
@@ -238,7 +216,7 @@ onUnmounted(() => {
               class="w-full py-4 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-red-600/20"
             >
               <User class="w-5 h-5" />
-              {{ languageStore.language === "en" ? "Sign In" : "Đăng nhập" }}
+              {{ languageStore.language === 'en' ? 'Sign In' : 'Đăng nhập' }}
             </router-link>
 
             <div class="grid grid-cols-3 gap-4">
@@ -274,6 +252,4 @@ onUnmounted(() => {
   </nav>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

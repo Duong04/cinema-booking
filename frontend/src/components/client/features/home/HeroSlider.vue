@@ -132,14 +132,20 @@ onUnmounted(() => {
             </p>
             <div class="flex flex-wrap gap-4">
               <router-link
-                :to="`/movie/${movie.id}`"
+                :to="{
+                  name: 'movie-detail',
+                  params: { id: movie.id }
+                }"
                 class="px-6 md:px-8 py-3 md:py-4 bg-red-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-red-700 transition-all transform hover:scale-105 shadow-xl shadow-red-600/20"
               >
                 <Play class="w-5 h-5 fill-current" />
                 {{ languageStore.t('movie.book_now') }}
               </router-link>
               <router-link
-                :to="`/movie/${movie.id}`"
+                :to="{
+                  name: 'movie-detail',
+                  params: { id: movie.id }
+                }"
                 class="px-6 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-2xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all"
               >
                 <Info class="w-5 h-5" />

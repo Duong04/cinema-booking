@@ -18,6 +18,14 @@ export const clientRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'movies/:id',
+    name: 'movie-detail',
+    component: () => import('@/views/client/MovieDetailView.vue'),
+    meta: {
+      title: 'Cinema - Chi tiết phim',
+    },
+  },
+  {
     path: 'cinemas',
     name: 'cinemas',
     component: () => import('@/views/client/CinemaView.vue'),
@@ -31,6 +39,22 @@ export const clientRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/client/ScheduleView.vue'),
     meta: {
       title: 'Cinema - Lịch chiếu',
+    },
+  },
+  {
+    path: 'wishlist',
+    name: 'wishlist',
+    component: () => import('@/views/client/WishlistView.vue'),
+    meta: {
+      title: 'Cinema - Danh sách yêu thích',
+    },
+  },
+  {
+    path: 'notifications',
+    name: 'notifications',
+    component: () => import('@/views/client/NotificationView.vue'),
+    meta: {
+      title: 'Cinema - Thông báo',
     },
   },
   {

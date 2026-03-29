@@ -12,7 +12,10 @@ const languageStore = useLanguageStore();
 
 <template>
   <div class="group relative bg-zinc-900 rounded-2xl overflow-hidden border border-white/5 shadow-2xl transition-all hover:-translate-y-2">
-    <router-link :to="`/movie/${movie.id}`">
+    <router-link :to="{
+                  name: 'movie-detail',
+                  params: { id: movie.id }
+                }">
       <div class="aspect-[2/3] relative overflow-hidden">
         <img
           :src="movie.poster"

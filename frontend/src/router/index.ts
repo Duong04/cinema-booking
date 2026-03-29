@@ -13,22 +13,6 @@ const router = createRouter({
     return { top: 0 }
   },
   routes: [
-    // {
-    //   path: '/auth',
-    //   component: () => import('@/layouts/shared/AuthLayout.vue'),
-    //   children: [
-    //     {
-    //       path: 'login',
-    //       name: 'login',
-    //       component: () => import('@/views/shared/Login.vue'),
-    //     },
-    //     {
-    //       path: 'forgot-password',
-    //       name: 'forgot-password',
-    //       component: () => import('@/views/shared/ForgotPassword.vue'),
-    //     },
-    //   ],
-    // },
     {
       path: '/',
       component: () => import('@/layouts/MainLayout.vue'),

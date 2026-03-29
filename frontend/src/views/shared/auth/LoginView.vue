@@ -1,77 +1,134 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useLanguageStore } from '@/stores/shared/language';
-import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next';
+import { ref } from 'vue'
+import { useForm } from 'vee-validate'
+import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next'
+import { useAuthStore } from '@/stores/shared/auth.store'
+import { useLanguageStore } from '@/stores/shared/language'
+import { loginSchema } from '@/validations/shared/auth.validation'
 
-const router = useRouter();
-const languageStore = useLanguageStore();
+const authStore = useAuthStore()
+const languageStore = useLanguageStore()
 
-const email = ref('');
-const password = ref('');
-const showPassword = ref(false);
-const isLoading = ref(false);
+const showPassword = ref(false)
 
-const handleLogin = async () => {
-  isLoading.value = true;
-  setTimeout(() => {
-    isLoading.value = false;
-    router.push('/');
-  }, 1500);
-};
+const { handleSubmit, defineField, errors, isSubmitting } = useForm({
+  validationSchema: loginSchema,
+  initialValues: {
+    email: '',
+    password: '',
+    remember: false,
+  },
+})
+
+const [email, emailAttrs] = defineField('email')
+const [password, passwordAttrs] = defineField('password')
+
+const onSubmit = handleSubmit(async (values) => {
+  await authStore.login(values)
+})
+
+const t = (en: string, vi: string) => (languageStore.language === 'en' ? en : vi)
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4 py-24 bg-zinc-950 relative overflow-hidden">
+  <div
+    class="min-h-screen flex items-center justify-center px-4 py-24 bg-zinc-950 relative overflow-hidden"
+  >
     <!-- Background Glow -->
-    <div class="absolute top-1/4 -left-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-[120px] pointer-events-none" />
-    <div class="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-[120px] pointer-events-none" />
+    <div
+      class="absolute top-1/4 -left-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-[120px] pointer-events-none"
+    />
+    <div
+      class="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-[120px] pointer-events-none"
+    />
 
     <div class="w-full max-w-md relative z-10">
+      <!-- Header -->
       <div class="text-center mb-10">
         <router-link to="/" class="inline-flex items-center gap-2 mb-6 group">
-          <div class="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-red-600/20">
+          <div
+            class="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-red-600/20"
+          >
             <Film class="text-white w-6 h-6" />
           </div>
           <span class="text-3xl font-black text-white tracking-tighter">CINEMAX</span>
         </router-link>
         <h1 class="text-3xl font-black text-white uppercase italic tracking-tight mb-2">
-          {{ languageStore.language === 'en' ? 'Welcome Back' : 'Chào mừng trở lại' }}
+          {{ t('Welcome Back', 'Chào mừng trở lại') }}
         </h1>
         <p class="text-gray-500 font-medium">
-          {{ languageStore.language === 'en' ? 'Sign in to your account' : 'Đăng nhập vào tài khoản của bạn' }}
+          {{ t('Sign in to your account', 'Đăng nhập vào tài khoản của bạn') }}
         </p>
       </div>
 
-      <div class="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 md:p-10 shadow-2xl">
-        <form @submit.prevent="handleLogin" class="space-y-6">
+      <!-- Card -->
+      <div
+        class="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 md:p-10 shadow-2xl"
+      >
+        <form @submit.prevent="onSubmit" novalidate class="space-y-6">
+          <!-- Email -->
           <div class="space-y-2">
-            <label class="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Email</label>
+            <label class="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">
+              Email
+            </label>
             <div class="relative group">
-              <Mail class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-red-500 transition-colors" />
+              <Mail
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-red-500 transition-colors"
+              />
               <input
                 v-model="email"
+                v-bind="emailAttrs"
                 type="email"
-                required
                 placeholder="name@example.com"
-                class="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-gray-700 focus:outline-none focus:border-red-600/50 focus:ring-4 focus:ring-red-600/10 transition-all"
+                :class="[
+                  'w-full bg-black/40 border rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-gray-700 focus:outline-none focus:ring-4 transition-all',
+                  errors.email
+                    ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10'
+                    : 'border-white/5 focus:border-red-600/50 focus:ring-red-600/10',
+                ]"
               />
             </div>
+            <!-- client validation -->
+            <p v-if="errors.email" class="text-red-500 text-xs font-medium ml-1">
+              {{ errors.email }}
+            </p>
+            <!-- laravel 422 validation -->
+            <p
+              v-else-if="authStore.validationErrors?.email"
+              class="text-red-500 text-xs font-medium ml-1"
+            >
+              {{ authStore.validationErrors.email[0] }}
+            </p>
           </div>
 
+          <!-- Password -->
           <div class="space-y-2">
             <div class="flex justify-between items-center ml-1">
-              <label class="text-xs font-black text-gray-500 uppercase tracking-widest">Password</label>
-              <a href="#" class="text-xs font-bold text-red-500 hover:text-red-400 transition-colors">Forgot?</a>
+              <label class="text-xs font-black text-gray-500 uppercase tracking-widest">
+                {{ t('Password', 'Mật khẩu') }}
+              </label>
+              <router-link
+                to="/auth/forgot-password"
+                class="text-xs font-bold text-red-500 hover:text-red-400 transition-colors"
+              >
+                {{ t('Forgot?', 'Quên mật khẩu?') }}
+              </router-link>
             </div>
             <div class="relative group">
-              <Lock class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-red-500 transition-colors" />
+              <Lock
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-red-500 transition-colors"
+              />
               <input
                 v-model="password"
+                v-bind="passwordAttrs"
                 :type="showPassword ? 'text' : 'password'"
-                required
                 placeholder="••••••••"
-                class="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-gray-700 focus:outline-none focus:border-red-600/50 focus:ring-4 focus:ring-red-600/10 transition-all"
+                :class="[
+                  'w-full bg-black/40 border rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-gray-700 focus:outline-none focus:ring-4 transition-all',
+                  errors.password
+                    ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10'
+                    : 'border-white/5 focus:border-red-600/50 focus:ring-red-600/10',
+                ]"
               />
               <button
                 type="button"
@@ -82,44 +139,81 @@ const handleLogin = async () => {
                 <EyeOff v-else class="w-5 h-5" />
               </button>
             </div>
+            <p v-if="errors.password" class="text-red-500 text-xs font-medium ml-1">
+              {{ errors.password }}
+            </p>
+            <p
+              v-else-if="authStore.validationErrors?.password"
+              class="text-red-500 text-xs font-medium ml-1"
+            >
+              {{ authStore.validationErrors.password[0] }}
+            </p>
           </div>
 
+          <!-- Error chung từ server -->
+          <div
+            v-if="authStore.error"
+            class="bg-red-500/10 border border-red-500/20 rounded-2xl px-4 py-3"
+          >
+            <p class="text-red-400 text-sm font-medium text-center">
+              {{ authStore.error }}
+            </p>
+          </div>
+
+          <!-- Submit -->
           <button
             type="submit"
-            :disabled="isLoading"
+            :disabled="isSubmitting || authStore.loading"
             class="w-full py-4 bg-red-600 text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-red-700 transition-all transform active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span v-if="!isLoading">{{ languageStore.language === 'en' ? 'Sign In' : 'Đăng nhập' }}</span>
-            <div v-else class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            <ArrowRight v-if="!isLoading" class="w-5 h-5" />
+            <template v-if="!isSubmitting && !authStore.loading">
+              <span>{{ t('Sign In', 'Đăng nhập') }}</span>
+              <ArrowRight class="w-5 h-5" />
+            </template>
+            <div
+              v-else
+              class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
+            />
           </button>
         </form>
 
+        <!-- Divider -->
         <div class="mt-8 relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-white/5"></div>
+            <div class="w-full border-t border-white/5" />
           </div>
           <div class="relative flex justify-center text-xs uppercase font-black">
-            <span class="bg-zinc-900 px-4 text-gray-600 tracking-widest">Or continue with</span>
+            <span class="bg-zinc-900 px-4 text-gray-600 tracking-widest">
+              {{ t('Or continue with', 'Hoặc tiếp tục với') }}
+            </span>
           </div>
         </div>
 
+        <!-- Social login -->
         <div class="grid grid-cols-2 gap-4 mt-8">
-          <button class="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all font-bold text-sm">
+          <button
+            class="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all font-bold text-sm text-white"
+          >
             <Chrome class="w-5 h-5" />
             Google
           </button>
-          <button class="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all font-bold text-sm">
+          <button
+            class="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all font-bold text-sm text-white"
+          >
             <Github class="w-5 h-5" />
             Github
           </button>
         </div>
       </div>
 
+      <!-- Footer -->
       <p class="text-center mt-8 text-gray-500 font-medium">
-        {{ languageStore.language === 'en' ? "Don't have an account?" : "Chưa có tài khoản?" }}
-        <router-link to="/register" class="text-red-500 font-black hover:text-red-400 transition-colors ml-1">
-          {{ languageStore.language === 'en' ? 'Create one' : 'Tạo tài khoản' }}
+        {{ t("Don't have an account?", 'Chưa có tài khoản?') }}
+        <router-link
+          to="/auth/register"
+          class="text-red-500 font-black hover:text-red-400 transition-colors ml-1"
+        >
+          {{ t('Create one', 'Tạo tài khoản') }}
         </router-link>
       </p>
     </div>
