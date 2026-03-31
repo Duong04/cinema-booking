@@ -1,7 +1,9 @@
 import axios, { type AxiosInstance } from 'axios'
 
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost'
+
 const instance: AxiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost'}/api/v1`,
+  baseURL: `${baseURL}/api/v1`,
   timeout: 10000,
   withCredentials: true,
   withXSRFToken: true,
@@ -9,6 +11,11 @@ const instance: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+})
+
+export const csrfClient = axios.create({
+  baseURL: `${baseURL}/api`,
+  withCredentials: true,
 })
 
 instance.interceptors.request.use(

@@ -1,9 +1,9 @@
-import instance from '@/plugins/axios'
+import instance, { csrfClient } from '@/plugins/axios'
 import type { AxiosRequestConfig } from 'axios'
 
 const api = {
   csrf() {
-    return instance.get('/sanctum/csrf-cookie')
+    return csrfClient.get('/csrf-cookie')
   },
 
   get<T>(url: string, config?: AxiosRequestConfig) {

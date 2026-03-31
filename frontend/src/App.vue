@@ -1,5 +1,16 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+import { RouterView } from 'vue-router'
+import { onMounted } from 'vue'
+
+import { useAuthStore } from './stores/shared/auth.store'
+
+const authStore = useAuthStore()
+
+onMounted(async () => {
+  if (localStorage.getItem('is_logged_in') === 'true') {
+    await authStore.fetchMe()
+  }
+})
 </script>
 
 <template>

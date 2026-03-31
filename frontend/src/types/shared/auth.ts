@@ -9,7 +9,18 @@ export interface User {
   updated_at?: string
 }
 
-export type UserRole = 'admin' | 'client'
+export interface UserRole {
+  id: string
+  name: string
+  description?: string
+  permissions: Permision[]
+}
+
+export interface Permision {
+  id: string
+  key: string
+  name: string
+}
 
 export interface LoginPayload {
   email: string
@@ -18,7 +29,7 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
-  user: User
+  data: User
   message?: string
 }
 
@@ -26,15 +37,20 @@ export interface RegisterPayload {
   name: string
   email: string
   password: string
-  password_confirmation: string   
+  password_confirmation: string
 }
 
 export interface RegisterResponse {
-  user: User
+  data: User
   message?: string
 }
 
 export interface ValidationError {
   message: string
-  errors: Record<string, string[]>  
+  errors: Record<string, string[]>
+}
+
+export enum EnumUserRole {
+  ADMIN = 'admin',
+  CUSTOMER = 'customer',
 }

@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { useForm } from 'vee-validate'
 import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/shared/auth.store'
 import { useLanguageStore } from '@/stores/shared/language'
 import { loginSchema } from '@/validations/shared/auth.validation'
+import { useRouter, useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const languageStore = useLanguageStore()
 
 const showPassword = ref(false)
+const router = useRouter()
+const route = useRoute()
 
 const { handleSubmit, defineField, errors, isSubmitting } = useForm({
   validationSchema: loginSchema,
@@ -24,7 +27,17 @@ const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
 
 const onSubmit = handleSubmit(async (values) => {
-  await authStore.login(values)
+  const success = await authStore.login(values)
+
+  if (success) {
+    localStorage.setItem('is_logged_in', 'true') 
+    
+    const redirectPath = (route.query.redirect as string) || '/'
+
+    await nextTick()
+    
+    router.push(redirectPath)
+  }
 })
 
 const t = (en: string, vi: string) => (languageStore.language === 'en' ? en : vi)
@@ -210,7 +223,7 @@ const t = (en: string, vi: string) => (languageStore.language === 'en' ? en : vi
       <p class="text-center mt-8 text-gray-500 font-medium">
         {{ t("Don't have an account?", 'Chưa có tài khoản?') }}
         <router-link
-          to="/auth/register"
+          :to="{ name: 'register' }"
           class="text-red-500 font-black hover:text-red-400 transition-colors ml-1"
         >
           {{ t('Create one', 'Tạo tài khoản') }}

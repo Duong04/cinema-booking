@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { ref, onMounted, onUnmounted, h } from 'vue'
 import { useLanguageStore } from '@/stores/shared/language'
 import {
   Film,
@@ -13,14 +14,19 @@ import {
   Menu,
   X,
   ChevronRight,
+  LogOut, LayoutDashboard,
 } from 'lucide-vue-next'
-import { useRoute } from 'vue-router'
+import { NAvatar } from 'naive-ui'
+import { useAuthStore } from '@/stores/shared/auth.store'
+import { useRouter, useRoute } from 'vue-router'
 
-const languageStore = useLanguageStore()
+const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
+const { isLoggedIn, isAdmin, fullName, avatar, user } = storeToRefs(authStore)
+const languageStore = useLanguageStore()
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
-
 const navItems = [
   { name: 'nav.home', namepath: 'home', icon: Film },
   { name: 'nav.movies', namepath: 'movies', icon: Film },
@@ -30,6 +36,32 @@ const navItems = [
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
+}
+
+const userMenuOptions = [
+  {
+    label: () => languageStore.language === 'en' ? 'Profile' : 'Tài khoản',
+    key: 'profile',
+    icon: () => h(User, { class: 'w-4 h-4' }),
+  },
+  {
+    label: () => languageStore.language === 'en' ? 'Admin Dashboard' : 'Quản trị',
+    key: 'admin',
+    icon: () => h(LayoutDashboard, { class: 'w-4 h-4' }),
+    show: isAdmin.value,
+  },
+  { type: 'divider', key: 'divider' },
+  {
+    label: () => languageStore.language === 'en' ? 'Sign Out' : 'Đăng xuất',
+    key: 'logout',
+    icon: () => h(LogOut, { class: 'w-4 h-4' }),
+  },
+]
+
+async function handleUserMenu(key: string) {
+  if (key === 'profile') router.push('/profile')
+  if (key === 'admin') router.push('/admin')
+  if (key === 'logout') await authStore.logout()
 }
 
 onMounted(() => {
@@ -155,16 +187,42 @@ onUnmounted(() => {
             {{ languageStore.language === 'en' ? 'EN' : 'VI' }}
           </button>
 
-          <!-- User -->
           <router-link
-            to="/login"
+            v-if="!isLoggedIn"
+            :to="{ name: 'login' }"
             class="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all transform active:scale-95 shadow-xl shadow-red-600/20"
           >
             <User class="w-4 h-4" />
             {{ languageStore.language === 'en' ? 'Sign In' : 'Đăng nhập' }}
           </router-link>
 
-          <!-- Mobile Menu Toggle -->
+          <n-dropdown
+            v-else
+            trigger="click"
+            :options="userMenuOptions.filter(o => o.show !== false)"
+            @select="handleUserMenu"
+            placement="bottom-end"
+          >
+            <button class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+              <n-avatar
+                :src="avatar ?? undefined"
+                :fallback-src="undefined"
+                round
+                size="small"
+                class="w-7 h-7"
+              >
+                <template v-if="!avatar">
+                  <span class="text-xs font-black">
+                    {{ fullName.charAt(0).toUpperCase() }}
+                  </span>
+                </template>
+              </n-avatar>
+              <span class="text-xs font-black text-white max-w-[80px] truncate">
+                {{ fullName }}
+              </span>
+              <ChevronRight class="w-3 h-3 text-gray-400 rotate-90" />
+            </button>
+          </n-dropdown>
           <button
             @click="isMobileMenuOpen = !isMobileMenuOpen"
             class="lg:hidden p-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-300 hover:text-white transition-all"
@@ -211,13 +269,50 @@ onUnmounted(() => {
 
           <div class="pt-6 mt-6 border-t border-white/5 space-y-4">
             <router-link
-              to="/login"
+              v-if="!isLoggedIn"
+              :to="{ name: 'login' }"
               @click="isMobileMenuOpen = false"
               class="w-full py-4 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-red-600/20"
             >
               <User class="w-5 h-5" />
               {{ languageStore.language === 'en' ? 'Sign In' : 'Đăng nhập' }}
             </router-link>
+
+            <!-- Mobile: đã login -->
+            <div v-else class="space-y-3">
+              <!-- User info -->
+              <div class="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-2xl">
+                <NAvatar :src="avatar ?? undefined" round size="medium">
+                  <template v-if="!avatar">
+                    <span class="text-sm font-black">{{ fullName.charAt(0).toUpperCase() }}</span>
+                  </template>
+                </NAvatar>
+                <div>
+                  <p class="text-white font-black text-sm">{{ fullName }}</p>
+                  <p class="text-gray-500 text-xs">{{ user?.email }}</p>
+                </div>
+              </div>
+
+              <!-- Admin link -->
+              <router-link
+                v-if="isAdmin"
+                to="/admin"
+                @click="isMobileMenuOpen = false"
+                class="w-full py-3 bg-white/5 border border-white/10 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3"
+              >
+                <LayoutDashboard class="w-5 h-5" />
+                {{ languageStore.language === 'en' ? 'Admin Dashboard' : 'Quản trị' }}
+              </router-link>
+
+              <!-- Logout -->
+              <button
+                @click="authStore.logout(); isMobileMenuOpen = false"
+                class="w-full py-3 bg-red-600/10 border border-red-600/20 text-red-500 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3"
+              >
+                <LogOut class="w-5 h-5" />
+                {{ languageStore.language === 'en' ? 'Sign Out' : 'Đăng xuất' }}
+              </button>
+            </div>
 
             <div class="grid grid-cols-3 gap-4">
               <router-link

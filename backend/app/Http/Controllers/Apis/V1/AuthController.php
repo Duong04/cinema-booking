@@ -165,7 +165,7 @@ class AuthController extends Controller
     )]
     public function profile(Request $request)
     {
-        return $this->success(new UserResource($request->user()));
+        return $this->success(new UserResource($request->user()->load('role.permissions.actions')));
     }
 
     #[OA\Post(
