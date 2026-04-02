@@ -1,5 +1,5 @@
 export interface User {
-  id: number
+  id: string
   name: string
   email: string
   role: UserRole
@@ -7,6 +7,21 @@ export interface User {
   email_verified_at?: string | null
   created_at?: string
   updated_at?: string
+}
+
+export interface UserProfile {
+  data: {
+    id: string,
+    name: string,
+    email: string,
+    role: UserRole,
+    avatar?: string,
+    email_verified_at?: string | null,
+    created_at?: string,
+    updated_at?: string
+  },
+  message?: string,
+  success?: boolean
 }
 
 export interface UserRole {

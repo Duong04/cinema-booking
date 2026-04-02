@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const validationErrors = ref<ValidationError['errors']>({})
+  const isInitialized = ref(false)
 
   const isLoggedIn = computed(() => !!user.value)
   const isAdmin = computed(() => user.value?.role?.name === EnumUserRole.ADMIN)
@@ -62,9 +63,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function logout() {
+  async function logout(): Promise<boolean> {
     try {
       await authService.logout()
+      return true
+    }catch {
+      return false
     } finally {
       user.value = null
       localStorage.removeItem('is_logged_in')
@@ -73,13 +77,16 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchMe() {
     try {
-      user.value = await authService.getMe()
+      const res = await authService.getMe()
+      user.value = res.data
       localStorage.setItem('is_logged_in', 'true')
     } catch {
       user.value = null
       localStorage.removeItem('is_logged_in')
+    } finally {
+      isInitialized.value = true
     }
   }
 
-  return { user, loading, error, validationErrors, isLoggedIn, isAdmin, isClient, login, register, logout, fetchMe }
+  return { user, loading, error, validationErrors, isLoggedIn, isAdmin, isClient, login, register, logout, fetchMe, isInitialized }
 })

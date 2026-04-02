@@ -63,6 +63,7 @@ export const clientRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/shared/auth/LoginView.vue'),
     meta: {
       title: 'Cinema - Đăng nhập',
+      guestOnly: true
     },
   },
   {
@@ -71,6 +72,7 @@ export const clientRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/shared/auth/RegisterView.vue'),
     meta: {
       title: 'Cinema - Đăng ký',
+      guestOnly: true
     },
   }
 ]

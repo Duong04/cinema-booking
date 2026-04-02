@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/shared/auth.store'
@@ -30,12 +30,9 @@ const onSubmit = handleSubmit(async (values) => {
   const success = await authStore.login(values)
 
   if (success) {
-    localStorage.setItem('is_logged_in', 'true') 
-    
-    const redirectPath = (route.query.redirect as string) || '/'
+    localStorage.setItem('is_logged_in', 'true')
 
-    await nextTick()
-    
+    const redirectPath = (route.query.redirect as string) || '/'
     router.push(redirectPath)
   }
 })
@@ -177,14 +174,14 @@ const t = (en: string, vi: string) => (languageStore.language === 'en' ? en : vi
           <button
             type="submit"
             :disabled="isSubmitting || authStore.loading"
-            class="w-full py-4 bg-red-600 text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-red-700 transition-all transform active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-4 bg-red-600 text-white rounded-2xl font-black hover:bg-red-700 transition-all transform active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            <template v-if="!isSubmitting && !authStore.loading">
+            <div class="flex items-center justify-center gap-2" v-show="!isSubmitting && !authStore.loading">
               <span>{{ t('Sign In', 'Đăng nhập') }}</span>
               <ArrowRight class="w-5 h-5" />
-            </template>
+            </div>
             <div
-              v-else
+              v-show="isSubmitting || authStore.loading"
               class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
             />
           </button>

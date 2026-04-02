@@ -1,5 +1,5 @@
 import api from '../api'
-import type { LoginPayload, LoginResponse, User, RegisterPayload, RegisterResponse } from '@/types/shared/auth'
+import type { LoginPayload, LoginResponse, User, RegisterPayload, RegisterResponse, UserProfile } from '@/types/shared/auth'
 
 export const authService = {
   login: async (payload: LoginPayload) => {
@@ -11,7 +11,7 @@ export const authService = {
     api.post('/auth/logout'),
 
   getMe: () =>
-    api.get<User>('/auth/profile'),
+    api.get<UserProfile>('/auth/profile'),
 
   register: async (payload: RegisterPayload) => {
     await api.csrf()

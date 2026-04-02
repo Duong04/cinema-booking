@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
-
+import { NConfigProvider, NMessageProvider } from 'naive-ui'
 import { useAuthStore } from './stores/shared/auth.store'
 
 const authStore = useAuthStore()
@@ -14,7 +14,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <router-view />
+  <n-config-provider>
+    <n-message-provider :max="3" closable>
+      <router-view />
+    </n-message-provider>
+  </n-config-provider>
 </template>
 
 <style scoped>

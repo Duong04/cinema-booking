@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { ref, onMounted, onUnmounted, h } from 'vue'
+import { ref, onMounted, onUnmounted, h, computed } from 'vue'
 import { useLanguageStore } from '@/stores/shared/language'
 import {
   Film,
@@ -16,14 +16,16 @@ import {
   ChevronRight,
   LogOut, LayoutDashboard,
 } from 'lucide-vue-next'
-import { NAvatar } from 'naive-ui'
+import { NAvatar, NDropdown } from 'naive-ui'
 import { useAuthStore } from '@/stores/shared/auth.store'
 import { useRouter, useRoute } from 'vue-router'
+import { useMessage } from 'naive-ui'
 
+const message = useMessage()
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const { isLoggedIn, isAdmin, fullName, avatar, user } = storeToRefs(authStore)
+const { isLoggedIn, isAdmin, user } = storeToRefs(authStore)
 const languageStore = useLanguageStore()
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
@@ -38,30 +40,54 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
 }
 
-const userMenuOptions = [
+const userMenuOptions = computed(() => [
   {
     label: () => languageStore.language === 'en' ? 'Profile' : 'Tài khoản',
     key: 'profile',
     icon: () => h(User, { class: 'w-4 h-4' }),
   },
-  {
+  ...(isAdmin.value ? [{
     label: () => languageStore.language === 'en' ? 'Admin Dashboard' : 'Quản trị',
     key: 'admin',
     icon: () => h(LayoutDashboard, { class: 'w-4 h-4' }),
-    show: isAdmin.value,
-  },
+  }] : []),
   { type: 'divider', key: 'divider' },
   {
     label: () => languageStore.language === 'en' ? 'Sign Out' : 'Đăng xuất',
     key: 'logout',
     icon: () => h(LogOut, { class: 'w-4 h-4' }),
   },
-]
+])
+
+const isLoggingOut = ref(false)
+
+async function handleLogout() {
+  if (isLoggingOut.value) return
+  
+  isLoggingOut.value = true
+  try {
+    const success = await authStore.logout()
+    if (success) {
+      message.success(languageStore.language === 'en' ? 'Logged out' : 'Đăng xuất thành công')
+      router.push('/login')
+    }
+  } finally {
+    isLoggingOut.value = false
+  }
+}
 
 async function handleUserMenu(key: string) {
-  if (key === 'profile') router.push('/profile')
-  if (key === 'admin') router.push('/admin')
-  if (key === 'logout') await authStore.logout()
+  switch (key) {
+    case 'profile':
+      router.push('/profile')
+      break
+    case 'admin':
+      router.push('/admin')
+      break
+    case 'logout':
+      await handleLogout()
+      break
+  }
 }
 
 onMounted(() => {
@@ -199,26 +225,26 @@ onUnmounted(() => {
           <n-dropdown
             v-else
             trigger="click"
-            :options="userMenuOptions.filter(o => o.show !== false)"
+            :options="userMenuOptions"
             @select="handleUserMenu"
             placement="bottom-end"
           >
             <button class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
               <n-avatar
-                :src="avatar ?? undefined"
+                :src="user?.avatar ?? undefined"
                 :fallback-src="undefined"
                 round
                 size="small"
                 class="w-7 h-7"
               >
-                <template v-if="!avatar">
+                <template v-if="!user?.avatar">
                   <span class="text-xs font-black">
-                    {{ fullName.charAt(0).toUpperCase() }}
+                    {{ user?.name.charAt(0).toUpperCase() }}
                   </span>
                 </template>
               </n-avatar>
               <span class="text-xs font-black text-white max-w-[80px] truncate">
-                {{ fullName }}
+                {{ user?.name }}
               </span>
               <ChevronRight class="w-3 h-3 text-gray-400 rotate-90" />
             </button>
@@ -282,13 +308,13 @@ onUnmounted(() => {
             <div v-else class="space-y-3">
               <!-- User info -->
               <div class="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-2xl">
-                <NAvatar :src="avatar ?? undefined" round size="medium">
-                  <template v-if="!avatar">
-                    <span class="text-sm font-black">{{ fullName.charAt(0).toUpperCase() }}</span>
+                <NAvatar :src="user?.avatar ?? undefined" round size="medium">
+                  <template v-if="!user?.avatar">
+                    <span class="text-sm font-black">{{ user?.name.charAt(0).toUpperCase() }}</span>
                   </template>
                 </NAvatar>
                 <div>
-                  <p class="text-white font-black text-sm">{{ fullName }}</p>
+                  <p class="text-white font-black text-sm">{{ user?.name }}</p>
                   <p class="text-gray-500 text-xs">{{ user?.email }}</p>
                 </div>
               </div>
