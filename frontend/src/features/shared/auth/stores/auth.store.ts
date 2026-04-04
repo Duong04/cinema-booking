@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios' 
-import { authService } from '@/services/shared/auth.service'
-import { EnumUserRole } from '@/types/shared/auth'
-import type { User, LoginPayload, RegisterPayload, ValidationError } from '@/types/shared/auth'
+import { authService } from '../services/auth.service'
+import { EnumUserRole } from '@/shared/types/auth'
+import type { User, LoginPayload, RegisterPayload, ValidationError } from '@/shared/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)

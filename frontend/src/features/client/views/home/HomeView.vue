@@ -3,8 +3,8 @@ import { computed } from 'vue'
 import { MOVIES } from '@/data/mockData'
 import { useLanguageStore } from '@/stores/shared/language'
 import { Star, Film, TrendingUp, Newspaper, Gift, ChevronRight } from 'lucide-vue-next'
-import MovieCard from '@/components/client/ui/MovieCard.vue'
-import HeroSlider from '@/components/client/features/home/HeroSlider.vue'
+import MovieCard from '../../components/ui/MovieCard.vue'
+import HeroSlider from '@/features/client/views/home/components/HeroSlider.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 
 const languageStore = useLanguageStore()
@@ -99,10 +99,13 @@ const promos = [
               </div>
 
               <!-- GIỮ NGUYÊN -->
-              <router-link :to="{
+              <router-link
+                :to="{
                   name: 'movie-detail',
-                  params: { id: movie.id }
-                }" class="relative z-10 block">
+                  params: { id: movie.id },
+                }"
+                class="relative z-10 block"
+              >
                 <div
                   class="movie-card relative aspect-[2/3] rounded-3xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group-hover:border-red-600/50 transition-all duration-500"
                 >

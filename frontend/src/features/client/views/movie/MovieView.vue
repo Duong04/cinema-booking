@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { MOVIES } from '@/data/mockData'
 import { useLanguageStore } from '@/stores/shared/language'
-import MovieCard from '@/components/client/ui/MovieCard.vue'
+import MovieCard from '../../components/ui/MovieCard.vue'
 import { Search, SlidersHorizontal, Film, X } from 'lucide-vue-next'
 
 const languageStore = useLanguageStore()

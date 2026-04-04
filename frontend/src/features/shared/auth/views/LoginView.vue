@@ -2,9 +2,9 @@
 import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next'
-import { useAuthStore } from '@/stores/shared/auth.store'
+import { useAuthStore } from '@/features/shared/auth/stores/auth.store'
 import { useLanguageStore } from '@/stores/shared/language'
-import { loginSchema } from '@/validations/shared/auth.validation'
+import { loginSchema } from '@/features/shared/auth/validators/auth.validation'
 import { useRouter, useRoute } from 'vue-router'
 
 const authStore = useAuthStore()

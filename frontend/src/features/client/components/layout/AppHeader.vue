@@ -17,7 +17,7 @@ import {
   LogOut, LayoutDashboard,
 } from 'lucide-vue-next'
 import { NAvatar, NDropdown } from 'naive-ui'
-import { useAuthStore } from '@/stores/shared/auth.store'
+import { useAuthStore } from '@/features/shared/auth/stores/auth.store'
 import { useRouter, useRoute } from 'vue-router'
 import { useMessage } from 'naive-ui'
 

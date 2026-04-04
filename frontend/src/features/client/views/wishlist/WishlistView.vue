@@ -3,7 +3,7 @@ import { useLanguageStore } from '@/stores/shared/language'
 import { useBookingStore } from '@/stores/client/booking'
 import { MOVIES } from '@/data/mockData'
 import { Heart, Film } from 'lucide-vue-next'
-import MovieCard from '@/components/client/ui/MovieCard.vue'
+import MovieCard from '../../components/ui/MovieCard.vue'
 
 const languageStore = useLanguageStore()
 const bookingStore = useBookingStore()

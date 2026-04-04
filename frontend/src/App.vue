@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
 import { NConfigProvider, NMessageProvider } from 'naive-ui'
-import { useAuthStore } from './stores/shared/auth.store'
+import { useAuthStore } from './features/shared/auth/stores/auth.store'
 
 const authStore = useAuthStore()
 
