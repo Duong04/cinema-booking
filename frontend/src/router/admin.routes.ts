@@ -1,10 +1,12 @@
-// src/router/admin.routes.ts
 import type { RouteRecordRaw } from 'vue-router'
 
 export const adminRoutes: RouteRecordRaw[] = [
   {
-    path: '',
+    path: 'doashboard',
     name: 'admin-dashboard',
-    component: <h1> Hello world </h1>,
+    component: () => import('@/features/admin/views/dashboard/DashboardView.vue'),
+    meta: {
+      title: 'Cinema - Admin Dashboard',
+    },
   }
 ]

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useForm } from 'vee-validate'
 import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next'
 import { useAuthStore } from '@/features/shared/auth/stores/auth.store'
 import { useLanguageStore } from '@/stores/shared/language'
 import { loginSchema } from '@/features/shared/auth/validators/auth.validation'
 import { useRouter, useRoute } from 'vue-router'
+import { STORAGE_KEYS } from '@/shared/constants/storage'
 
 const authStore = useAuthStore()
 const languageStore = useLanguageStore()
@@ -13,6 +14,10 @@ const languageStore = useLanguageStore()
 const showPassword = ref(false)
 const router = useRouter()
 const route = useRoute()
+
+onUnmounted(() => {
+  authStore.resetError()
+})
 
 const { handleSubmit, defineField, errors, isSubmitting } = useForm({
   validationSchema: loginSchema,
@@ -30,7 +35,7 @@ const onSubmit = handleSubmit(async (values) => {
   const success = await authStore.login(values)
 
   if (success) {
-    localStorage.setItem('is_logged_in', 'true')
+    localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true')
 
     const redirectPath = (route.query.redirect as string) || '/'
     router.push(redirectPath)
@@ -91,10 +96,10 @@ const t = (en: string, vi: string) => (languageStore.language === 'en' ? en : vi
                 type="email"
                 placeholder="name@example.com"
                 :class="[
-                  'w-full bg-black/40 border rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-gray-700 focus:outline-none focus:ring-4 transition-all',
-                  errors.email
-                    ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10'
-                    : 'border-white/5 focus:border-red-600/50 focus:ring-red-600/10',
+                  'w-full bg-black/40 border rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-gray-700 focus:outline-none transition-all',
+                  errors.email || authStore.validationErrors?.email
+                    ? 'border-red-600/50 ring-4 ring-red-600/10'
+                    : 'border-white/5 focus:border-red-600/50 focus:ring-4 focus:ring-red-600/10',
                 ]"
               />
             </div>
@@ -135,7 +140,7 @@ const t = (en: string, vi: string) => (languageStore.language === 'en' ? en : vi
                 placeholder="••••••••"
                 :class="[
                   'w-full bg-black/40 border rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-gray-700 focus:outline-none focus:ring-4 transition-all',
-                  errors.password
+                  errors.password || authStore.validationErrors?.password
                     ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10'
                     : 'border-white/5 focus:border-red-600/50 focus:ring-red-600/10',
                 ]"
@@ -171,20 +176,22 @@ const t = (en: string, vi: string) => (languageStore.language === 'en' ? en : vi
           </div>
 
           <!-- Submit -->
-          <button
-            type="submit"
-            :disabled="isSubmitting || authStore.loading"
-            class="w-full py-4 bg-red-600 text-white rounded-2xl font-black hover:bg-red-700 transition-all transform active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            <div class="flex items-center justify-center gap-2" v-show="!isSubmitting && !authStore.loading">
-              <span>{{ t('Sign In', 'Đăng nhập') }}</span>
-              <ArrowRight class="w-5 h-5" />
-            </div>
-            <div
-              v-show="isSubmitting || authStore.loading"
-              class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
-            />
-          </button>
+          <div class="col-span-2 pt-4">
+            <button
+              type="submit"
+              :disabled="isSubmitting || authStore.loading"
+              class="w-full py-4 bg-red-600 text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-red-700 transition-all transform active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span v-if="!isSubmitting && !authStore.loading">{{
+                languageStore.language === 'en' ? 'Sign In' : 'Đăng nhập'
+              }}</span>
+              <div
+                v-else
+                class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
+              />
+              <ArrowRight v-if="!isSubmitting && !authStore.loading" class="w-5 h-5" />
+            </button>
+          </div>
         </form>
 
         <!-- Divider -->

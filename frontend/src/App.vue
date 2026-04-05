@@ -3,11 +3,12 @@ import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
 import { NConfigProvider, NMessageProvider } from 'naive-ui'
 import { useAuthStore } from './features/shared/auth/stores/auth.store'
+import { STORAGE_KEYS } from './shared/constants/storage'
 
 const authStore = useAuthStore()
 
 onMounted(async () => {
-  if (localStorage.getItem('is_logged_in') === 'true') {
+  if (localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN) === 'true') {
     await authStore.fetchMe()
   }
 })

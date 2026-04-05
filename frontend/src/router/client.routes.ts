@@ -74,5 +74,14 @@ export const clientRoutes: RouteRecordRaw[] = [
       title: 'Cinema - Đăng ký',
       guestOnly: true
     },
+  },
+  {
+    path: 'register-success',
+    name: 'register-success',
+    component: () => import('@/features/shared/auth/views/RegisterSuccessView.vue'),
+    meta: {
+      title: 'Cinema - Đăng ký thành công',
+      guestOnly: true
+    },
   }
 ]

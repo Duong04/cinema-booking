@@ -79,10 +79,10 @@ async function handleLogout() {
 async function handleUserMenu(key: string) {
   switch (key) {
     case 'profile':
-      router.push('/profile')
+      router.push({ name: 'profile' })
       break
     case 'admin':
-      router.push('/admin')
+      router.push({ name: 'admin-dashboard' })
       break
     case 'logout':
       await handleLogout()

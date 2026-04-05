@@ -56,7 +56,7 @@ class AuthController extends Controller
     public function verifyEmail($token) {
         $user = $this->authService->verifyEmail($token);
 
-        return $this->success($user, 'Tài khoản đã được xác minh thành công!', 200);
+        return redirect('/login');
     }
 
     #[OA\Post(

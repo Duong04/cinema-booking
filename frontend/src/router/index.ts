@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { clientRoutes } from './client.routes'
-// import { adminRoutes } from './admin.routes'
+import { adminRoutes } from './admin.routes'
 import { authGuard, adminGuard } from './guards'
 
 const router = createRouter({
@@ -17,12 +17,12 @@ const router = createRouter({
       component: () => import('@/layouts/MainLayout.vue'),
       children: clientRoutes,
     },
-    // {
-    //   path: '/admin',
-    //   component: () => import('@/layouts/admin/AdminLayout.vue'),
-    //   meta: { requiresAdmin: true },
-    //   children: adminRoutes,
-    // },
+    {
+      path: '/admin',
+      component: () => import('@/layouts/AdminLayout.vue'),
+      meta: { requiresAdmin: true },
+      children: adminRoutes,
+    },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',

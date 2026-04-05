@@ -25,7 +25,7 @@ class AuthService {
 
         Mail::to($user->email)->queue(new VerifyEmailMail($user));
 
-        return $user;
+        return true;
     }
 
     public function verifyEmail($token) {

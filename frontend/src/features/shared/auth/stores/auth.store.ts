@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import axios from 'axios' 
+import { ApiError } from '@/plugins/axios'
 import { authService } from '../services/auth.service'
 import { EnumUserRole } from '@/shared/types/auth'
 import type { User, LoginPayload, RegisterPayload, ValidationError } from '@/shared/types/auth'
+import { STORAGE_KEYS } from '@/shared/constants/storage'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -22,12 +23,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function handleError(err: unknown) {
-    if (axios.isAxiosError(err)) {
-      if (err.response?.status === 422) {
-        validationErrors.value = err.response.data.errors
+    if (err instanceof ApiError) {
+      if (err.status === 422 && err.errors) {
+        validationErrors.value = err.errors
         return
       }
-      error.value = err.response?.data?.message || 'Đã có lỗi xảy ra từ máy chủ'
+      error.value = err.message
     } else {
       error.value = 'Lỗi kết nối không xác định'
     }
@@ -52,9 +53,8 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     resetError()
     try {
-      const res = await authService.register(payload)
-      user.value = res.data
-      return true 
+      await authService.register(payload)
+      return true
     } catch (err) {
       handleError(err)
       return false
@@ -66,12 +66,11 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout(): Promise<boolean> {
     try {
       await authService.logout()
+      user.value = null
+      localStorage.removeItem(STORAGE_KEYS.IS_LOGGED_IN)
       return true
     }catch {
       return false
-    } finally {
-      user.value = null
-      localStorage.removeItem('is_logged_in')
     }
   }
 
@@ -79,14 +78,14 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await authService.getMe()
       user.value = res.data
-      localStorage.setItem('is_logged_in', 'true')
+      localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true')
     } catch {
       user.value = null
-      localStorage.removeItem('is_logged_in')
+      localStorage.removeItem(STORAGE_KEYS.IS_LOGGED_IN)
     } finally {
       isInitialized.value = true
     }
   }
 
-  return { user, loading, error, validationErrors, isLoggedIn, isAdmin, isClient, login, register, logout, fetchMe, isInitialized }
+  return { user, loading, error, validationErrors, isLoggedIn, isAdmin, isClient, login, register, logout, fetchMe, isInitialized, resetError }
 })

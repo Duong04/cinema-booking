@@ -2,7 +2,6 @@ import api from '@/shared/api/api'
 import type {
   LoginPayload,
   LoginResponse,
-  User,
   RegisterPayload,
   RegisterResponse,
   UserProfile,

@@ -1,5 +1,6 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { useAuthStore } from '@/features/shared/auth/stores/auth.store'
+import { STORAGE_KEYS } from '@/shared/constants/storage'
 
 export const authGuard = async (
   to: RouteLocationNormalized,
@@ -8,7 +9,7 @@ export const authGuard = async (
 ) => {
   const authStore = useAuthStore()
 
-  if (!authStore.isInitialized && localStorage.getItem('is_logged_in') === 'true') {
+  if (!authStore.isInitialized && localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN) === 'true') {
     await authStore.fetchMe() 
   }
 

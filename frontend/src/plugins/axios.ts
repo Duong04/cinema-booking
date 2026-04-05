@@ -2,6 +2,17 @@ import axios, { type AxiosInstance } from 'axios'
 
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost'
 
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly errors?: Record<string, string[]>,
+    message?: string,
+  ) {
+    super(message ?? 'Đã có lỗi xảy ra')
+    this.name = 'ApiError'
+  }
+}
+
 const instance: AxiosInstance = axios.create({
   baseURL: `${baseURL}/api/v1`,
   timeout: 10000,
@@ -18,31 +29,24 @@ export const csrfClient = axios.create({
   withCredentials: true,
 })
 
-instance.interceptors.request.use(
-  (config) => config,    
-  (error) => Promise.reject(error)
-)
-
 instance.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      window.location.href = '/login'
-    }
+  (error) => {
+    if (!axios.isAxiosError(error)) return Promise.reject(error)
 
-    if (error.response?.status === 403) {
-      window.location.href = '/'
-    }
+    const status = error.response?.status ?? 0
 
-    if (error.response?.status === 422) {
-      return Promise.reject(error.response.data)
-    }
+    if (status === 401) window.location.href = '/login'
+    if (status === 403) window.location.href = '/'
+    if (status >= 500) console.error('Server error:', error.response?.data?.message)
 
-    if (error.response?.status >= 500) {
-      console.error('Server error:', error.response?.data?.message)
-    }
-
-    return Promise.reject(error)
+    return Promise.reject(
+      new ApiError(
+        status,
+        error.response?.data?.errors,
+        error.response?.data?.message,
+      )
+    )
   }
 )
 

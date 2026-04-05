@@ -66,6 +66,6 @@ export interface ValidationError {
 }
 
 export enum EnumUserRole {
-  ADMIN = 'admin',
+  ADMIN = 'super admin',
   CUSTOMER = 'customer',
 }
