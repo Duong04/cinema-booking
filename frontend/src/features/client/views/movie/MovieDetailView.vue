@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { MOVIES } from '@/data/mockData'
-import { useLanguageStore } from '@/stores/shared/language'
+import { useLanguageStore } from '@/stores/language'
 import { useBookingStore } from '@/stores/client/booking'
 import { Star, Clock, Play, ChevronLeft, Heart, X } from 'lucide-vue-next'
 import { ref, computed } from 'vue'

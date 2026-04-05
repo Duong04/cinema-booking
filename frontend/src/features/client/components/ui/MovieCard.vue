@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Movie } from '@/data/mockData';
-import { useLanguageStore } from '@/stores/shared/language';
+import { useLanguageStore } from '@/stores/language';
 import { Star, Clock, Play } from 'lucide-vue-next';
 
 defineProps<{

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SHOWTIMES, MOVIES, CINEMAS } from '@/data/mockData';
-import { useLanguageStore } from '@/stores/shared/language';
+import { useLanguageStore } from '@/stores/language';
 import { Calendar, Clock, MapPin } from 'lucide-vue-next';
 
 const languageStore = useLanguageStore();

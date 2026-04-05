@@ -80,7 +80,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return $this->success($user, 'Người dùng đã đăng nhập thành công!');
+        return $this->success(new UserResource($user), 'Người dùng đã đăng nhập thành công!');
     }
 
     #[OA\Get(

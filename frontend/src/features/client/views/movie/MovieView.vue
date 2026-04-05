@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { MOVIES } from '@/data/mockData'
-import { useLanguageStore } from '@/stores/shared/language'
+import { useLanguageStore } from '@/stores/language'
 import MovieCard from '../../components/ui/MovieCard.vue'
 import { Search, SlidersHorizontal, Film, X } from 'lucide-vue-next'
 
