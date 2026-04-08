@@ -15,7 +15,7 @@ const formLoading = ref(false)
 const isEdit = ref(false)
 const formData = reactive({ name: '', description: '' })
 const formRules = {
-  name: [{ required: true, message: 'Name is required', trigger: 'blur' }],
+  name: [{ required: true, message: 'Trường này là bắt buộc', trigger: 'blur' }],
 }
 
 watch(() => props.role, (role) => {
@@ -37,10 +37,10 @@ async function handleSubmit() {
     try {
       if (isEdit.value && props.role) {
         await roleService.updateRole(props.role.id, formData as Role)
-        message.success('Role updated successfully')
+        message.success('Cập nhật vai trò thành công!')
       } else {
         await roleService.createRole(formData as Role)
-        message.success('Role created successfully')
+        message.success('Tạo vai trò thành công!')
       }
       showModal.value = false
       emit('success')
