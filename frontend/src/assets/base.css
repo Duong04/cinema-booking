@@ -6,9 +6,6 @@
 }
 
 @layer base {
-  body {
-    @apply bg-black text-white antialiased;
-  }
 
   /* Custom Scrollbar */
   ::-webkit-scrollbar {

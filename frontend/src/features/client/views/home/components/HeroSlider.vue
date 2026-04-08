@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { type Movie } from '@/data/mockData'
-import { useLanguageStore } from '@/stores/shared/language'
+import { useLanguageStore } from '@/stores/language'
 import { Star, Play, Info, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const props = defineProps<{

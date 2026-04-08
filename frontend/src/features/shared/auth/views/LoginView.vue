@@ -3,9 +3,9 @@ import { ref, onUnmounted } from 'vue'
 import { useForm } from 'vee-validate'
 import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next'
 import { useAuthStore } from '@/features/shared/auth/stores/auth.store'
-import { useLanguageStore } from '@/stores/shared/language'
+import { useLanguageStore } from '@/stores/language'
 import { loginSchema } from '@/features/shared/auth/validators/auth.validation'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { STORAGE_KEYS } from '@/shared/constants/storage'
 
 const authStore = useAuthStore()
@@ -13,7 +13,6 @@ const languageStore = useLanguageStore()
 
 const showPassword = ref(false)
 const router = useRouter()
-const route = useRoute()
 
 onUnmounted(() => {
   authStore.resetError()
@@ -37,8 +36,7 @@ const onSubmit = handleSubmit(async (values) => {
   if (success) {
     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true')
 
-    const redirectPath = (route.query.redirect as string) || '/'
-    router.push(redirectPath)
+    router.push({ name: 'home' })
   }
 })
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { ref, onMounted, onUnmounted, h, computed } from 'vue'
-import { useLanguageStore } from '@/stores/shared/language'
+import { useLanguageStore } from '@/stores/language'
 import {
   Film,
   Search,
@@ -82,7 +82,7 @@ async function handleUserMenu(key: string) {
       router.push({ name: 'profile' })
       break
     case 'admin':
-      router.push({ name: 'admin-dashboard' })
+      router.push({ name: 'dashboard' })
       break
     case 'logout':
       await handleLogout()

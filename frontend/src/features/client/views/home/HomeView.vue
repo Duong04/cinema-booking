@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { MOVIES } from '@/data/mockData'
-import { useLanguageStore } from '@/stores/shared/language'
+import { useLanguageStore } from '@/stores/language'
 import { Star, Film, TrendingUp, Newspaper, Gift, ChevronRight } from 'lucide-vue-next'
 import MovieCard from '../../components/ui/MovieCard.vue'
 import HeroSlider from '@/features/client/views/home/components/HeroSlider.vue'

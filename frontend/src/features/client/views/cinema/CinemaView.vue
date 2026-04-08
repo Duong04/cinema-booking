@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { CINEMAS } from '@/data/mockData';
-import { useLanguageStore } from '@/stores/shared/language';
+import { useLanguageStore } from '@/stores/language';
 import { MapPin, Phone, Clock, Search, SlidersHorizontal, Star, Coffee, Wifi, Car, Tv } from 'lucide-vue-next';
 
 const languageStore = useLanguageStore();

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useLanguageStore } from '@/stores/shared/language';
+import { useLanguageStore } from '@/stores/language';
 import { Mail, ArrowLeft, Film, CheckCircle2 } from 'lucide-vue-next';
 
 const languageStore = useLanguageStore();
