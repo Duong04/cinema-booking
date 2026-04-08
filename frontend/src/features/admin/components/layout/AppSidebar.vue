@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NMenu } from 'naive-ui'
-import { menuOptions } from '../../configs/menu.config'
+import { menuOptions, handleMenuSelect } from '../../configs/menu.config';
 
 </script>
 
@@ -10,7 +10,7 @@ import { menuOptions } from '../../configs/menu.config'
       ADMIN
     </div>
 
-    <n-menu :options="menuOptions" />
+    <n-menu :options="menuOptions" @update:value="handleMenuSelect" />
   </div>
 </template>
 

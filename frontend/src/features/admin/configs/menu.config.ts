@@ -5,11 +5,18 @@ import {
   BookOutline as BookIcon,
   PersonOutline as PersonIcon,
   WineOutline as WineIcon,
+  ShieldCheckmarkOutline as ShieldCheckmarkIcon,
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
+import router from '@/router'
 
-function renderIcon(icon: Component) {
+
+const renderIcon = (icon: Component) => {
   return () => h(NIcon, null, { default: () => h(icon) })
+}
+
+export const handleMenuSelect = (key: string) => {
+  router.push({ name: key })
 }
 
 export const menuOptions: MenuOption[] = [
@@ -33,6 +40,25 @@ export const menuOptions: MenuOption[] = [
     label: 'Cinemas',
     key: 'cinemas',
     icon: renderIcon(BookIcon),
+  },
+  {
+    label: 'Phân quyền',
+    key: 'permissions',
+    icon: renderIcon(ShieldCheckmarkIcon),
+    children: [
+      {
+        label: 'Vai trò',
+        key: 'role',
+      },
+      {
+        label: 'Quyền',
+        key: 'permission',
+      },
+      {
+        label: 'Hành động',
+        key: 'action',
+      }
+    ],
   },
   {
     label: 'Dance Dance Dance',

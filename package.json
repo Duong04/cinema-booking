@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "unplugin-vue-components": "^32.0.0"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.2.1"
+  }
+}

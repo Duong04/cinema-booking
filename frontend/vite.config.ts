@@ -1,4 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -10,7 +12,10 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    tailwindcss()
+    tailwindcss(),
+    Components({
+      resolvers: [NaiveUiResolver()]
+    })
   ],
   resolve: {
     alias: {

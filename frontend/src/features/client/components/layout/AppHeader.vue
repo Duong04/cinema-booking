@@ -82,7 +82,7 @@ async function handleUserMenu(key: string) {
       router.push({ name: 'profile' })
       break
     case 'admin':
-      router.push({ name: 'admin-dashboard' })
+      router.push({ name: 'dashboard' })
       break
     case 'logout':
       await handleLogout()

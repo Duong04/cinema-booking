@@ -37,7 +37,7 @@ const theme = computed(() => (themeStore.isDark ? darkTheme : null))
           <AppHeader />
         </n-layout-header>
 
-        <n-layout-content class="p-4 bg-gray-100">
+        <n-layout-content class="p-4 bg-gray-100 min-h-full">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
               <component :is="Component" />
