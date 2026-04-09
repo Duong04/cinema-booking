@@ -1,10 +1,10 @@
 import { ref, reactive, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
-import { roleService } from '../services/role.service'
-import type { Role } from '../types/role.type'
+import { actionService } from '../services/action.service'
+import type { Action } from '../types/action.type'
 
-export function useRole() {
-  const data = ref<Role[]>([])
+export function useAction() {
+  const data = ref<Action[]>([])
   const loading = ref(false)
   const filters = reactive({ search: '' })
   const pagination = reactive({
@@ -13,14 +13,14 @@ export function useRole() {
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [3, 5, 7],
-    onChange: (page: number) => { pagination.page = page; fetchRoles() },
-    onUpdatePageSize: (pageSize: number) => { pagination.pageSize = pageSize; pagination.page = 1; fetchRoles() },
+    onChange: (page: number) => { pagination.page = page; fetchActions() },
+    onUpdatePageSize: (pageSize: number) => { pagination.pageSize = pageSize; pagination.page = 1; fetchActions() },
   })
 
-  async function fetchRoles() {
+  async function fetchActions() {
     loading.value = true
     try {
-      const res = await roleService.getAllRoles({
+      const res = await actionService.getAllActions({
         page: pagination.page,
         limit: pagination.pageSize,
         q: filters.search || undefined,
@@ -32,17 +32,17 @@ export function useRole() {
     }
   }
 
+  async function deleteAction(id: string) {
+      await actionService.deleteAction(id)
+      fetchActions()
+    }
+
   const debouncedSearch = useDebounceFn(() => {
     pagination.page = 1
-    fetchRoles()
+    fetchActions()
   }, 500)
 
   watch(() => filters.search, debouncedSearch)
 
-  async function deleteRole(id: string) {
-    await roleService.deleteRole(id)
-    fetchRoles()
-  }
-
-  return { data, loading, filters, pagination, fetchRoles, deleteRole }
+  return { data, loading, filters, pagination, fetchActions, deleteAction }
 }

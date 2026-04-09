@@ -39,7 +39,7 @@ const theme = computed(() => (themeStore.isDark ? darkTheme : null))
 
         <n-layout-content class="p-4 bg-gray-100 min-h-full">
           <router-view v-slot="{ Component }">
-            <transition name="fade" mode="out-in">
+            <transition name="fade" appear>
               <component :is="Component" />
             </transition>
           </router-view>
