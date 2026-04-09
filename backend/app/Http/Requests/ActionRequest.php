@@ -33,7 +33,7 @@ class ActionRequest extends FormRequest
             $rules['name'] = [
                 'sometimes',
                 'required',
-                Rule::unique('actions', 'key')->ignore($id),
+                Rule::unique('actions', 'name')->ignore($id),
             ];
 
             $rules['key'] = [

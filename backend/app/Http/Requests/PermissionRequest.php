@@ -33,7 +33,7 @@ class PermissionRequest extends FormRequest
             $rules['name'] = [
                 'sometimes',
                 'required',
-                Rule::unique('permissions', 'key')->ignore($id),
+                Rule::unique('permissions', 'name')->ignore($id),
             ];
 
             $rules['key'] = [

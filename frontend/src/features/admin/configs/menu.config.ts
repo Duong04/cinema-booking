@@ -6,6 +6,8 @@ import {
   PersonOutline as PersonIcon,
   WineOutline as WineIcon,
   ShieldCheckmarkOutline as ShieldCheckmarkIcon,
+  LocationOutline as LocationOutlineIcon,
+  ColorFilterOutline as ColorFilterOutlineIcon
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import router from '@/router'
@@ -37,9 +39,20 @@ export const menuOptions: MenuOption[] = [
     ],
   },
   {
-    label: 'Cinemas',
-    key: 'cinemas',
-    icon: renderIcon(BookIcon),
+    label: 'Chuỗi rạp',
+    key: 'cinema-chains',
+    icon: renderIcon(ColorFilterOutlineIcon),
+  },
+  {
+    label: 'Khu vực',
+    key: 'locations',
+    icon: renderIcon(LocationOutlineIcon),
+    children: [
+      {
+        label: 'Thành phố',
+        key: 'cities',
+      },
+    ],
   },
   {
     label: 'Phân quyền',
@@ -48,15 +61,15 @@ export const menuOptions: MenuOption[] = [
     children: [
       {
         label: 'Vai trò',
-        key: 'role',
+        key: 'roles',
       },
       {
         label: 'Quyền',
-        key: 'permission',
+        key: 'permissions',
       },
       {
         label: 'Hành động',
-        key: 'action',
+        key: 'actions',
       }
     ],
   },
