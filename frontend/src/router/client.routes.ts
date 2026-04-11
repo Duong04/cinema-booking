@@ -60,7 +60,7 @@ export const clientRoutes: RouteRecordRaw[] = [
   {
     path: 'login',
     name: 'login',
-    component: () => import('@/features/shared/auth/views/LoginView.vue'),
+    component: () => import('@/features/shared/views/LoginView.vue'),
     meta: {
       title: 'Cinema - Đăng nhập',
       guestOnly: true
@@ -69,7 +69,7 @@ export const clientRoutes: RouteRecordRaw[] = [
   {
     path: 'register',
     name: 'register',
-    component: () => import('@/features/shared/auth/views/RegisterView.vue'),
+    component: () => import('@/features/shared/views/RegisterView.vue'),
     meta: {
       title: 'Cinema - Đăng ký',
       guestOnly: true
@@ -78,7 +78,7 @@ export const clientRoutes: RouteRecordRaw[] = [
   {
     path: 'register-success',
     name: 'register-success',
-    component: () => import('@/features/shared/auth/views/RegisterSuccessView.vue'),
+    component: () => import('@/features/shared/views/RegisterSuccessView.vue'),
     meta: {
       title: 'Cinema - Đăng ký thành công',
       guestOnly: true

@@ -2,9 +2,9 @@
 import { ref, onUnmounted } from 'vue'
 import { useForm } from 'vee-validate'
 import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-vue-next'
-import { useAuthStore } from '@/features/shared/auth/stores/auth.store'
+import { useAuthStore } from '../stores/auth.store'
 import { useLanguageStore } from '@/stores/language'
-import { loginSchema } from '@/features/shared/auth/validators/auth.validation'
+import { loginSchema } from '../validators/auth.validation'
 import { useRouter } from 'vue-router'
 import { STORAGE_KEYS } from '@/shared/constants/storage'
 

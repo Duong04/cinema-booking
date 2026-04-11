@@ -4,8 +4,8 @@ import { useForm } from 'vee-validate'
 import { useRouter } from 'vue-router'
 import { useLanguageStore } from '@/stores/language'
 import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, User } from 'lucide-vue-next'
-import { registerSchema } from '@/features/shared/auth/validators/auth.validation'
-import { useAuthStore } from '@/features/shared/auth/stores/auth.store'
+import { registerSchema } from '../validators/auth.validation'
+import { useAuthStore } from '../stores/auth.store'
 import { useMessage } from 'naive-ui'
 
 const message = useMessage()
