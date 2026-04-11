@@ -13,6 +13,7 @@ use App\Http\Controllers\Apis\V1\RoomController;
 use App\Http\Controllers\Apis\V1\SeatController;
 use App\Http\Controllers\Apis\V1\SeatTypeController;
 use App\Http\Controllers\Apis\V1\ShowtimeController;
+use App\Http\Controllers\Apis\V1\UploadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('upload')->controller(UploadController::class)->middleware('auth:sanctum')->group(function () {
+        Route::post('/image', 'uploadImage');
+        Route::post('/file', 'uploadFile');
+        Route::post('/multiple', 'uploadMultiple');
+        Route::delete('/', 'delete');
+        Route::delete('/multiple', 'deleteMultiple');
     });
 
     Route::prefix('cities')->controller(CityController::class)->middleware('auth:sanctum')->group(function () {
