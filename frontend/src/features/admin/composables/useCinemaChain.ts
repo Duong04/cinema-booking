@@ -1,7 +1,7 @@
 import { ref, reactive, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
-import { cinemaChainService } from '../services/cinema-chain.service'
-import type { CinemaChain } from '../types/cinema-chain.type'
+import { cinemaChainService } from '@/features/admin/services/cinema-chain.service'
+import type { CinemaChain } from '@/features/admin/types/cinema-chain.type'
 
 export function useCinemaChain() {
   const data = ref<CinemaChain[]>([])

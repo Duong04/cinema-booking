@@ -1,7 +1,7 @@
 import { ref, reactive, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
-import { permissionService } from '../services/permission.service'
-import type { Permission } from '../types/permission.type'
+import { permissionService } from '@/features/admin/services/permission.service'
+import type { Permission } from '@/features/admin/types/permission.type'
 
 export function usePermission() {
   const data = ref<Permission[]>([])

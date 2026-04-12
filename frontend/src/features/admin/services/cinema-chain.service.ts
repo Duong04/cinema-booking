@@ -1,5 +1,5 @@
 import api from '@/shared/api/api'
-import type { CinemaChain } from '../types/cinema-chain.type'
+import type { CinemaChain } from '@/features/admin/types/cinema-chain.type'
 import type { ApiResponse, PaginatedResponse } from '@/shared/types/apiResponse'
 
 export const cinemaChainService = {

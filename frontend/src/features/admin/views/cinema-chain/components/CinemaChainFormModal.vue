@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, reactive, watch, nextTick } from 'vue'
-import type { FormInst, FormRules } from 'naive-ui'
-import { useMessage } from 'naive-ui'
+import type { FormInst, FormRules, UploadCustomRequestOptions } from 'naive-ui'
+import { useMessage, NAvatar } from 'naive-ui'
 import { cinemaChainService } from '@/features/admin/services/cinema-chain.service'
+import { uploadService } from '@/features/shared/services/upload.service'
 import { ApiError } from '@/plugins/axios'
 import type { CinemaChain } from '@/features/admin/types/cinema-chain.type'
 
@@ -23,10 +24,13 @@ const message = useMessage()
 const showModal = defineModel<boolean>('show')
 const formRef = ref<FormInst | null>(null)
 const formLoading = ref(false)
+const uploadLoading = ref(false)
 const isEdit = ref(false)
+const previewUrl = ref<string>('')
 
 const formData = reactive<CinemaChainForm>({
-  name: ''
+  name: '',
+  logo: ''
 })
 
 const backendErrors = reactive<Record<string, string>>({})
@@ -47,13 +51,44 @@ function syncFormWithProps() {
   if (props.cinemaChain) {
     isEdit.value = true
     formData.name = props.cinemaChain.name
+    formData.logo = props.cinemaChain.logo ?? ''
+    previewUrl.value = props.cinemaChain.logo ?? ''
   } else {
     isEdit.value = false
     formData.name = ''
+    formData.logo = ''
+    previewUrl.value = ''
   }
-  
+
   Object.keys(backendErrors).forEach((key) => delete backendErrors[key])
   nextTick(() => formRef.value?.restoreValidation())
+}
+
+async function handleCustomUpload({ file, onFinish, onError }: UploadCustomRequestOptions) {
+  try {
+    uploadLoading.value = true
+    const res = await uploadService.uploadImage(file.file as File, 'cinema-chains')
+    formData.logo = res.data.url 
+    previewUrl.value = formData.logo
+    onFinish()
+    message.success('Tải ảnh lên thành công')
+  } catch {
+    onError()
+    message.error('Tải ảnh lên thất bại')
+  } finally {
+    uploadLoading.value = false
+  }
+}
+
+async function handleRemoveLogo() {
+  if (!formData.logo) return
+  try {
+    await uploadService.deleteFile(formData.logo)
+  } catch {
+  } finally {
+    formData.logo = ''
+    previewUrl.value = ''
+  }
 }
 
 async function handleSubmit() {
@@ -99,7 +134,7 @@ watch(() => props.cinemaChain, syncFormWithProps, { immediate: true })
     :title="isEdit ? 'Chỉnh sửa chuỗi rạp' : 'Tạo chuỗi rạp mới'"
     :show-icon="false"
     style="width: 550px"
-    @after-leave="syncFormWithProps" 
+    @after-leave="syncFormWithProps"
   >
     <n-form
       ref="formRef"
@@ -109,6 +144,48 @@ watch(() => props.cinemaChain, syncFormWithProps, { immediate: true })
       require-mark-placement="right-hanging"
       class="mt-4"
     >
+      <!-- Logo -->
+      <n-form-item label="Logo" path="logo">
+        <div class="flex items-center gap-4">
+          <!-- Preview -->
+          <n-avatar
+            :src="previewUrl || undefined"
+            round
+            :size="64"
+            object-fit="cover"
+          >
+            <template v-if="!previewUrl" #default>
+              <span class="text-xs text-gray-400">Logo</span>
+            </template>
+          </n-avatar>
+
+          <!-- Actions -->
+          <div class="flex flex-col gap-2">
+            <n-upload
+              accept="image/*"
+              :max="1"
+              :show-file-list="false"
+              :custom-request="handleCustomUpload"
+            >
+              <n-button size="small" :loading="uploadLoading">
+                {{ previewUrl ? 'Đổi ảnh' : 'Tải ảnh lên' }}
+              </n-button>
+            </n-upload>
+
+            <n-button
+              v-if="previewUrl"
+              size="small"
+              type="error"
+              ghost
+              @click="handleRemoveLogo"
+            >
+              Xóa ảnh
+            </n-button>
+          </div>
+        </div>
+      </n-form-item>
+
+      <!-- Tên -->
       <n-form-item
         label="Tên chuỗi rạp"
         path="name"
@@ -117,21 +194,15 @@ watch(() => props.cinemaChain, syncFormWithProps, { immediate: true })
       >
         <n-input
           v-model:value="formData.name"
-          placeholder="Ví dụ: Da Nang, Ha Noi..."
+          placeholder="Ví dụ: CGV, Lotte Cinema..."
           @input="clearFieldError('name')"
         />
       </n-form-item>
     </n-form>
 
     <template #action>
-      <n-button ghost @click="showModal = false">
-        Hủy bỏ
-      </n-button>
-      <n-button 
-        type="primary" 
-        :loading="formLoading" 
-        @click="handleSubmit"
-      >
+      <n-button ghost @click="showModal = false">Hủy bỏ</n-button>
+      <n-button type="primary" :loading="formLoading" @click="handleSubmit">
         {{ isEdit ? 'Cập nhật ngay' : 'Thêm chuỗi rạp' }}
       </n-button>
     </template>

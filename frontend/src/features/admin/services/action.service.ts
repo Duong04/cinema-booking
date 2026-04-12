@@ -1,5 +1,5 @@
 import api from '@/shared/api/api'
-import type { Action } from '../types/action.type'
+import type { Action } from '@/features/admin/types/action.type'
 import type { ApiResponse, PaginatedResponse } from '@/shared/types/apiResponse'
 
 export const actionService = {

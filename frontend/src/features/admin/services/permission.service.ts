@@ -1,5 +1,5 @@
 import api from '@/shared/api/api'
-import type { Permission } from '../types/permission.type'
+import type { Permission } from '@/features/admin/types/permission.type'
 import type { ApiResponse, PaginatedResponse } from '@/shared/types/apiResponse'
 
 export const permissionService = {

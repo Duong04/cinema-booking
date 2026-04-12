@@ -1,5 +1,5 @@
 import api from '@/shared/api/api'
-import type { City } from '../types/city.type'
+import type { City } from '@/features/admin/types/city.type'
 import type { ApiResponse, PaginatedResponse } from '@/shared/types/apiResponse'
 
 export const cityService = {

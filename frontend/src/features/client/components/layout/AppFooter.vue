@@ -46,7 +46,7 @@ import { Film } from 'lucide-vue-next'
         class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
       >
         <p class="text-gray-600 text-xs">
-          © {{ new Date().getFullYear }} CINEMAX. All rights reserved.
+          © {{ new Date().getFullYear() }} CINEMAX. All rights reserved.
         </p>
       </div>
     </div>

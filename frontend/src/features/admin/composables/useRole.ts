@@ -1,7 +1,7 @@
 import { ref, reactive, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
-import { roleService } from '../services/role.service'
-import type { Role } from '../types/role.type'
+import { roleService } from '@/features/admin/services/role.service'
+import type { Role } from '@/features/admin/types/role.type'
 
 export function useRole() {
   const data = ref<Role[]>([])

@@ -1,37 +1,51 @@
 <script setup lang="ts">
 import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
-import { ref, onMounted, h, computed, resolveComponent } from 'vue'
-import { NButton } from 'naive-ui'
-import { useCinemaChain } from '../../composables/useCinemaChain'
-import CinemaChainFormModal from './components/CinemaChainFormModal.vue'
-import type { CinemaChain } from '../../types/cinema-chain.type'
+import { ref, onMounted, h, computed } from 'vue'
+import { NButton, NAvatar } from 'naive-ui'
+import { useCinema } from '../../composables/useCinema'
+import CinemaFormModal from './components/CinemaFormModal.vue'
+import type { Cinema } from '../../types/cinema.type'
 import { formatDate } from '@/shared/utils/formatDate'
 import { Search as SearchIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { useMessage, useDialog } from 'naive-ui'
 
-const { data, loading, filters, pagination, fetchCinemaChains, deleteCinemaChain } = useCinemaChain()
+const { data, loading, filters, pagination, fetchCinemas, deleteCinema } = useCinema()
 
 const message = useMessage()
 const dialog = useDialog()
 const showModal = ref(false)
-const selectedCinemaChain = ref<CinemaChain | null>(null)
+const selectedCinema = ref<Cinema | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
 
-function createColumns(): DataTableColumns<CinemaChain> {
+function createColumns(): DataTableColumns<Cinema> {
   return [
     { type: 'selection' },
-    { title: 'Name', key: 'name' },
-    { 
-        title: 'Logo', 
-        key: 'logo',
-        render: (row) => h(resolveComponent('n-avatar'), {
+    { title: 'Tên rạp', key: 'name' },
+    {
+      title: 'Chuỗi rạp',
+      key: 'cinema_chain',
+      render: (row) =>
+        h('div', { style: 'display: flex; align-items: center; gap: 8px' }, [
+          h(NAvatar, {
+            src: row.cinema_chain?.logo ?? '',
+            size: 28,
             round: true,
-            src: row.logo,
-            size: 40
-        })
+            objectFit: 'cover',
+          }),
+          h('span', row.cinema_chain?.name ?? '—'),
+        ]),
+    },
+    {
+      title: 'Địa chỉ',
+      key: 'address',
+    },
+    {
+      title: 'Thành phố',
+      key: 'city',
+      render: (row) => h('span', row.city?.name ?? '—'),
     },
     {
       title: 'Created At',
@@ -66,29 +80,28 @@ function createColumns(): DataTableColumns<CinemaChain> {
 const columns = createColumns()
 
 function openCreateModal() {
-  selectedCinemaChain.value = null
+  selectedCinema.value = null
   showModal.value = true
 }
 
-function openEditModal(row: CinemaChain) {
-  selectedCinemaChain.value = row
+function openEditModal(row: Cinema) {
+  selectedCinema.value = row
   showModal.value = true
-  console.log(selectedCinemaChain.value);
 }
 
-function handleDelete(row: CinemaChain) {
+function handleDelete(row: Cinema) {
   dialog.warning({
     title: 'Xác nhận xóa',
-    content: `Bạn có chắc chắn muốn xóa chuỗi rạp "${row.name}" không?`,
+    content: `Bạn có chắc chắn muốn xóa rạp phim "${row.name}" không?`,
     positiveText: 'Xóa',
     negativeText: 'Hủy',
     onPositiveClick: async () => {
       try {
-        await deleteCinemaChain(row.id)
-        message.success('Xóa chuỗi rạp thành công')
-        fetchCinemaChains()
+        await deleteCinema(row.id)
+        message.success('Xóa rạp phim thành công')
+        fetchCinemas()
       } catch {
-        message.error('Đã có lỗi xảy ra khi xóa chuỗi rạp')
+        message.error('Đã có lỗi xảy ra khi xóa rạp phim')
       }
     },
   })
@@ -98,23 +111,23 @@ function handleDeleteMultiple() {
   const count = checkedRowKeysRef.value.length
   dialog.warning({
     title: 'Xác nhận xóa nhiều',
-    content: `Bạn có chắc chắn muốn xóa ${count} chuỗi rạp đã chọn không?`,
+    content: `Bạn có chắc chắn muốn xóa ${count} rạp phim đã chọn không?`,
     positiveText: 'Xóa tất cả',
     negativeText: 'Hủy',
     onPositiveClick: async () => {
       try {
-        await Promise.all(checkedRowKeysRef.value.map((id) => deleteCinemaChain(id as string)))
-        message.success(`Đã xóa ${count} chuỗi rạp thành công`)
+        await Promise.all(checkedRowKeysRef.value.map((id) => deleteCinema(id as string)))
+        message.success(`Đã xóa ${count} rạp phim thành công`)
         checkedRowKeysRef.value = []
-        fetchCinemaChains()
+        fetchCinemas()
       } catch {
-        message.error('Đã có lỗi xảy ra khi xóa các chuỗi rạp')
+        message.error('Đã có lỗi xảy ra khi xóa các rạp phim')
       }
     },
   })
 }
 
-onMounted(fetchCinemaChains)
+onMounted(fetchCinemas)
 </script>
 
 <template>
@@ -132,15 +145,11 @@ onMounted(fetchCinemaChains)
           </n-icon>
         </template>
       </n-input>
-      <n-button
-        v-if="hasChecked"
-        type="error"
-        @click="handleDeleteMultiple"
-      >
+      <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
-    <n-button type="primary" @click="openCreateModal">+ Tạo chuỗi rạp</n-button>
+    <n-button type="primary" @click="openCreateModal">+ Tạo rạp phim</n-button>
   </n-space>
 
   <n-data-table
@@ -148,10 +157,10 @@ onMounted(fetchCinemaChains)
     :data="data"
     :loading="loading"
     :pagination="pagination"
-    :row-key="(row: CinemaChain) => row.id"
+    :row-key="(row: Cinema) => row.id"
     remote
     @update:checked-row-keys="(keys: DataTableRowKey[]) => (checkedRowKeysRef = keys)"
   />
 
-  <CinemaChainFormModal v-model:show="showModal" :cinemaChain="selectedCinemaChain" @success="fetchCinemaChains" />
+  <CinemaFormModal v-model:show="showModal" :cinema="selectedCinema" @success="fetchCinemas" />
 </template>

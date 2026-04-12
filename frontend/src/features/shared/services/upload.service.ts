@@ -1,11 +1,11 @@
 import api from '@/shared/api/api'
 
 export const uploadService = {
-  uploadImage: (file: File, folder: string) => {
+  uploadImage: (file: File, folder: string): Promise<{ data: { url: string } }> => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('folder', folder)
-    return api.post('/upload/images', formData, {
+    return api.post('/upload/image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
   },

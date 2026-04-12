@@ -1,7 +1,7 @@
 import { ref, reactive, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
-import { cityService } from '../services/city.service'
-import type { City } from '../types/city.type'
+import { cityService } from '@/features/admin/services/city.service'
+import type { City } from '@/features/admin/types/city.type'
 
 export function useCity() {
   const data = ref<City[]>([])

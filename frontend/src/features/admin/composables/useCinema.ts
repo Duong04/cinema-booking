@@ -1,10 +1,10 @@
 import { ref, reactive, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
-import { actionService } from '@/features/admin/services/action.service'
-import type { Action } from '@/features/admin/types/action.type'
+import { cinemaService } from '@/features/admin/services/cinema.service'
+import type { Cinema } from '@/features/admin/types/cinema.type'
 
-export function useAction() {
-  const data = ref<Action[]>([])
+export function useCinema() {
+  const data = ref<Cinema[]>([])
   const loading = ref(false)
   const filters = reactive({ search: '' })
   const pagination = reactive({
@@ -13,14 +13,14 @@ export function useAction() {
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [3, 5, 7],
-    onChange: (page: number) => { pagination.page = page; fetchActions() },
-    onUpdatePageSize: (pageSize: number) => { pagination.pageSize = pageSize; pagination.page = 1; fetchActions() },
+    onChange: (page: number) => { pagination.page = page; fetchCinemas() },
+    onUpdatePageSize: (pageSize: number) => { pagination.pageSize = pageSize; pagination.page = 1; fetchCinemas() },
   })
 
-  async function fetchActions() {
+  async function fetchCinemas() {
     loading.value = true
     try {
-      const res = await actionService.getAllActions({
+      const res = await cinemaService.getAllCinemas({
         page: pagination.page,
         limit: pagination.pageSize,
         q: filters.search || undefined,
@@ -32,17 +32,17 @@ export function useAction() {
     }
   }
 
-  async function deleteAction(id: string) {
-      await actionService.deleteAction(id)
-      fetchActions()
+  async function deleteCinema(id: string) {
+      await cinemaService.deleteCinema(id)
+      fetchCinemas()
     }
 
   const debouncedSearch = useDebounceFn(() => {
     pagination.page = 1
-    fetchActions()
+    fetchCinemas()
   }, 500)
 
   watch(() => filters.search, debouncedSearch)
 
-  return { data, loading, filters, pagination, fetchActions, deleteAction }
+  return { data, loading, filters, pagination, fetchCinemas, deleteCinema }
 }

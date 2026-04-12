@@ -7,7 +7,8 @@ import {
   WineOutline as WineIcon,
   ShieldCheckmarkOutline as ShieldCheckmarkIcon,
   LocationOutline as LocationOutlineIcon,
-  ColorFilterOutline as ColorFilterOutlineIcon
+  ColorFilterOutline as ColorFilterOutlineIcon,
+  NuclearSharp as NuclearSharpIcon
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import router from '@/router'
@@ -35,6 +36,21 @@ export const menuOptions: MenuOption[] = [
       {
         label: 'Rat',
         key: 'rat',
+      },
+    ],
+  },
+  {
+    label: 'Rạp chiếu phim',
+    key: 'cinemas',
+    icon: renderIcon(NuclearSharpIcon),
+    children: [
+      {
+        label: 'Danh sách rạp',
+        key: 'cinemas',
+      },
+      {
+        label: 'Phòng chiếu',
+        key: 'rooms',
       },
     ],
   },

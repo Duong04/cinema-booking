@@ -11,10 +11,18 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'cinema-chains',
-    name: 'cinema-chainns',
-    component: () => import('@/features/admin/views/city/CityView.vue'),
+    name: 'cinema-chains',
+    component: () => import('@/features/admin/views/cinema-chain/CinemaChainView.vue'),
     meta: {
       title: 'Cinema - Admin Cinema Chains',
+    },
+  },
+  {
+    path: 'cinemas',
+    name: 'cinemas',
+    component: () => import('@/features/admin/views/cinema/CinemaView.vue'),
+    meta: {
+      title: 'Cinema - Admin Cinemas',
     },
   },
   {

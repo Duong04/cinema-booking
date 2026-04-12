@@ -1,5 +1,5 @@
 import api from '@/shared/api/api'
-import type { Role } from '../types/role.type'
+import type { Role } from '@/features/admin/types/role.type'
 import type { ApiResponse, PaginatedResponse } from '@/shared/types/apiResponse'
 
 export const roleService = {
