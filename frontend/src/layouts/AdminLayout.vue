@@ -13,6 +13,7 @@ import {
   NLayoutFooter,
   darkTheme,
 } from 'naive-ui'
+import AppBreadcrumb from '@/features/admin/components/layout/AppBreadcrumb.vue'
 
 const themeStore = useThemeStore()
 
@@ -36,8 +37,9 @@ const theme = computed(() => (themeStore.isDark ? darkTheme : null))
         <n-layout-header bordered class="h-14 flex items-center px-4">
           <AppHeader />
         </n-layout-header>
-
+        
         <n-layout-content class="p-4 bg-gray-100 min-h-full">
+          <AppBreadcrumb class="flex-1" />
           <router-view v-slot="{ Component }">
             <transition name="fade" appear>
               <component :is="Component" />
