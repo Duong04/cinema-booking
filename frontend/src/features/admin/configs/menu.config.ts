@@ -12,7 +12,6 @@ import {
 import { NIcon } from 'naive-ui'
 import router from '@/router'
 
-
 const renderIcon = (icon: Component) => {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
@@ -34,11 +33,11 @@ export const menuOptions: MenuOption[] = [
     children: [
       {
         label: 'Danh sách rạp',
-        key: 'cinemas',
+        key: 'admin-cinemas',
       },
       {
         label: 'Phòng chiếu',
-        key: 'rooms',
+        key: 'admin-rooms',
       },
     ],
   },
@@ -49,17 +48,17 @@ export const menuOptions: MenuOption[] = [
     children: [
       {
         label: 'Thể loại phim',
-        key: 'genres',
+        key: 'admin-genres',
       },
       {
         label: 'Danh sách phim',
-        key: 'movies',
+        key: 'admin-movies',
       }
     ],
   },
   {
     label: 'Chuỗi rạp',
-    key: 'cinema-chains',
+    key: 'admin-cinema-chains',
     icon: renderIcon(ColorFilterOutlineIcon),
   },
   {
@@ -69,7 +68,7 @@ export const menuOptions: MenuOption[] = [
     children: [
       {
         label: 'Thành phố',
-        key: 'cities',
+        key: 'admin-cities',
       },
     ],
   },
@@ -80,15 +79,15 @@ export const menuOptions: MenuOption[] = [
     children: [
       {
         label: 'Vai trò',
-        key: 'roles',
+        key: 'admin-roles',
       },
       {
         label: 'Quyền',
-        key: 'permissions',
+        key: 'admin-permissions',
       },
       {
         label: 'Hành động',
-        key: 'actions',
+        key: 'admin-actions',
       }
     ],
   }

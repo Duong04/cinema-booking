@@ -12,7 +12,7 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'cinema-chains',
-    name: 'cinema-chains',
+    name: 'admin-cinema-chains',
     component: () => import('@/features/admin/views/cinema-chain/CinemaChainView.vue'),
     meta: {
       title: 'Cinema - Admin Cinema Chains',
@@ -24,7 +24,7 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'cinemas',
-    name: 'cinemas',
+    name: 'admin-cinemas',
     component: () => import('@/features/admin/views/cinema/CinemaView.vue'),
     meta: {
       title: 'Cinema - Admin Cinemas',
@@ -37,7 +37,7 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'rooms',
-    name: 'rooms',
+    name: 'admin-rooms',
     component: () => import('@/features/admin/views/room/RoomView.vue'),
     meta: {
       title: 'Cinema - Admin Rooms',
@@ -49,8 +49,21 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'movies',
+    name: 'admin-movies',
+    component: () => import('@/features/admin/views/movie/MovieView.vue'),
+    meta: {
+      title: 'Cinema - Admin Movies',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Phim' },
+        { label: 'Danh sách phim' },
+      ],
+    },
+  },
+  {
     path: 'genres',
-    name: 'genres',
+    name: 'admin-genres',
     component: () => import('@/features/admin/views/genre/GenreView.vue'),
     meta: {
       title: 'Cinema - Admin Genres',
@@ -63,7 +76,7 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'cities',
-    name: 'cities',
+    name: 'admin-cities',
     component: () => import('@/features/admin/views/city/CityView.vue'),
     meta: {
       title: 'Cinema - Admin Cities',
@@ -76,7 +89,7 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'roles',
-    name: 'roles',
+    name: 'admin-roles',
     component: () => import('@/features/admin/views/role/RoleView.vue'),
     meta: {
       title: 'Cinema - Admin Roles',
@@ -89,7 +102,7 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'permissions',
-    name: 'permissions',
+    name: 'admin-permissions',
     component: () => import('@/features/admin/views/permission/PermissionView.vue'),
     meta: {
       title: 'Cinema - Admin Permissions',
@@ -102,7 +115,7 @@ export const adminRoutes: RouteRecordRaw[] = [
   },
   {
     path: 'ations',
-    name: 'actions',
+    name: 'admin-actions',
     component: () => import('@/features/admin/views/action/ActionView.vue'),
     meta: {
       title: 'Cinema - Admin Actions',
