@@ -39,6 +39,14 @@ export const menuOptions: MenuOption[] = [
         label: 'Phòng chiếu',
         key: 'admin-rooms',
       },
+      {
+        label: 'Loại ghế',
+        key: 'admin-seat-types',
+      },
+      {
+        label: 'Ghế',
+        key: 'admin-seats'
+      },
     ],
   },
   {

@@ -9,6 +9,7 @@ import { formatDate } from '@/shared/utils/formatDate'
 import { Search as SearchIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { useMessage, useDialog } from 'naive-ui'
+import SeatFormModal from './components/SeatFormModal.vue'
 
 const { data, loading, filters, pagination, fetchRooms, deleteRoom } = useRoom()
 
@@ -64,6 +65,16 @@ function createColumns(): DataTableColumns<Room> {
       render: (row) => h('span', formatDate(row.updated_at)),
     },
     {
+      title: 'Show Seats',
+      key: 'show_seats',
+      render: (row) =>
+        h(
+          NButton,
+          { size: 'small', type: 'info', onClick: () => openSeatModal(row) },
+          { default: () => 'Seats' },
+        ),
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (row) =>
@@ -84,6 +95,14 @@ function createColumns(): DataTableColumns<Room> {
 }
 
 const columns = createColumns()
+
+const showSeatModal = ref(false)
+const selectedRoomForSeat = ref<Room | null>(null)
+
+function openSeatModal(row: Room) {
+  selectedRoomForSeat.value = row
+  showSeatModal.value = true
+}
 
 function openCreateModal() {
   selectedRoom.value = null
@@ -168,5 +187,6 @@ onMounted(fetchRooms)
     @update:checked-row-keys="(keys: DataTableRowKey[]) => (checkedRowKeysRef = keys)"
   />
 
+  <SeatFormModal v-model:show="showSeatModal" :room="selectedRoomForSeat" />
   <RoomFormModal v-model:show="showModal" :room="selectedRoom" @success="fetchRooms" />
 </template>

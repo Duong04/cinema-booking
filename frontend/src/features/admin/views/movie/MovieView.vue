@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
-import { ref, onMounted, h, computed } from 'vue'
+import { ref, onMounted, h, computed, resolveComponent } from 'vue'
 import { NButton } from 'naive-ui'
 import { useMovie } from '../../composables/useMovie'
 import MovieFormModal from './components/MovieFormModal.vue'
@@ -39,7 +39,7 @@ function createColumns(): DataTableColumns<Movie> {
         }),
     },
     {
-      title: 'Tên phim',
+      title: 'Title',
       key: 'title',
       render: (row) =>
         h('div', [
@@ -52,7 +52,7 @@ function createColumns(): DataTableColumns<Movie> {
         ]),
     },
     {
-      title: 'Thể loại',
+      title: 'Genre',
       key: 'genres',
       render: (row) =>
         h(
@@ -71,18 +71,26 @@ function createColumns(): DataTableColumns<Movie> {
         ),
     },
     {
-      title: 'Thời lượng',
+      title: 'Duration',
       key: 'duration_minutes',
       width: 100,
       render: (row) =>
         h(
-          'span',
-          { style: 'color:var(--n-text-color-3);font-size:13px' },
-          `${row.duration_minutes} phút`,
+          resolveComponent('n-tag'),
+          {
+            round: true,
+            type: 'info',
+          },
+          () =>
+            h(
+              'span',
+              { style: 'color:var(--n-text-color-3);font-size:13px' },
+              `${row.duration_minutes} phút`,
+            ),
         ),
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       key: 'status',
       width: 120,
       render: (row) => {
@@ -118,7 +126,7 @@ function createColumns(): DataTableColumns<Movie> {
       },
     },
     {
-      title: 'Ngày chiếu',
+      title: 'Release Date',
       key: 'release_date',
       width: 110,
       render: (row) =>
@@ -129,7 +137,18 @@ function createColumns(): DataTableColumns<Movie> {
         ),
     },
     {
-      title: 'Thao tác',
+      title: 'Created At',
+      key: 'created_at',
+      width: 110,
+      render: (row) =>
+        h(
+          'span',
+          { style: 'font-size:12px;color:var(--n-text-color-3)' },
+          formatDate(row.created_at),
+        ),
+    },
+    {
+      title: 'Actions',
       key: 'actions',
       width: 120,
       render: (row) =>
@@ -230,6 +249,7 @@ onMounted(fetchMovies)
     :loading="loading"
     :pagination="pagination"
     :row-key="(row: Movie) => row.id"
+    :scroll-x="1000"
     remote
     @update:checked-row-keys="(keys: DataTableRowKey[]) => (checkedRowKeysRef = keys)"
   />

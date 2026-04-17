@@ -49,6 +49,19 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'seat-types',
+    name: 'admin-seat-types',
+    component: () => import('@/features/admin/views/seat-type/SeatTypeView.vue'),
+    meta: {
+      title: 'Cinema - Admin Seat Types',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Rạp chiếu phim' },
+        { label: 'Loại ghế' },
+      ],
+    },
+  },
+  {
     path: 'movies',
     name: 'admin-movies',
     component: () => import('@/features/admin/views/movie/MovieView.vue'),
