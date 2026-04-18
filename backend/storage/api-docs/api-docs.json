@@ -5776,6 +5776,222 @@
                 }
             }
         },
+        "/api/v1/rooms/{roomId}/seats/{rowLabel}": {
+            "put": {
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "Update a specific seat row in a room",
+                "operationId": "2db62bbe94ddb7df16b2f910657facfe",
+                "parameters": [
+                    {
+                        "name": "roomId",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d8785-d6c2-70c6-b875-3e13669b46b4"
+                        }
+                    },
+                    {
+                        "name": "rowLabel",
+                        "in": "path",
+                        "description": "Row label (A, B, C...)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "A"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "seat_type_id",
+                                    "seats_per_row"
+                                ],
+                                "properties": {
+                                    "seat_type_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "019d9c3e-498c-7224-a8ca-ca1648b8b7a8"
+                                    },
+                                    "seats_per_row": {
+                                        "type": "integer",
+                                        "example": 9
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Row updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật hàng ghế thành công"
+                                        },
+                                        "data": {
+                                            "type": "nullable",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Room or row not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy hàng ghế hoặc phòng chiếu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "seat_type_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "seats_per_row": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Seat"
+                ],
+                "summary": "Delete a specific seat row in a room",
+                "operationId": "82d96a0d84714d36ec9d6a6886d6238e",
+                "parameters": [
+                    {
+                        "name": "roomId",
+                        "in": "path",
+                        "description": "Room ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d8785-d6c2-70c6-b875-3e13669b46b4"
+                        }
+                    },
+                    {
+                        "name": "rowLabel",
+                        "in": "path",
+                        "description": "Row label (A, B, C...)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "A"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Row deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa hàng thành công"
+                                        },
+                                        "data": {
+                                            "type": "nullable",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Room or row not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Không tìm thấy hàng ghế hoặc phòng chiếu!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/seat-types": {
             "get": {
                 "tags": [
@@ -7719,6 +7935,293 @@
                     }
                 }
             }
+        },
+        "/api/v1/upload/image": {
+            "post": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Upload a single image",
+                "operationId": "fd37480ec7351ffa83eeef73ddd21cb9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "Image file (jpeg, png, jpg, gif, webp, max 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "images"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Upload image successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Upload ảnh thành công"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "url": {
+                                                    "type": "string",
+                                                    "example": "https://res.cloudinary.com/demo/image/upload/v123456/sample.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/upload/file": {
+            "post": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Upload a single file",
+                "operationId": "d296d23de98eaa05b6dc631a7ecd1e17",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "File (pdf, doc, docx, mp4, mov, avi, max 50MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "files"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Upload file successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Upload file thành công"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "url": {
+                                                    "type": "string",
+                                                    "example": "https://res.cloudinary.com/demo/raw/upload/v123456/sample.pdf"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/upload/multiple": {
+            "post": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Upload multiple files",
+                "operationId": "c8542ccfc5634892ba593c4328b2ec5f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "files"
+                                ],
+                                "properties": {
+                                    "files": {
+                                        "description": "Max 10 files, each ≤ 10MB",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        },
+                                        "maxItems": 10
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "files"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Upload multiple files successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Upload 3 file thành công"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "url": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "https://res.cloudinary.com/demo/raw/upload/v1/file1.pdf",
+                                                        "https://res.cloudinary.com/demo/raw/upload/v1/file2.pdf"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Delete multiple files",
+                "operationId": "fbcdf361bd79df842d4832343b50a4cd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "urls"
+                                ],
+                                "properties": {
+                                    "urls": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "https://res.cloudinary.com/demo/image/upload/v1/file1.jpg",
+                                            "https://res.cloudinary.com/demo/image/upload/v1/file2.jpg"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/upload": {
+            "delete": {
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Delete a file by URL",
+                "operationId": "b7be5dd233bd6731eebb9b893523010a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "url"
+                                ],
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "example": "https://res.cloudinary.com/demo/image/upload/v123/sample.jpg"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -7777,6 +8280,10 @@
         {
             "name": "Showtime",
             "description": "Showtime"
+        },
+        {
+            "name": "Upload",
+            "description": "Upload"
         }
     ]
 }

@@ -6,6 +6,7 @@ import { ApiError } from '@/plugins/axios'
 import type { Seat, SeatRow } from '@/features/admin/types/seat.type'
 import type { Room } from '@/features/admin/types/room.type'
 import { seatTypeService } from '@/features/admin/services/seat-type.service'
+import { Pencil, Trash } from 'lucide-vue-next'
 
 interface SeatTypeOption {
   label: string
@@ -33,7 +34,6 @@ const activeTab = ref<'view' | 'create'>('view')
 const seatTypeOptions = ref<SeatTypeOption[]>([])
 const newRows = reactive<SeatRow[]>([{ label: '', seats_per_row: 10, seat_type_id: '' }])
 
-// Edit state
 const editingLabel = ref<string | null>(null)
 const editingRow = reactive<EditingRow>({ label: '', seat_type_id: '', seats_per_row: 10 })
 const savingRow = ref(false)
@@ -176,7 +176,6 @@ watch(
     @after-leave="resetNewRows"
   >
     <n-tabs v-model:value="activeTab" type="line" animated>
-      <!-- ── Tab: Sơ đồ ghế ── -->
       <n-tab-pane name="view" tab="Sơ đồ ghế">
         <n-spin :show="loadingSeats">
           <div v-if="!loadingSeats && !hasSeats" class="empty-state">
@@ -191,7 +190,6 @@ watch(
             <div class="screen-bar"><span>MÀN HÌNH</span></div>
 
             <div v-for="rowLabel in sortedRowLabels" :key="rowLabel" class="seat-row-wrapper">
-              <!-- Inline edit form -->
               <div v-if="editingLabel === rowLabel" class="edit-row-form">
                 <n-card size="small" :title="`Sửa hàng ${rowLabel}`">
                   <n-grid :cols="2" :x-gap="12">
@@ -231,7 +229,6 @@ watch(
                 </n-card>
               </div>
 
-              <!-- Normal seat row -->
               <div v-else class="seat-row">
                 <span class="row-label">{{ rowLabel }}</span>
                 <div class="seats">
@@ -255,10 +252,9 @@ watch(
                 </div>
                 <span class="row-label">{{ rowLabel }}</span>
 
-                <!-- Action buttons -->
                 <div class="row-actions">
                   <n-button size="tiny" quaternary type="primary" @click="startEdit(rowLabel)">
-                    ✏️ Sửa
+                    <Pencil :size="16" :stroke-width="2" />
                   </n-button>
                   <n-button
                     size="tiny"
@@ -267,13 +263,12 @@ watch(
                     :loading="deletingLabel === rowLabel"
                     @click="confirmDeleteRow(rowLabel)"
                   >
-                    🗑️ Xóa
+                    <Trash :size="16" :stroke-width="2" />
                   </n-button>
                 </div>
               </div>
             </div>
 
-            <!-- Legend -->
             <div class="legend">
               <div class="legend-item">
                 <div class="seat standard" style="pointer-events: none" />
@@ -292,7 +287,6 @@ watch(
         </n-spin>
       </n-tab-pane>
 
-      <!-- ── Tab: Tạo hàng mới ── -->
       <n-tab-pane name="create" tab="Tạo hàng ghế mới">
         <div class="create-section">
           <div v-for="(row, index) in newRows" :key="index" class="row-form-item">
