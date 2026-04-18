@@ -106,6 +106,8 @@ Route::prefix('v1')->group(function () {
     Route::prefix('rooms')->controller(SeatController::class)->middleware('auth:sanctum')->group(function () {
         Route::get('/{id}/seats', 'getSeatByRoom');
         Route::post('/{id}/seats', 'create');
+        Route::put('/{id}/seats/{rowLabel}', 'updateRow');
+        Route::delete('/{id}/seats/{rowLabel}', 'deleteRow');
     });
 
     Route::prefix('movies')->controller(MovieController::class)->middleware('auth:sanctum')->group(function () {

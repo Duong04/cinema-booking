@@ -210,4 +210,135 @@ class SeatController extends Controller
         return $this->success($seats, 'Generate ghế thành công', 201);
     }
 
+    #[OA\Put(
+        path: "/api/v1/rooms/{roomId}/seats/{rowLabel}",
+        summary: "Update a specific seat row in a room",
+        tags: ["Seat"],
+        parameters: [
+            new OA\Parameter(
+                name: "roomId",
+                in: "path",
+                required: true,
+                description: "Room ID",
+                schema: new OA\Schema(type: "string", format: "uuid", example: "019d8785-d6c2-70c6-b875-3e13669b46b4")
+            ),
+            new OA\Parameter(
+                name: "rowLabel",
+                in: "path",
+                required: true,
+                description: "Row label (A, B, C...)",
+                schema: new OA\Schema(type: "string", example: "A")
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["seat_type_id", "seats_per_row"],
+                properties: [
+                    new OA\Property(property: "seat_type_id", type: "string", format: "uuid", example: "019d9c3e-498c-7224-a8ca-ca1648b8b7a8"),
+                    new OA\Property(property: "seats_per_row", type: "integer", example: 9),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Row updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Cập nhật hàng ghế thành công"),
+                        new OA\Property(property: "data", type: "nullable", example: null),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Room or row not found",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy hàng ghế hoặc phòng chiếu!"),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Validation error",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "The given data was invalid."),
+                        new OA\Property(
+                            property: "errors",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "seat_type_id", type: "array", items: new OA\Items(type: "string")),
+                                new OA\Property(property: "seats_per_row", type: "array", items: new OA\Items(type: "string")),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function updateRow(SeatRequest $request, string $roomId, string $rowLabel)
+    {
+        $data = $request->validated();
+
+        $this->seatService->update($roomId, $rowLabel, $data);
+
+        return $this->success(null, 'Cập nhật hàng ghế thành công', 200);
+    }
+
+    #[OA\Delete(
+        path: "/api/v1/rooms/{roomId}/seats/{rowLabel}",
+        summary: "Delete a specific seat row in a room",
+        tags: ["Seat"],
+        parameters: [
+            new OA\Parameter(
+                name: "roomId",
+                in: "path",
+                required: true,
+                description: "Room ID",
+                schema: new OA\Schema(type: "string", format: "uuid", example: "019d8785-d6c2-70c6-b875-3e13669b46b4")
+            ),
+            new OA\Parameter(
+                name: "rowLabel",
+                in: "path",
+                required: true,
+                description: "Row label (A, B, C...)",
+                schema: new OA\Schema(type: "string", example: "A")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Row deleted successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Xóa hàng thành công"),
+                        new OA\Property(property: "data", type: "nullable", example: null),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Room or row not found",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Không tìm thấy hàng ghế hoặc phòng chiếu!"),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function deleteRow(string $roomId, string $rowLabel)
+    {
+        $this->seatService->deleteRow($roomId, $rowLabel);
+
+        return $this->success(null, 'Xóa hàng thành công', 200);
+    }
 }

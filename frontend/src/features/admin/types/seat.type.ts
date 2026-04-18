@@ -20,3 +20,8 @@ export interface SeatRow {
 export interface CreateSeatPayload {
   rows: SeatRow[]
 }
+
+export interface UpdateSeatPayload {
+  seat_type_id: string
+  seats_per_row: number
+}

@@ -17,7 +17,7 @@ export function useSeat(roomId: string) {
   }
 
   async function createSeats(payload: CreateSeatPayload) {
-    await seatService.createSeatByRoomId(roomId, payload as any)
+    await seatService.createSeatByRoomId(roomId, payload)
     await fetchSeats()
   }
 

@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue'
-import { useMessage } from 'naive-ui'
+import { useMessage, useDialog } from 'naive-ui'
 import { seatService } from '@/features/admin/services/seat.service'
 import { ApiError } from '@/plugins/axios'
 import type { Seat, SeatRow } from '@/features/admin/types/seat.type'
 import type { Room } from '@/features/admin/types/room.type'
+import { seatTypeService } from '@/features/admin/services/seat-type.service'
 
 interface SeatTypeOption {
   label: string
   value: string
+}
+
+interface EditingRow {
+  label: string
+  seat_type_id: string
+  seats_per_row: number
 }
 
 const props = defineProps<{
@@ -17,20 +24,22 @@ const props = defineProps<{
 
 const showModal = defineModel<boolean>('show')
 const message = useMessage()
+const dialog = useDialog()
 
 const seatMap = ref<Record<string, Seat[]> | null>(null)
 const loadingSeats = ref(false)
 const submitting = ref(false)
 const activeTab = ref<'view' | 'create'>('view')
-
 const seatTypeOptions = ref<SeatTypeOption[]>([])
-
 const newRows = reactive<SeatRow[]>([{ label: '', seats_per_row: 10, seat_type_id: '' }])
 
-const sortedRowLabels = computed(() =>
-  seatMap.value ? Object.keys(seatMap.value).sort() : [],
-)
+// Edit state
+const editingLabel = ref<string | null>(null)
+const editingRow = reactive<EditingRow>({ label: '', seat_type_id: '', seats_per_row: 10 })
+const savingRow = ref(false)
+const deletingLabel = ref<string | null>(null)
 
+const sortedRowLabels = computed(() => (seatMap.value ? Object.keys(seatMap.value).sort() : []))
 const hasSeats = computed(() => sortedRowLabels.value.length > 0)
 
 async function fetchSeats() {
@@ -38,24 +47,75 @@ async function fetchSeats() {
   loadingSeats.value = true
   try {
     const res = await seatService.getSeatByRoomId(props.room.id)
-    seatMap.value = res.data.data as unknown as Record<string, Seat[]>
-
-    const typeMap: Record<string, string> = {}
-    Object.values(seatMap.value)
-      .flat()
-      .forEach((seat) => {
-        if (seat.seat_type) {
-          typeMap[seat.seat_type.id] = seat.seat_type.name
-        }
-      })
-    seatTypeOptions.value = Object.entries(typeMap).map(([id, name]) => ({
-      label: name,
-      value: id,
-    }))
+    seatMap.value = res.data
   } catch {
     message.error('Không thể tải dữ liệu ghế')
   } finally {
     loadingSeats.value = false
+  }
+}
+
+async function fetchOptions() {
+  const seatTypesRes = await seatTypeService.getAllSeatTypes()
+  seatTypeOptions.value = seatTypesRes.data.map((seatType) => ({
+    label: seatType.name,
+    value: seatType.id,
+  }))
+}
+
+function startEdit(rowLabel: string) {
+  const seats = seatMap.value?.[rowLabel] ?? []
+  editingLabel.value = rowLabel
+  editingRow.label = rowLabel
+  editingRow.seat_type_id = seats[0]?.seat_type_id ?? ''
+  editingRow.seats_per_row = seats.length
+}
+
+function cancelEdit() {
+  editingLabel.value = null
+}
+
+async function handleSaveRow() {
+  if (!props.room?.id || !editingLabel.value) return
+  savingRow.value = true
+  try {
+    await seatService.updateRow(props.room.id, editingLabel.value, {
+      seat_type_id: editingRow.seat_type_id,
+      seats_per_row: editingRow.seats_per_row,
+    })
+    message.success(`Đã cập nhật hàng ${editingLabel.value}`)
+    editingLabel.value = null
+    await fetchSeats()
+  } catch (err) {
+    if (err instanceof ApiError) message.error(err.message)
+    else message.error('Đã có lỗi xảy ra')
+  } finally {
+    savingRow.value = false
+  }
+}
+
+function confirmDeleteRow(rowLabel: string) {
+  dialog.warning({
+    title: `Xóa hàng ${rowLabel}`,
+    content: `Bạn có chắc muốn xóa toàn bộ ghế hàng ${rowLabel}? Hành động này không thể hoàn tác.`,
+    positiveText: 'Xóa',
+    negativeText: 'Hủy',
+    onPositiveClick: () => handleDeleteRow(rowLabel),
+  })
+}
+
+async function handleDeleteRow(rowLabel: string) {
+  if (!props.room?.id) return
+  deletingLabel.value = rowLabel
+  try {
+    await seatService.deleteRow(props.room.id, rowLabel)
+    message.success(`Đã xóa hàng ${rowLabel}`)
+    await fetchSeats()
+  } catch (err) {
+    if (err instanceof ApiError) message.error(err.message)
+    else message.error('Đã có lỗi xảy ra')
+  } finally {
+    deletingLabel.value = null
   }
 }
 
@@ -69,13 +129,11 @@ function removeRow(index: number) {
 
 async function handleSubmit() {
   if (!props.room?.id) return
-
   const invalid = newRows.some((r) => !r.label.trim() || !r.seat_type_id || r.seats_per_row < 1)
   if (invalid) {
     message.warning('Vui lòng điền đầy đủ thông tin cho tất cả các hàng')
     return
   }
-
   submitting.value = true
   try {
     await seatService.createSeatByRoomId(props.room.id, { rows: [...newRows] })
@@ -84,11 +142,8 @@ async function handleSubmit() {
     activeTab.value = 'view'
     await fetchSeats()
   } catch (err) {
-    if (err instanceof ApiError) {
-      message.error(err.message)
-    } else {
-      message.error('Đã có lỗi hệ thống xảy ra')
-    }
+    if (err instanceof ApiError) message.error(err.message)
+    else message.error('Đã có lỗi hệ thống xảy ra')
   } finally {
     submitting.value = false
   }
@@ -105,6 +160,7 @@ watch(
       activeTab.value = 'view'
       resetNewRows()
       fetchSeats()
+      fetchOptions()
     }
   },
 )
@@ -115,50 +171,109 @@ watch(
     v-model:show="showModal"
     preset="card"
     :title="`Quản lý ghế — ${room?.name ?? ''}`"
-    style="width: 760px"
+    style="width: 820px"
     :segmented="{ content: true, footer: 'soft' }"
     @after-leave="resetNewRows"
   >
     <n-tabs v-model:value="activeTab" type="line" animated>
+      <!-- ── Tab: Sơ đồ ghế ── -->
       <n-tab-pane name="view" tab="Sơ đồ ghế">
         <n-spin :show="loadingSeats">
           <div v-if="!loadingSeats && !hasSeats" class="empty-state">
             <n-empty description="Phòng này chưa có ghế nào" size="large">
               <template #extra>
-                <n-button type="primary" @click="activeTab = 'create'"> + Tạo ghế ngay </n-button>
+                <n-button type="primary" @click="activeTab = 'create'">+ Tạo ghế ngay</n-button>
               </template>
             </n-empty>
           </div>
 
           <div v-else class="seat-map">
-            <div class="screen-bar">
-              <span>MÀN HÌNH</span>
-            </div>
+            <div class="screen-bar"><span>MÀN HÌNH</span></div>
 
-            <div v-for="rowLabel in sortedRowLabels" :key="rowLabel" class="seat-row">
-              <span class="row-label">{{ rowLabel }}</span>
-              <div class="seats">
-                <n-tooltip
-                  v-for="seat in (seatMap || {})[rowLabel] || []"
-                  :key="seat.id"
-                  trigger="hover"
-                  placement="top"
-                >
-                  <template #trigger>
-                    <div class="seat" :class="seat.seat_type?.name?.toLowerCase()">
-                      {{ seat.seat_number }}
-                    </div>
+            <div v-for="rowLabel in sortedRowLabels" :key="rowLabel" class="seat-row-wrapper">
+              <!-- Inline edit form -->
+              <div v-if="editingLabel === rowLabel" class="edit-row-form">
+                <n-card size="small" :title="`Sửa hàng ${rowLabel}`">
+                  <n-grid :cols="2" :x-gap="12">
+                    <n-gi>
+                      <n-form-item label="Loại ghế" required>
+                        <n-select
+                          v-model:value="editingRow.seat_type_id"
+                          :options="seatTypeOptions"
+                          placeholder="Chọn loại ghế"
+                        />
+                      </n-form-item>
+                    </n-gi>
+                    <n-gi>
+                      <n-form-item label="Số ghế / hàng" required>
+                        <n-input-number
+                          v-model:value="editingRow.seats_per_row"
+                          :min="1"
+                          :max="50"
+                          style="width: 100%"
+                        />
+                      </n-form-item>
+                    </n-gi>
+                  </n-grid>
+                  <template #footer>
+                    <n-space justify="end">
+                      <n-button size="small" @click="cancelEdit">Hủy</n-button>
+                      <n-button
+                        size="small"
+                        type="primary"
+                        :loading="savingRow"
+                        @click="handleSaveRow"
+                      >
+                        Lưu
+                      </n-button>
+                    </n-space>
                   </template>
-                  <span>
-                    {{ rowLabel }}{{ seat.seat_number }} · {{ seat.seat_type?.name }} (×{{
-                      seat.seat_type?.base_multiplier
-                    }})
-                  </span>
-                </n-tooltip>
+                </n-card>
               </div>
-              <span class="row-label">{{ rowLabel }}</span>
+
+              <!-- Normal seat row -->
+              <div v-else class="seat-row">
+                <span class="row-label">{{ rowLabel }}</span>
+                <div class="seats">
+                  <n-tooltip
+                    v-for="seat in seatMap?.[rowLabel] ?? []"
+                    :key="seat.id"
+                    trigger="hover"
+                    placement="top"
+                  >
+                    <template #trigger>
+                      <div class="seat" :class="seat.seat_type?.name?.toLowerCase()">
+                        {{ seat.seat_number }}
+                      </div>
+                    </template>
+                    <span>
+                      {{ rowLabel }}{{ seat.seat_number }} · {{ seat.seat_type?.name }} (×{{
+                        seat.seat_type?.base_multiplier
+                      }})
+                    </span>
+                  </n-tooltip>
+                </div>
+                <span class="row-label">{{ rowLabel }}</span>
+
+                <!-- Action buttons -->
+                <div class="row-actions">
+                  <n-button size="tiny" quaternary type="primary" @click="startEdit(rowLabel)">
+                    ✏️ Sửa
+                  </n-button>
+                  <n-button
+                    size="tiny"
+                    quaternary
+                    type="error"
+                    :loading="deletingLabel === rowLabel"
+                    @click="confirmDeleteRow(rowLabel)"
+                  >
+                    🗑️ Xóa
+                  </n-button>
+                </div>
+              </div>
             </div>
 
+            <!-- Legend -->
             <div class="legend">
               <div class="legend-item">
                 <div class="seat standard" style="pointer-events: none" />
@@ -177,6 +292,7 @@ watch(
         </n-spin>
       </n-tab-pane>
 
+      <!-- ── Tab: Tạo hàng mới ── -->
       <n-tab-pane name="create" tab="Tạo hàng ghế mới">
         <div class="create-section">
           <div v-for="(row, index) in newRows" :key="index" class="row-form-item">
@@ -192,7 +308,6 @@ watch(
                   Xóa
                 </n-button>
               </template>
-
               <n-grid :cols="3" :x-gap="12">
                 <n-gi>
                   <n-form-item label="Ký hiệu hàng" required>
@@ -226,8 +341,7 @@ watch(
               </n-grid>
             </n-card>
           </div>
-
-          <n-button dashed block @click="addRow"> + Thêm hàng </n-button>
+          <n-button dashed block @click="addRow">+ Thêm hàng</n-button>
         </div>
       </n-tab-pane>
     </n-tabs>
@@ -249,7 +363,6 @@ watch(
 </template>
 
 <style scoped>
-/* ── Seat map ── */
 .seat-map {
   display: flex;
   flex-direction: column;
@@ -272,10 +385,35 @@ watch(
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.seat-row-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .seat-row {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.row-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.seat-row:hover .row-actions {
+  opacity: 1;
+}
+
+.edit-row-form {
+  width: 90%;
+  margin-bottom: 4px;
+  animation: slideIn 0.2s ease;
 }
 
 .row-label {
@@ -310,7 +448,6 @@ watch(
   transform: scale(1.15);
 }
 
-/* Seat type colors */
 .seat.standard {
   background: #e8f4fd;
   color: #2080f0;
@@ -327,7 +464,6 @@ watch(
   border-bottom-color: #18a058;
 }
 
-/* Legend */
 .legend {
   display: flex;
   gap: 16px;
@@ -344,14 +480,14 @@ watch(
   color: #666;
 }
 
-/* ── Create section ── */
 .create-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.row-form-item {
+.row-form-item,
+.edit-row-form {
   animation: slideIn 0.2s ease;
 }
 

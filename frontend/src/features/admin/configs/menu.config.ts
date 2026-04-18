@@ -42,11 +42,7 @@ export const menuOptions: MenuOption[] = [
       {
         label: 'Loại ghế',
         key: 'admin-seat-types',
-      },
-      {
-        label: 'Ghế',
-        key: 'admin-seats'
-      },
+      }
     ],
   },
   {
