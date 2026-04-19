@@ -62,6 +62,19 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'showtimes',
+    name: 'admin-showtimes',
+    component: () => import('@/features/admin/views/showtime/ShowtimeView.vue'),
+    meta: {
+      title: 'Cinema - Admin Showtimes',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Rạp chiếu phim' },
+        { label: 'Lịch chiếu' },
+      ],
+    },
+  },
+  {
     path: 'movies',
     name: 'admin-movies',
     component: () => import('@/features/admin/views/movie/MovieView.vue'),

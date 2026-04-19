@@ -42,6 +42,10 @@ export const menuOptions: MenuOption[] = [
       {
         label: 'Loại ghế',
         key: 'admin-seat-types',
+      },
+      {
+        label: 'Lịch chiếu',
+        key: 'admin-showtimes',
       }
     ],
   },
