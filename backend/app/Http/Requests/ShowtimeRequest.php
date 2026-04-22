@@ -43,4 +43,32 @@ class ShowtimeRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'movie_id'   => 'Phim',
+            'room_id'    => 'Rạp',
+            'show_date'  => 'Ngày chiếu',
+            'start_time' => 'Giờ chiếu',
+            'base_price' => 'Giá gốc',
+            'prices'     => 'Giá ghế',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'string' => ':attribute phải là chuỗi.',
+            'integer' => ':attribute phải là số nguyên.',
+            'min' => ':attribute phải lớn hơn hoặc bằng :min.',
+            'exists' => ':attribute không tồn tại.',
+            'array' => ':attribute phải là mảng.',
+            'date' => ':attribute không hợp lệ.',
+            'date_format' => ':attribute không hợp lệ.',
+            'after_or_equal' => ':attribute phải sau hoặc bằng ngày hiện tại.',
+            'numeric' => ':attribute phải là số.',
+        ];
+    }
 }

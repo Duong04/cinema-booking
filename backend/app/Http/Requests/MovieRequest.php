@@ -23,7 +23,7 @@ class MovieRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'title'            => ['required', 'string', 'max:255'],
+            'title'            => ['required', 'string', 'max:255', Rule::unique('movies', 'title')],
             'duration_minutes' => ['required', 'integer', 'min:1'],
             'poster_url'       => ['nullable', 'url', 'max:500'],
             'trailer_url'      => ['nullable', 'url', 'max:500'],
@@ -45,6 +45,7 @@ class MovieRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+                Rule::unique('movies', 'title')->ignore($id)
             ];
 
             $rules['duration_minutes'] = [
@@ -65,5 +66,39 @@ class MovieRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'title'            => 'Tiêu đề',
+            'duration_minutes' => 'Thời lượng',
+            'poster_url'       => 'Poster',
+            'trailer_url'      => 'Trailer',
+            'description'      => 'Mô tả',
+            'content'          => 'Nội dung',
+            'release_date'     => 'Ngày phát hành',
+            'rating'           => 'Đánh giá',
+            'language'         => 'Ngôn ngữ',
+            'status'           => 'Trạng thái',
+            'genres'           => 'Thể loại',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'unique' => ':attribute này đã tồn tại.',
+            'string' => ':attribute phải là chuỗi.',
+            'max' => ':attribute không được vượt quá :max ký tự.',
+            'integer' => ':attribute phải là số nguyên.',
+            'min' => ':attribute phải lớn hơn hoặc bằng :min.',
+            'array' => ':attribute phải là mảng.',
+            'exists' => ':attribute không tồn tại.',
+            'in' => ':attribute không hợp lệ.',
+            'url' => ':attribute không hợp lệ.',
+            'date' => ':attribute không hợp lệ.',
+        ];
     }
 }

@@ -38,4 +38,28 @@ class SeatRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'rows' => 'Rạp',
+            'seat_type_id' => 'Loại ghế',
+            'seats_per_row' => 'Số ghế mỗi hàng',   
+            'label' => 'Nhãn',
+        ];
+    }
+
+    public function messages(): array
+    {   
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'string' => ':attribute phải là chuỗi.',
+            'integer' => ':attribute phải là số nguyên.',
+            'min' => ':attribute phải lớn hơn hoặc bằng :min.',
+            'max' => ':attribute phải nhỏ hơn hoặc bằng :max.',
+            'exists' => ':attribute không tồn tại.',
+            'distinct' => ':attribute phải khác nhau.',
+            'array' => ':attribute phải là mảng.',  
+        ];
+    }
 }

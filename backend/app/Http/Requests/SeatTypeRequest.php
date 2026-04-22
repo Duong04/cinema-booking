@@ -47,4 +47,24 @@ class SeatTypeRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Tên',
+            'base_multiplier' => 'Tỉ lệ',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'unique' => ':attribute này đã tồn tại.',
+            'string' => ':attribute phải là chuỗi.',
+            'max' => ':attribute không được vượt quá :max ký tự.',
+            'numeric' => ':attribute phải là số.',
+            'min' => ':attribute phải lớn hơn hoặc bằng :min.',
+        ];
+    }
 }

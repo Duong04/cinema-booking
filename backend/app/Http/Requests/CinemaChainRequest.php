@@ -47,4 +47,22 @@ class CinemaChainRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Tên',
+            'logo' => 'Logo',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'unique' => ':attribute này đã tồn tại.',
+            'string' => ':attribute phải là chuỗi.',
+            'max' => ':attribute không được vượt quá :max ký tự.',
+        ];
+    }
 }

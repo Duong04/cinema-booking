@@ -28,4 +28,22 @@ class LoginRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'email' => 'Email',
+            'password' => 'Mật khẩu',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'email' => ':attribute không hợp lệ.',
+            'string' => ':attribute phải là chuỗi.',
+            'min' => ':attribute phải có ít nhất :min ký tự.',
+        ];
+    }
 }

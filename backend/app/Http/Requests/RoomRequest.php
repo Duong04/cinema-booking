@@ -52,4 +52,23 @@ class RoomRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Tên',
+            'type' => 'Loại',
+            'cinema_id' => 'Rạp',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'string' => ':attribute phải là chuỗi.',
+            'in' => ':attribute không hợp lệ.',
+            'exists' => ':attribute không tồn tại.',
+        ];
+    }
 }

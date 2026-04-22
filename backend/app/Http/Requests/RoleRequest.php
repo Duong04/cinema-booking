@@ -43,4 +43,22 @@ class RoleRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Tên',
+            'description' => 'Mô tả',
+            'permissions' => 'Quyền hạn',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute là bắt buộc.',
+            'unique' => ':attribute này đã tồn tại.',
+            'array' => ':attribute phải là mảng.',
+        ];
+    }
 }
