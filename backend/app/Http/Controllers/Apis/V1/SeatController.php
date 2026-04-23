@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SeatRequest;
 use App\Services\SeatService;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;

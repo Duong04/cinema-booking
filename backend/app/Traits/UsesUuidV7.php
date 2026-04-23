@@ -9,13 +9,13 @@ trait UsesUuidV7
 {
     use HasUuids;
 
-    public function initializeUsesUuidV7()
+    protected function initializeUsesUuidV7()
     {
         $this->incrementing = false;
         $this->keyType = 'string';
     }
 
-    public function newUniqueId()
+    protected function newUniqueId()
     {
         return (string) Str::uuid7();
     }

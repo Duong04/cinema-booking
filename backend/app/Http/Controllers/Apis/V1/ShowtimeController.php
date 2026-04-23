@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Http\Requests\ShowtimeRequest;
 use App\Services\ShowtimeService;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class ShowtimeController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $showtimeService;
 
@@ -173,9 +174,9 @@ class ShowtimeController extends Controller
             ),
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $movieId = $query['movie_id'] ?? null;
         $roomId = $query['room_id'] ?? null;
@@ -183,17 +184,7 @@ class ShowtimeController extends Controller
 
         $showtimes = $this->showtimeService->paginate($limit, $movieId, $roomId, $showDate);
 
-        return $this->successList($showtimes->items(), [
-            'total' => $showtimes->total(),
-            'per_page' => $showtimes->perPage(),
-            'current_page' => $showtimes->currentPage(),
-            'last_page' => $showtimes->lastPage(),
-            'current_page_url' => $showtimes->url($showtimes->currentPage()),
-            'first_page_url' => $showtimes->url(1),
-            'last_page_url' => $showtimes->url($showtimes->lastPage()),
-            'next_page_url' => $showtimes->nextPageUrl(),
-            'prev_page_url' => $showtimes->previousPageUrl(),
-        ]);
+        return $this->successList($showtimes->items(), $this->paginationMeta($showtimes));
     }
     #[OA\Post(
         path: "/api/v1/showtimes",

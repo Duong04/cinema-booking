@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ActionRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\ActionService;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class ActionController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $actionService;
 
@@ -93,24 +94,14 @@ class ActionController extends Controller
             )
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
 
         $actions = $this->actionService->paginate($limit);
 
-        return $this->successList($actions->items(), [
-            'total' => $actions->total(),
-            'per_page' => $actions->perPage(),
-            'current_page' => $actions->currentPage(),
-            'last_page' => $actions->lastPage(),
-            'current_page_url' => $actions->url($actions->currentPage()),
-            'first_page_url' => $actions->url(1),
-            'last_page_url' => $actions->url($actions->lastPage()),
-            'next_page_url' => $actions->nextPageUrl(),
-            'prev_page_url' => $actions->previousPageUrl(),
-        ]);
+        return $this->successList($actions->items(), $this->paginationMeta($actions));
     }
 
     #[OA\Post(

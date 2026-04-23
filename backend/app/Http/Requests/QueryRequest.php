@@ -27,6 +27,9 @@ class QueryRequest extends FormRequest
             'room_id' => 'nullable|uuid|exists:rooms,id',
             'movie_id' => 'nullable|uuid|exists:movies,id',
             'show_date' => 'nullable|date',
+            'city_id' => 'nullable|exists:cities,id',
+            'cinema_chain_id' => 'nullable|exists:cinema_chains,id',
+            'status' => 'nullable|string'
         ];
     }
 }

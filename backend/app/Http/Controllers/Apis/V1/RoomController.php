@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Http\Requests\RoomRequest;
+use App\Traits\PaginationTrait;
 use Illuminate\Http\Request;
 use App\Services\RoomService;
 use App\Traits\ResponseHelper;
@@ -12,7 +13,7 @@ use OpenApi\Attributes as OA;
 
 class RoomController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $roomService;
 
@@ -105,25 +106,15 @@ class RoomController extends Controller
             ),
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 
         $rooms = $this->roomService->paginate($limit, $q);
 
-        return $this->successList($rooms->items(), [
-            'total' => $rooms->total(),
-            'per_page' => $rooms->perPage(),
-            'current_page' => $rooms->currentPage(),
-            'last_page' => $rooms->lastPage(),
-            'current_page_url' => $rooms->url($rooms->currentPage()),
-            'first_page_url' => $rooms->url(1),
-            'last_page_url' => $rooms->url($rooms->lastPage()),
-            'next_page_url' => $rooms->nextPageUrl(),
-            'prev_page_url' => $rooms->previousPageUrl(),
-        ]);
+        return $this->successList($rooms->items(), $this->paginationMeta($rooms));
     }
 
     #[OA\Post(

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Http\Requests\CityRequest;
+use App\Traits\PaginationTrait;
 use Illuminate\Http\Request;
 use App\Services\CityService;
 use App\Traits\ResponseHelper;
@@ -12,7 +13,7 @@ use OpenApi\Attributes as OA;
 
 class CityController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $cityService;
 
@@ -97,25 +98,15 @@ class CityController extends Controller
             )
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 
         $cities = $this->cityService->paginate($limit, $q);
 
-        return $this->successList($cities->items(), [
-            'total' => $cities->total(),
-            'per_page' => $cities->perPage(),
-            'current_page' => $cities->currentPage(),
-            'last_page' => $cities->lastPage(),
-            'current_page_url' => $cities->url($cities->currentPage()),
-            'first_page_url' => $cities->url(1),
-            'last_page_url' => $cities->url($cities->lastPage()),
-            'next_page_url' => $cities->nextPageUrl(),
-            'prev_page_url' => $cities->previousPageUrl(),
-        ]);
+        return $this->successList($cities->items(), $this->paginationMeta($cities));
     }
 
     #[OA\Post(

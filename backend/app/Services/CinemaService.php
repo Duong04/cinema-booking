@@ -10,8 +10,8 @@ class CinemaService {
         $this->cinemaRepository = $cinemaRepository;
     }
 
-    public function paginate($limit, $q) {
-        $cinemas = $this->cinemaRepository->paginate($limit, $q);
+    public function paginate($limit, $q, $cityId, $cinemaChainId) {
+        $cinemas = $this->cinemaRepository->paginate($limit, $q, $cityId, $cinemaChainId);
 
         return $cinemas;
     }

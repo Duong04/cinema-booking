@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\PermissionService;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class PermissionController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $permissionService;
 
@@ -92,24 +93,14 @@ class PermissionController extends Controller
             )
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
 
         $permissions = $this->permissionService->paginate($limit);
 
-        return $this->successList($permissions->items(), [
-            'total' => $permissions->total(),
-            'per_page' => $permissions->perPage(),
-            'current_page' => $permissions->currentPage(),
-            'last_page' => $permissions->lastPage(),
-            'current_page_url' => $permissions->url($permissions->currentPage()),
-            'first_page_url' => $permissions->url(1),
-            'last_page_url' => $permissions->url($permissions->lastPage()),
-            'next_page_url' => $permissions->nextPageUrl(),
-            'prev_page_url' => $permissions->previousPageUrl(),
-        ]);
+        return $this->successList($permissions->items(), $this->paginationMeta($permissions));
     }
 
     #[OA\Post(

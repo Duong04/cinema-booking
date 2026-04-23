@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\GenreRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\GenreService;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class GenreController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $genreTypeService;
 
@@ -86,25 +87,15 @@ class GenreController extends Controller
             ),
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 
         $genres = $this->genreTypeService->paginate($limit, $q);
 
-        return $this->successList($genres->items(), [
-            'total' => $genres->total(),
-            'per_page' => $genres->perPage(),
-            'current_page' => $genres->currentPage(),
-            'last_page' => $genres->lastPage(),
-            'current_page_url' => $genres->url($genres->currentPage()),
-            'first_page_url' => $genres->url(1),
-            'last_page_url' => $genres->url($genres->lastPage()),
-            'next_page_url' => $genres->nextPageUrl(),
-            'prev_page_url' => $genres->previousPageUrl(),
-        ]);
+        return $this->successList($genres->items(), $this->paginationMeta($genres));
     }
 
     #[OA\Post(

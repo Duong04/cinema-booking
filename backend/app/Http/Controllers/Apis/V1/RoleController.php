@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Http\Requests\RoleRequest;
 use App\Http\Resources\RoleResource;
+use App\Traits\PaginationTrait;
 use Illuminate\Http\Request;
 use App\Services\RoleService;
 use App\Traits\ResponseHelper;
@@ -13,7 +14,7 @@ use OpenApi\Attributes as OA;
 
 class RoleController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $roleService;
 
@@ -99,25 +100,15 @@ class RoleController extends Controller
             )
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 
         $roles = $this->roleService->paginate($limit, $q);
 
-        return $this->successList($roles->items(), [
-            'total' => $roles->total(),
-            'per_page' => $roles->perPage(),
-            'current_page' => $roles->currentPage(),
-            'last_page' => $roles->lastPage(),
-            'current_page_url' => $roles->url($roles->currentPage()),
-            'first_page_url' => $roles->url(1),
-            'last_page_url' => $roles->url($roles->lastPage()),
-            'next_page_url' => $roles->nextPageUrl(),
-            'prev_page_url' => $roles->previousPageUrl(),
-        ]);
+        return $this->successList($roles->items(), $this->paginationMeta($roles));
     }
 
     #[OA\Post(

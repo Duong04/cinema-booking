@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Http\Requests\CinemaRequest;
+use App\Traits\PaginationTrait;
 use Illuminate\Http\Request;
 use App\Services\CinemaService;
 use App\Traits\ResponseHelper;
@@ -12,7 +13,7 @@ use OpenApi\Attributes as OA;
 
 class CinemaController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $cinemaService;
 
@@ -44,6 +45,20 @@ class CinemaController extends Controller
                 description: "Search by name",
                 required: false,
                 schema: new OA\Schema(type: "string", example: "CGV")
+            ),
+            new OA\Parameter(
+                name: "city_id",
+                in: "query",
+                description: "Search by city",
+                required: false,
+                schema: new OA\Schema(type: "string", example: "019d14e8-de20-7178-acf2-5850afc288f1")
+            ),
+            new OA\Parameter(
+                name: "cinema_chain_id",
+                in: "query",
+                description: "Search by cinema chain",
+                required: false,
+                schema: new OA\Schema(type: "string", example: "019d14e8-de20-7178-acf2-5850afc288f1")
             ),
         ],
         responses: [
@@ -107,25 +122,17 @@ class CinemaController extends Controller
             )
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
+        $cityId = $query['city_id'] ?? null;
+        $cinemaChainId = $query['cinema_chain_id'] ?? null;
 
-        $cinemas = $this->cinemaService->paginate($limit, $q);
+        $cinemas = $this->cinemaService->paginate($limit, $q, $cityId, $cinemaChainId);
 
-        return $this->successList($cinemas->items(), [
-            'total' => $cinemas->total(),
-            'per_page' => $cinemas->perPage(),
-            'current_page' => $cinemas->currentPage(),
-            'last_page' => $cinemas->lastPage(),
-            'current_page_url' => $cinemas->url($cinemas->currentPage()),
-            'first_page_url' => $cinemas->url(1),
-            'last_page_url' => $cinemas->url($cinemas->lastPage()),
-            'next_page_url' => $cinemas->nextPageUrl(),
-            'prev_page_url' => $cinemas->previousPageUrl(),
-        ]);
+        return $this->successList($cinemas->items(), $this->paginationMeta($cinemas));
     }
 
     #[OA\Post(

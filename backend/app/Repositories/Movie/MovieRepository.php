@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Repositories\Movie;
 
 use App\Repositories\Base\BaseRepository;
@@ -12,8 +12,11 @@ class MovieRepository extends BaseRepository implements MovieRepositoryInterface
         $this->model = $model;
     }
 
-    public function paginate($limit = 15, $q) {
-        $movies = $this->model->with('genres:id,name')->when($q, fn ($query) => $query->where('name', 'like', "%$q%"));
+    public function paginate($limit = 15, $q, $status)
+    {
+        $movies = $this->model->with('genres:id,name')
+            ->when($q, fn($query) => $query->where('title', 'like', "%$q%"))
+            ->when($status, fn($query) => $query->where('status', $status));
 
         return $movies->orderByDesc('created_at')->paginate($limit);
     }

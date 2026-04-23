@@ -14,8 +14,8 @@ class MovieService {
         $this->movieGenreRepository = $movieGenreRepository;
     }
 
-    public function paginate($limit, $q) {
-        $movies = $this->movieRepository->paginate($limit, $q);
+    public function paginate($limit, $q, $status) {
+        $movies = $this->movieRepository->paginate($limit, $q, $status);
 
         return $movies;
     }

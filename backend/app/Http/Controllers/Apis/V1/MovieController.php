@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MovieRequest;
 use App\Http\Requests\QueryRequest;
 use App\Services\MovieService;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class MovieController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $movieService;
 
@@ -49,7 +50,7 @@ class MovieController extends Controller
                 in: "query",
                 description: "Filter by status",
                 required: false,
-                schema: new OA\Schema(type: "string", enum: ["coming_soon", "now_showing", "ended"], example: "coming_soon")
+                schema: new OA\Schema(type: "string", enum: ["coming_soon", "now_showing", "ended", "cancelled"], example: "coming_soon")
             ),
         ],
         responses: [
@@ -121,25 +122,16 @@ class MovieController extends Controller
             ),
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
+        $status = $query['status'] ?? null;
 
-        $movies = $this->movieService->paginate($limit, $q);
+        $movies = $this->movieService->paginate($limit, $q, $status);
 
-        return $this->successList($movies->items(), [
-            'total' => $movies->total(),
-            'per_page' => $movies->perPage(),
-            'current_page' => $movies->currentPage(),
-            'last_page' => $movies->lastPage(),
-            'current_page_url' => $movies->url($movies->currentPage()),
-            'first_page_url' => $movies->url(1),
-            'last_page_url' => $movies->url($movies->lastPage()),
-            'next_page_url' => $movies->nextPageUrl(),
-            'prev_page_url' => $movies->previousPageUrl(),
-        ]);
+        return $this->successList($movies->items(), $this->paginationMeta($movies));
     }
     #[OA\Post(
         path: "/api/v1/movies",

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Http\Requests\CinemaChainRequest;
+use App\Traits\PaginationTrait;
 use Illuminate\Http\Request;
 use App\Services\CinemaChainService;
 use App\Traits\ResponseHelper;
@@ -12,7 +13,7 @@ use OpenApi\Attributes as OA;
 
 class CinemaChainController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $cinemaChainService;
 
@@ -108,25 +109,15 @@ class CinemaChainController extends Controller
             ),
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 
         $cinemaChains = $this->cinemaChainService->paginate($limit, $q);
 
-        return $this->successList($cinemaChains->items(), [
-            'total' => $cinemaChains->total(),
-            'per_page' => $cinemaChains->perPage(),
-            'current_page' => $cinemaChains->currentPage(),
-            'last_page' => $cinemaChains->lastPage(),
-            'current_page_url' => $cinemaChains->url($cinemaChains->currentPage()),
-            'first_page_url' => $cinemaChains->url(1),
-            'last_page_url' => $cinemaChains->url($cinemaChains->lastPage()),
-            'next_page_url' => $cinemaChains->nextPageUrl(),
-            'prev_page_url' => $cinemaChains->previousPageUrl(),
-        ]);
+        return $this->successList($cinemaChains->items(), $this->paginationMeta($cinemaChains));
     }
 
     #[OA\Post(

@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\QueryRequest;
 use App\Http\Requests\SeatTypeRequest;
 use App\Services\SeatTypeService;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class SeatTypeController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
 
     private $seatTypeService;
 
@@ -86,25 +87,15 @@ class SeatTypeController extends Controller
             ),
         ]
     )]
-    public function paginate(QueryRequest $requets)
+    public function paginate(QueryRequest $requet)
     {
-        $query = $requets->validated();
+        $query = $requet->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 
         $seatTypes = $this->seatTypeService->paginate($limit, $q);
 
-        return $this->successList($seatTypes->items(), [
-            'total' => $seatTypes->total(),
-            'per_page' => $seatTypes->perPage(),
-            'current_page' => $seatTypes->currentPage(),
-            'last_page' => $seatTypes->lastPage(),
-            'current_page_url' => $seatTypes->url($seatTypes->currentPage()),
-            'first_page_url' => $seatTypes->url(1),
-            'last_page_url' => $seatTypes->url($seatTypes->lastPage()),
-            'next_page_url' => $seatTypes->nextPageUrl(),
-            'prev_page_url' => $seatTypes->previousPageUrl(),
-        ]);
+        return $this->successList($seatTypes->items(), $this->paginationMeta($seatTypes));
     }
     #[OA\Post(
         path: "/api/v1/seat-types",

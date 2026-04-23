@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Repositories\Cinema;
 
 use App\Repositories\Base\BaseRepository;
@@ -12,13 +12,18 @@ class CinemaRepository extends BaseRepository implements CinemaRepositoryInterfa
         $this->model = $model;
     }
 
-    public function paginate($limit = 15, $q) {
+    public function paginate($limit = 15, $q, $cityId, $cinemaChainId)
+    {
         $cinemas = $this->model
-                ->with(['city:id,name', 'cinemaChain:id,name,logo'])
-                ->when($q, fn ($query) => $query
+            ->with(['city:id,name', 'cinemaChain:id,name,logo'])
+            ->when(
+                $q,
+                fn($query) => $query
                     ->where('name', 'like', "%$q%")
                     ->orWhere('address', 'like', "%$q%")
-                );
+            )
+            ->when($cityId, fn($query) => $query->where('city_id', $cityId))
+            ->when($cinemaChainId, fn($query) => $query->where('cinema_chain_id', $cinemaChainId));
 
         return $cinemas->orderByDesc('created_at')->paginate($limit);
     }
