@@ -3,11 +3,15 @@ import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import { ref, onMounted, h, computed } from 'vue'
 import { NButton, NTag, NSpace, NIcon, useMessage, useDialog } from 'naive-ui'
 import { useShowtime } from '../../composables/useShowtime'
+import { useMovie } from '../../composables/useMovie'
+import { useRoom } from '../../composables/useRoom'
 import ShowtimeFormModal from './components/ShowtimeFormModal.vue'
 import type { Showtime, Status } from '../../types/showtime.type'
 import { Search as SearchIcon } from '@vicons/ionicons5'
 
 const { data, loading, filters, pagination, fetchShowtimes, deleteShowtime } = useShowtime()
+const { data: movieData, fetchMovies } = useMovie()
+const { data: roomData, fetchRooms } = useRoom()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -17,30 +21,33 @@ const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
 
-const STATUS_MAP: Record<Status, { label: string; type: 'info' | 'success' | 'default' | 'error' | 'warning' }> = {
+const STATUS_MAP: Record<
+  Status,
+  { label: string; type: 'info' | 'success' | 'default' | 'error' | 'warning' }
+> = {
   scheduled: { label: 'Sắp chiếu', type: 'info' },
-  ongoing:   { label: 'Đang chiếu', type: 'success' },
+  ongoing: { label: 'Đang chiếu', type: 'success' },
   completed: { label: 'Đã kết thúc', type: 'default' },
   cancelled: { label: 'Đã hủy', type: 'error' },
 }
+
+const movieOptions = computed(() => movieData.value.map((c) => ({ label: c.title, value: c.id })))
+
+const roomOptions = computed(() => roomData.value.map((c) => ({ label: c.name, value: c.id })))
 
 function formatVND(value: string | number) {
   return Number(value).toLocaleString('vi-VN') + ' đ'
 }
 
 function formatTime(datetimeStr: string) {
-  // '2026-04-04 10:00:00' → '10:00'
   return datetimeStr?.split(' ')[1]?.slice(0, 5) ?? ''
 }
 
 function formatShowDate(dateStr: string) {
-  // '2026-04-04' → '04/04/2026'
   if (!dateStr) return ''
   const [y, m, d] = dateStr.split('-')
   return `${d}/${m}/${y}`
 }
-
-// ── Columns ───────────────────────────────────────────────────────────────────
 
 function createColumns(): DataTableColumns<Showtime> {
   return [
@@ -56,8 +63,16 @@ function createColumns(): DataTableColumns<Showtime> {
             style: 'width:36px; height:50px; object-fit:cover; border-radius:4px; flex-shrink:0',
           }),
           h('div', [
-            h('div', { style: 'font-weight:500; font-size:13px; line-height:1.3' }, row.movie?.title ?? '—'),
-            h('div', { style: 'font-size:12px; color:#999; margin-top:2px' }, `${row.movie?.duration_minutes} phút`),
+            h(
+              'div',
+              { style: 'font-weight:500; font-size:13px; line-height:1.3' },
+              row.movie?.title ?? '—',
+            ),
+            h(
+              'div',
+              { style: 'font-size:12px; color:#999; margin-top:2px' },
+              `${row.movie?.duration_minutes} phút`,
+            ),
           ]),
         ]),
     },
@@ -81,8 +96,7 @@ function createColumns(): DataTableColumns<Showtime> {
       title: 'Giờ chiếu',
       key: 'start_time',
       width: 140,
-      render: (row) =>
-        h('span', `${formatTime(row.start_time)} → ${formatTime(row.end_time)}`),
+      render: (row) => h('span', `${formatTime(row.start_time)} → ${formatTime(row.end_time)}`),
     },
     {
       title: 'Giá cơ bản',
@@ -126,27 +140,29 @@ function createColumns(): DataTableColumns<Showtime> {
       width: 130,
       fixed: 'right',
       render: (row) =>
-        h(NSpace, { size: 8 }, {
-          default: () => [
-            h(
-              NButton,
-              { size: 'small', type: 'primary', ghost: true, onClick: () => openEditModal(row) },
-              { default: () => 'Sửa' },
-            ),
-            h(
-              NButton,
-              { size: 'small', type: 'error', ghost: true, onClick: () => handleDelete(row) },
-              { default: () => 'Xóa' },
-            ),
-          ],
-        }),
+        h(
+          NSpace,
+          { size: 8 },
+          {
+            default: () => [
+              h(
+                NButton,
+                { size: 'small', type: 'primary', ghost: true, onClick: () => openEditModal(row) },
+                { default: () => 'Sửa' },
+              ),
+              h(
+                NButton,
+                { size: 'small', type: 'error', ghost: true, onClick: () => handleDelete(row) },
+                { default: () => 'Xóa' },
+              ),
+            ],
+          },
+        ),
     },
   ]
 }
 
 const columns = createColumns()
-
-// ── Actions ───────────────────────────────────────────────────────────────────
 
 function openCreateModal() {
   selectedShowtime.value = null
@@ -196,7 +212,9 @@ function handleDeleteMultiple() {
   })
 }
 
-onMounted(fetchShowtimes)
+onMounted(() => {
+  Promise.all([fetchShowtimes(), fetchMovies(), fetchRooms()])
+})
 </script>
 
 <template>
@@ -212,11 +230,28 @@ onMounted(fetchShowtimes)
           <n-icon><SearchIcon /></n-icon>
         </template>
       </n-input>
-      <n-button
-        v-if="hasChecked"
-        type="error"
-        @click="handleDeleteMultiple"
-      >
+      <n-select
+        v-model:value="filters.movie_id"
+        :options="movieOptions"
+        placeholder="Tìm theo phim"
+        filterable
+        clearable
+      />
+      <n-select
+        v-model:value="filters.room_id"
+        :options="roomOptions"
+        placeholder="Tìm theo phòng"
+        filterable
+        clearable
+      />
+      <n-date-picker
+        v-model:formatted-value="filters.show_date"
+        type="date"
+        value-format="yyyy-MM-dd"
+        placeholder="Chọn ngày chiếu"
+        clearable
+      />
+      <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
@@ -238,5 +273,7 @@ onMounted(fetchShowtimes)
     v-model:show="showModal"
     :showtime="selectedShowtime"
     @success="fetchShowtimes"
+    :movies="movieOptions"
+    :rooms="roomOptions"
   />
 </template>

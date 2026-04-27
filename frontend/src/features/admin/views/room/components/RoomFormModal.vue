@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick, onMounted } from 'vue'
+import { ref, reactive, watch, nextTick } from 'vue'
 import type { FormInst, FormRules, SelectOption } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { roomService } from '@/features/admin/services/room.service'
 import { ApiError } from '@/plugins/axios'
 import type { Room, RoomType } from '@/features/admin/types/room.type'
-import { cinemaService } from '@/features/admin/services/cinema.service'
 import { ROOM_TYPES } from '@/features/admin/types/room.type'
 
 interface RoomForm {
   name: string
   type: RoomType
-  cinema_id: string
+  cinema_id: string | null
 }
 
 const props = defineProps<{
   room?: Room | null
+  cinemas: SelectOption[]
 }>()
 
 const emit = defineEmits<{
@@ -27,7 +27,6 @@ const showModal = defineModel<boolean>('show')
 const formRef = ref<FormInst | null>(null)
 const formLoading = ref(false)
 const isEdit = ref(false)
-const cinemaOptions = ref<SelectOption[]>([])
 const roomTypeOptions = ROOM_TYPES.map((type) => ({
   label: type,
   value: type,
@@ -36,7 +35,7 @@ const roomTypeOptions = ROOM_TYPES.map((type) => ({
 const formData = reactive<RoomForm>({
   name: '',
   type: '2D',
-  cinema_id: '',
+  cinema_id: null,
 })
 
 const backendErrors = reactive<Record<string, string>>({})
@@ -53,14 +52,6 @@ function clearFieldError(field: keyof RoomForm) {
   }
 }
 
-async function fetchOptions() {
-  const cinemasRes = await cinemaService.getAllCinemas()
-  cinemaOptions.value = cinemasRes.data.map((cinema) => ({
-    label: cinema.name + ' (' + cinema.address + ')',
-    value: cinema.id,
-  }))
-}
-
 function syncFormWithProps() {
   if (props.room) {
     isEdit.value = true
@@ -71,7 +62,7 @@ function syncFormWithProps() {
     isEdit.value = false
     formData.name = ''
     formData.type = '2D'
-    formData.cinema_id = ''
+    formData.cinema_id = null
   }
 
   Object.keys(backendErrors).forEach((key) => delete backendErrors[key])
@@ -111,7 +102,6 @@ async function handleSubmit() {
   }
 }
 
-onMounted(fetchOptions)
 watch(() => props.room, syncFormWithProps, { immediate: true })
 </script>
 
@@ -165,9 +155,10 @@ watch(() => props.room, syncFormWithProps, { immediate: true })
       >
         <n-select
           v-model:value="formData.cinema_id"
-          :options="cinemaOptions"
+          :options="cinemas"
           placeholder="Chọn rạp phim"
           filterable
+          clearable
           @update:value="clearFieldError('cinema_id')"
         />
       </n-form-item>

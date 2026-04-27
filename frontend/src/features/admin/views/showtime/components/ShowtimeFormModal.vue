@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue'
-import type { FormInst, FormRules } from 'naive-ui'
+import type { FormInst, FormRules, SelectOption } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { showtimeService } from '@/features/admin/services/showtime.service'
-import { movieService } from '@/features/admin/services/movie.service'
-import { roomService } from '@/features/admin/services/room.service'
-import { seatTypeService } from '@/features/admin/services/seat-type.service'
 import { ApiError } from '@/plugins/axios'
 import type { Showtime, Prices } from '@/features/admin/types/showtime.type'
-import type { Movie } from '@/features/admin/types/movie.type'
-import type { Room } from '@/features/admin/types/room.type'
 import type { SeatType } from '@/features/admin/types/seat-type.type'
 
 interface PriceRow {
@@ -20,14 +15,16 @@ interface PriceRow {
 interface ShowtimeForm {
   movie_id: string | null
   room_id: string | null
-  show_date: string | null // null-safe cho n-date-picker
-  start_time: string | null // null-safe cho n-time-picker
+  show_date: string | null
+  start_time: string | null
   base_price: number | null
   prices: PriceRow[]
 }
 
 const props = defineProps<{
   showtime?: Showtime | null
+  movies: SelectOption[]
+  rooms: SelectOption[]
 }>()
 
 const emit = defineEmits<{
@@ -40,8 +37,6 @@ const formRef = ref<FormInst | null>(null)
 const formLoading = ref(false)
 const isEdit = ref(false)
 
-const movies = ref<Movie[]>([])
-const rooms = ref<Room[]>([])
 const seatTypes = ref<SeatType[]>([])
 const loadingOptions = ref(false)
 
@@ -56,8 +51,6 @@ const formData = reactive<ShowtimeForm>({
 
 const backendErrors = reactive<Record<string, string>>({})
 
-const movieOptions = computed(() => movies.value.map((m) => ({ label: m.title, value: m.id })))
-const roomOptions = computed(() => rooms.value.map((r) => ({ label: r.name, value: r.id })))
 const seatTypeOptions = computed(() =>
   seatTypes.value.map((st) => ({ label: st.name, value: st.id })),
 )
@@ -194,28 +187,7 @@ function syncFormWithProps() {
   nextTick(() => formRef.value?.restoreValidation())
 }
 
-async function loadOptions() {
-  loadingOptions.value = true
-  try {
-    const [moviesRes, roomsRes, seatTypesRes] = await Promise.all([
-      movieService.getAllMovies({ limit: 100 }),
-      roomService.getAllRooms({ limit: 100 }),
-      seatTypeService.getAllSeatTypes(),
-    ])
-    movies.value = moviesRes.data ?? []
-    rooms.value = roomsRes.data ?? []
-    seatTypes.value = seatTypesRes.data ?? []
-  } catch {
-    message.error('Không thể tải dữ liệu, vui lòng thử lại')
-  } finally {
-    loadingOptions.value = false
-  }
-}
-
 watch(() => props.showtime, syncFormWithProps, { immediate: true })
-watch(showModal, (val) => {
-  if (val) loadOptions()
-})
 </script>
 
 <template>
@@ -245,7 +217,7 @@ watch(showModal, (val) => {
         >
           <n-select
             v-model:value="formData.movie_id"
-            :options="movieOptions"
+            :options="movies"
             placeholder="Chọn phim"
             filterable
             @update:value="clearFieldError('movie_id')"
@@ -261,7 +233,7 @@ watch(showModal, (val) => {
         >
           <n-select
             v-model:value="formData.room_id"
-            :options="roomOptions"
+            :options="rooms"
             placeholder="Chọn phòng chiếu"
             filterable
             @update:value="clearFieldError('room_id')"

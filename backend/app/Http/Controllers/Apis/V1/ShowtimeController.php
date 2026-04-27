@@ -58,14 +58,7 @@ class ShowtimeController extends Controller
                 description: "Filter by show date (Y-m-d)",
                 required: false,
                 schema: new OA\Schema(type: "string", format: "date", example: "2026-04-04")
-            ),
-            new OA\Parameter(
-                name: "status",
-                in: "query",
-                description: "Filter by status",
-                required: false,
-                schema: new OA\Schema(type: "string", enum: ["scheduled", "ongoing", "completed", "cancelled"], example: "scheduled")
-            ),
+            )
         ],
         responses: [
             new OA\Response(

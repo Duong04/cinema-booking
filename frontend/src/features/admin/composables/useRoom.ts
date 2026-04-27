@@ -6,7 +6,7 @@ import type { Room } from '@/features/admin/types/room.type'
 export function useRoom() {
   const data = ref<Room[]>([])
   const loading = ref(false)
-  const filters = reactive({ search: '' })
+  const filters = reactive({ search: '', cinema_id: null })
   const pagination = reactive({
     page: 1,
     pageSize: 5,
@@ -24,6 +24,7 @@ export function useRoom() {
         page: pagination.page,
         limit: pagination.pageSize,
         q: filters.search || undefined,
+        cinema_id: filters.cinema_id || undefined,
       })
       data.value = res.data
       pagination.itemCount = res.meta.total
@@ -43,6 +44,11 @@ export function useRoom() {
   }, 500)
 
   watch(() => filters.search, debouncedSearch)
+
+  watch(() => filters.cinema_id, () => {
+    pagination.page = 1
+    fetchRooms()
+  })
 
   return { data, loading, filters, pagination, fetchRooms, deleteRoom }
 }

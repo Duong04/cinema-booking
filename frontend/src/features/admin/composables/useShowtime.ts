@@ -6,15 +6,28 @@ import type { Showtime } from '@/features/admin/types/showtime.type'
 export function useShowtime() {
   const data = ref<Showtime[]>([])
   const loading = ref(false)
-  const filters = reactive({ search: '' })
+  const filters = reactive({
+    search: '',
+    movie_id: null,
+    room_id: null,
+    status: null,
+    show_date: null,
+  })
   const pagination = reactive({
     page: 1,
     pageSize: 5,
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [3, 5, 7],
-    onChange: (page: number) => { pagination.page = page; fetchShowtimes() },
-    onUpdatePageSize: (pageSize: number) => { pagination.pageSize = pageSize; pagination.page = 1; fetchShowtimes() },
+    onChange: (page: number) => {
+      pagination.page = page
+      fetchShowtimes()
+    },
+    onUpdatePageSize: (pageSize: number) => {
+      pagination.pageSize = pageSize
+      pagination.page = 1
+      fetchShowtimes()
+    },
   })
 
   async function fetchShowtimes() {
@@ -24,6 +37,10 @@ export function useShowtime() {
         page: pagination.page,
         limit: pagination.pageSize,
         q: filters.search || undefined,
+        movie_id: filters.movie_id || undefined,
+        room_id: filters.room_id || undefined,
+        status: filters.status || undefined,
+        show_date: filters.show_date || undefined,
       })
       data.value = res.data
       pagination.itemCount = res.meta.total
@@ -33,9 +50,9 @@ export function useShowtime() {
   }
 
   async function deleteShowtime(id: string) {
-      await showtimeService.deleteShowtime(id)
-      fetchShowtimes()
-    }
+    await showtimeService.deleteShowtime(id)
+    fetchShowtimes()
+  }
 
   const debouncedSearch = useDebounceFn(() => {
     pagination.page = 1
@@ -43,6 +60,14 @@ export function useShowtime() {
   }, 500)
 
   watch(() => filters.search, debouncedSearch)
+
+  watch(
+    () => [filters.movie_id, filters.room_id, filters.status, filters.show_date],
+    () => {
+      pagination.page = 1
+      fetchShowtimes()
+    },
+  )
 
   return { data, loading, filters, pagination, fetchShowtimes, deleteShowtime }
 }

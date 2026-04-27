@@ -15,7 +15,7 @@ trait UsesUuidV7
         $this->keyType = 'string';
     }
 
-    protected function newUniqueId()
+    public function newUniqueId()
     {
         return (string) Str::uuid7();
     }

@@ -3,6 +3,7 @@ import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import { ref, onMounted, h, computed, resolveComponent } from 'vue'
 import { NButton } from 'naive-ui'
 import { useRoom } from '../../composables/useRoom'
+import { useCinema } from '../../composables/useCinema'
 import RoomFormModal from './components/RoomFormModal.vue'
 import type { Room } from '../../types/room.type'
 import { formatDate } from '@/shared/utils/formatDate'
@@ -12,6 +13,7 @@ import { useMessage, useDialog } from 'naive-ui'
 import SeatFormModal from './components/SeatFormModal.vue'
 
 const { data, loading, filters, pagination, fetchRooms, deleteRoom } = useRoom()
+const { data: cinemaData, fetchCinemas } = useCinema()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -27,6 +29,10 @@ const typeColor = {
   '4DX': 'warning',
   VIP: 'error',
 }
+
+const cinemaOptions = computed(() =>
+  cinemaData.value.map((c) => ({ label: c.name, value: c.id }))
+)
 
 function createColumns(): DataTableColumns<Room> {
   return [
@@ -152,7 +158,9 @@ function handleDeleteMultiple() {
   })
 }
 
-onMounted(fetchRooms)
+onMounted(() => {
+  Promise.all([fetchRooms(), fetchCinemas()])
+})
 </script>
 
 <template>
@@ -164,12 +172,19 @@ onMounted(fetchRooms)
         clearable
         style="width: 300px"
       >
-        <template #suffix>
-          <n-icon>
-            <SearchIcon />
-          </n-icon>
-        </template>
-      </n-input>
+      <template #suffix>
+        <n-icon>
+          <SearchIcon />
+        </n-icon>
+      </template>
+    </n-input>
+    <n-select
+      v-model:value="filters.cinema_id"
+        placeholder="Chọn rạp phim"
+        filterable
+        clearable
+        :options="cinemaOptions"
+      />
       <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
@@ -188,5 +203,5 @@ onMounted(fetchRooms)
   />
 
   <SeatFormModal v-model:show="showSeatModal" :room="selectedRoomForSeat" />
-  <RoomFormModal v-model:show="showModal" :room="selectedRoom" @success="fetchRooms" />
+  <RoomFormModal v-model:show="showModal" :cinemas="cinemaOptions" :room="selectedRoom" @success="fetchRooms" />
 </template>
