@@ -36,7 +36,7 @@ const onSubmit = handleSubmit(async (values) => {
   if (success) {
     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true')
 
-    router.push({ name: 'home' })
+    await router.push({ name: 'home' })
   }
 })
 

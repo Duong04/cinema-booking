@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h } from 'vue'
+import { h, ref } from 'vue'
 import { NAvatar, NDropdown, NIcon, NButton, NBadge, NText, useMessage } from 'naive-ui'
 import {
   PersonCircleOutline,
@@ -10,31 +10,61 @@ import {
   NotificationsOutline,
 } from '@vicons/ionicons5'
 import { useThemeStore } from '@/stores/theme'
+import { useAuthStore } from '@/features/shared/stores/auth.store'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
+const authStore = useAuthStore()
 const message = useMessage()
 const themeStore = useThemeStore()
+const isLoggingOut = ref(false)
 
 const options = [
   {
-    label: 'Profile',
+    label: 'Thông tin cá nhân',
     key: 'profile',
     icon: () => h(NIcon, null, { default: () => h(PersonCircleOutline) }),
   },
   {
-    label: 'Settings',
+    label: 'Cài đặt',
     key: 'settings',
     icon: () => h(NIcon, null, { default: () => h(SettingsOutline) }),
   },
   { type: 'divider', key: 'd1' },
   {
-    label: 'Logout',
+    label: 'Đăng xuất',
     key: 'logout',
     icon: () => h(NIcon, null, { default: () => h(LogOutOutline) }),
   },
 ]
 
-function handleSelect(key: string) {
-  if (key === 'logout') message.info('Logout...')
+async function handleLogout() {
+  if (isLoggingOut.value) return
+  
+  isLoggingOut.value = true
+  try {
+    const success = await authStore.logout()
+    if (success) {
+      message.success('Đăng xuất thành công')
+      router.push('/login')
+    }
+  } finally {
+    isLoggingOut.value = false
+  }
+}
+
+async function handleSelect(key: string) {
+  switch (key) {
+    case 'profile':
+      router.push({ name: 'profile' })
+      break
+    case 'admin':
+      router.push({ name: 'settings' })
+      break
+    case 'logout':
+      await handleLogout()
+      break
+  }
 }
 </script>
 
