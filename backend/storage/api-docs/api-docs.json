@@ -1308,6 +1308,26 @@
                             "type": "string",
                             "example": "CGV"
                         }
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "query",
+                        "description": "Search by city",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "019d14e8-de20-7178-acf2-5850afc288f1"
+                        }
+                    },
+                    {
+                        "name": "cinema_chain_id",
+                        "in": "query",
+                        "description": "Search by cinema chain",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "019d14e8-de20-7178-acf2-5850afc288f1"
+                        }
                     }
                 ],
                 "responses": {
@@ -2343,6 +2363,429 @@
                 }
             }
         },
+        "/api/v1/combos": {
+            "get": {
+                "tags": [
+                    "Combos"
+                ],
+                "summary": "Get list of combos",
+                "operationId": "49d87d6257d846f19a44b06dc32f52f4",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "admin"
+                        }
+                    },
+                    {
+                        "name": "cinema_id",
+                        "in": "query",
+                        "description": "Search by cinema",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "019d14e8-de20-7178-acf2-5850afc288f1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Đà Nẵng"
+                                                    },
+                                                    "price": {
+                                                        "type": "string",
+                                                        "example": "200.00"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "inactive",
+                                                        "enum": [
+                                                            "active",
+                                                            "inactive"
+                                                        ]
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/image.jpg"
+                                                    },
+                                                    "cinema": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "CGV Đà Nẵng"
+                                                            },
+                                                            "address": {
+                                                                "type": "string",
+                                                                "example": "Đà Nẵng"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-06-06 18:09:22"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-06-06 18:09:22"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Combos"
+                ],
+                "summary": "Create new combo",
+                "operationId": "7e14bb8a95dfe29f88d4c63a3adefd51",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Combo 1"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Combo 1 description"
+                                    },
+                                    "price": {
+                                        "type": "string",
+                                        "example": "200.00"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active",
+                                        "enum": [
+                                            "active",
+                                            "inactive"
+                                        ]
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "example": "https://example.com/image.jpg"
+                                    },
+                                    "cinema_id": {
+                                        "type": "string",
+                                        "example": "019d14e8-de20-7178-acf2-5850afc288f1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo combo thành công!"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/combos/{id}": {
+            "get": {
+                "tags": [
+                    "Combos"
+                ],
+                "summary": "Get combo detail",
+                "operationId": "d52e63a168940977e27748d421d722a0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "price": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "image": {
+                                                    "type": "string"
+                                                },
+                                                "cinema_id": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Combos"
+                ],
+                "summary": "Update combo",
+                "operationId": "a46c780d7ae93673f5572f2a2d5b01dd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "price": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "type": "string"
+                                    },
+                                    "cinema_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật combo thành công!"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Combos"
+                ],
+                "summary": "Delete combo",
+                "operationId": "e3652a680c21d587123b8f319c81eaf8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Xóa combo thành công!"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/genres": {
             "get": {
                 "tags": [
@@ -2921,7 +3364,8 @@
                             "enum": [
                                 "coming_soon",
                                 "now_showing",
-                                "ended"
+                                "ended",
+                                "cancelled"
                             ]
                         }
                     }
@@ -6623,22 +7067,6 @@
                             "format": "date",
                             "example": "2026-04-04"
                         }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Filter by status",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "scheduled",
-                            "enum": [
-                                "scheduled",
-                                "ongoing",
-                                "completed",
-                                "cancelled"
-                            ]
-                        }
                     }
                 ],
                 "responses": {
@@ -8248,6 +8676,10 @@
         {
             "name": "Cities",
             "description": "Cities"
+        },
+        {
+            "name": "Combos",
+            "description": "Combos"
         },
         {
             "name": "Genre",
