@@ -11,7 +11,6 @@ class BookingItem extends Model
     protected $table = 'booking_items';
     protected $fillable = [
         'booking_id',
-        'showtime_id',
         'seat_id',
         'price',
         'seat_type_name',
@@ -19,4 +18,14 @@ class BookingItem extends Model
         'room_name',
         'seat_label',
     ];
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
+
+    public function seat()
+    {
+        return $this->belongsTo(Seat::class);
+    }
 }

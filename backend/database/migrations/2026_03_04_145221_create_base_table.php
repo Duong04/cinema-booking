@@ -353,7 +353,6 @@ return new class extends Migration {
             $table->uuid('id')->primary();
 
             $table->foreignUuid('booking_id')->constrained('bookings');
-            $table->foreignUuid('showtime_id')->constrained('showtimes');
             $table->foreignUuid('seat_id')->constrained('seats');
 
             $table->decimal('price', 10, 2);
