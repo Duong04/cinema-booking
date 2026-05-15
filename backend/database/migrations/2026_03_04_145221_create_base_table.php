@@ -507,6 +507,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
 
             $table->string('code')->unique();
+            $table->string('description')->nullable();
 
             $table->enum('discount_type', ['percentage', 'fixed_amount']);
             $table->decimal('discount_value', 10, 2);
@@ -523,28 +524,16 @@ return new class extends Migration {
         });
 
 
-        Schema::create('booking_promotions', function (Blueprint $table) {
-
-            $table->uuid('id')->primary();
-
-            $table->foreignUuid('booking_id')->constrained('bookings');
-            $table->foreignUuid('promotion_id')->constrained('promotions');
-
-            $table->decimal('discount_amount', 10, 2);
-        });
-
-
         Schema::create('promotion_usages', function (Blueprint $table) {
-
             $table->uuid('id')->primary();
 
             $table->foreignUuid('promotion_id')->constrained('promotions');
             $table->foreignUuid('user_id')->constrained('users');
             $table->foreignUuid('booking_id')->constrained('bookings');
 
+            $table->decimal('discount_amount', 10, 2); 
             $table->timestamp('used_at')->nullable();
         });
-
 
         /*
         |--------------------------------------------------------------------------
@@ -607,7 +596,6 @@ return new class extends Migration {
         Schema::dropIfExists('activity_logs');
         Schema::dropIfExists('memberships');
         Schema::dropIfExists('promotion_usages');
-        Schema::dropIfExists('booking_promotions');
         Schema::dropIfExists('promotions');
         Schema::dropIfExists('booking_combos');
         Schema::dropIfExists('combos');

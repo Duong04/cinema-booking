@@ -25,17 +25,10 @@ class Booking extends Model
     protected static function booted(): void
     {
         static::creating(function ($booking) {
-            $booking->booking_code = self::generateBookingCode();
+            if (empty($booking->booking_code)) {
+                $booking->booking_code = 'BK-' . now()->format('Ymd') . '-' . strtoupper(substr($booking->id, -6));
+            }
         });
-    }
-
-    private static function generateBookingCode(): string
-    {
-        do {
-            $code = 'BK-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
-        } while (self::where('booking_code', $code)->exists());
-
-        return $code;
     }
 
     public function user()
@@ -65,11 +58,19 @@ class Booking extends Model
 
     public function combos()
     {
-        return $this->belongsToMany(Combo::class, 'booking_combos')->withPivot('quantity');
+        return $this->belongsToMany(Combo::class, 'booking_combos', 'booking_id', 'combo_id')
+            ->withPivot(['combo_name', 'quantity', 'unit_price', 'total_price'])
+            ->withTimestamps();
     }
 
-    public function promotion()
+    public function promotions()
     {
-        return $this->belongsTo(Promotion::class, 'promotion_usages');
+        return $this->belongsToMany(Promotion::class, 'promotion_usages')
+            ->withPivot(['discount_amount', 'used_at']);
+    }
+
+    public function promotionUsages()
+    {
+        return $this->hasMany(PromotionUsage::class);
     }
 }

@@ -46,7 +46,7 @@ class BookingService
             'statusLogs',
             'payment',
             'combos',
-            'promotion',
+            'promotions',
         ]);
 
         return $booking;
