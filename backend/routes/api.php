@@ -15,6 +15,7 @@ use App\Http\Controllers\Apis\V1\SeatTypeController;
 use App\Http\Controllers\Apis\V1\ShowtimeController;
 use App\Http\Controllers\Apis\V1\UploadController;
 use App\Http\Controllers\Apis\V1\ComboController;
+use App\Http\Controllers\Apis\V1\BookingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -133,6 +134,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('bookings')->controller(BookingController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}/cancel', 'cancel');
     });
 
     Route::prefix('combos')->controller(ComboController::class)->middleware('auth:sanctum')->group(function () {

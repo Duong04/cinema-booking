@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\UsesUuidV7;
 
 class Payment extends Model
 {
-    use UsesUuidV7;
+    use HasFactory, UsesUuidV7;
 
     protected $table = 'payments';
 

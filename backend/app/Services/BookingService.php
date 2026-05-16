@@ -133,7 +133,7 @@ class BookingService
         }
     }
 
-    public function cancel($data, string $id): JsonResponse
+    public function cancel($data, string $id)
     {
         $booking = $this->bookingRepository->find($id);
  

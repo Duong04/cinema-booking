@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\UsesUuidV7;
 use Illuminate\Support\Str;
 
 class Booking extends Model
 {
-    use UsesUuidV7; 
+    use HasFactory, UsesUuidV7;
     protected $table = 'bookings';
     protected $fillable = [
         'user_id',
