@@ -10,6 +10,7 @@ use App\Repositories\BookingItem\BookingItemRepositoryInterface;
 use App\Repositories\Seat\SeatRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BookingService
 {
@@ -65,7 +66,7 @@ class BookingService
  
             if ($holds->count() !== count($seatIds)) {
                 DB::rollBack();
-                throw new \Exception('Một số ghế không còn được giữ hoặc đã hết hạn. Vui lòng chọn lại.');
+                throw new HttpException(422, 'Một số ghế không còn được giữ hoặc đã hết hạn. Vui lòng chọn lại.');
             }
  
             $showtime = $this->showtimeRepository->find($showtimeId, ['*'], ['movie', 'room']);
@@ -138,7 +139,7 @@ class BookingService
         $booking = $this->bookingRepository->find($id);
  
         if (! in_array($booking->status, ['pending', 'confirmed'])) {
-            throw new \Exception("Không thể huỷ booking ở trạng thái {$booking->status}.");    
+            throw new HttpException(422, "Không thể huỷ booking ở trạng thái {$booking->status}.");    
         }
  
         try {
@@ -161,7 +162,7 @@ class BookingService
             ]);
  
             if ($newStatus === 'refunded') {
-                // TODO: dispatch(new ProcessRefundJob($booking));
+                
             }
  
             DB::commit();

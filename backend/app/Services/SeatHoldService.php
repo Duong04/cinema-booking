@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Repositories\SeatHoldRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SeatHoldService
 {
@@ -34,7 +35,7 @@ class SeatHoldService
             if ($existing->isNotEmpty()) {
                 DB::rollBack();
  
-                throw new \Exception('Một số ghế đã được giữ bởi người khác.');
+                throw new HttpException(422, 'Một số ghế đã được giữ bởi người khác.');
             }
  
             $bookedSeatIds = $this->seatHoldRepository->getBookedSeatIds($seatIds, $showtimeId);
@@ -42,7 +43,7 @@ class SeatHoldService
             if ($bookedSeatIds->isNotEmpty()) {
                 DB::rollBack();
  
-                throw new \Exception('Một số ghế đã được đặt.');
+                throw new HttpException(422, 'Một số ghế đã được đặt.');
             }
  
             $this->seatHoldRepository->deleteByMixCol($seatIds, $showtimeId, $user->id);
