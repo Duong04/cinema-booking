@@ -11,6 +11,7 @@ use App\Http\Controllers\Apis\V1\PermissionController;
 use App\Http\Controllers\Apis\V1\RoleController;
 use App\Http\Controllers\Apis\V1\RoomController;
 use App\Http\Controllers\Apis\V1\SeatController;
+use App\Http\Controllers\Apis\V1\SeatHoldController;
 use App\Http\Controllers\Apis\V1\SeatTypeController;
 use App\Http\Controllers\Apis\V1\ShowtimeController;
 use App\Http\Controllers\Apis\V1\UploadController;
@@ -134,6 +135,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('seat-holds')->controller(SeatHoldController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/showtimes/{showtimeId}', 'getListShowtime');
+        Route::post('/hold', 'hold');
+        Route::post('/release', 'release');
     });
 
     Route::prefix('bookings')->controller(BookingController::class)->middleware('auth:sanctum')->group(function () {

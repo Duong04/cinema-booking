@@ -1,7 +1,7 @@
 <?php
 namespace App\Services;
 
-use App\Repositories\SeatHoldRepository;
+use App\Repositories\SeatHold\SeatHoldRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -10,7 +10,7 @@ class SeatHoldService
 {
     protected $seatHoldRepository;
 
-    public function __construct(SeatHoldRepository $seatHoldRepository)
+    public function __construct(SeatHoldRepositoryInterface $seatHoldRepository)
     {
         $this->seatHoldRepository = $seatHoldRepository;
     }

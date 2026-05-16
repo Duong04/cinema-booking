@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories\SeatHold;
 
+use App\Models\BookingItem;
 use App\Models\SeatHold;
 use App\Repositories\SeatHold\SeatHoldRepositoryInterface;
 use App\Repositories\Base\BaseRepository;
@@ -23,7 +24,7 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
         return $this->model->insert($data);
     }
 
-    public function checkHoldTransaction(string $seatIds, string $showtimeId, string $userId = null)
+    public function checkHoldTransaction(array $seatIds, string $showtimeId, string $userId = null)
     {
         return $this->model->whereIn('seat_id', $seatIds)
             ->where('showtime_id', $showtimeId)
@@ -50,10 +51,14 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
 
     public function getBookedSeatIds(array $seatIds, string $showtimeId)
     {
-        return $this->model->query()
+        return BookingItem::query()
             ->whereIn('seat_id', $seatIds)
-            ->where('showtime_id', $showtimeId)
-            ->whereHas('booking', fn($q) => $q->whereIn('status', ['pending', 'confirmed']))
+            ->whereHas(
+                'booking',
+                fn($query) => $query
+                    ->where('showtime_id', $showtimeId)
+                    ->whereIn('status', ['pending', 'confirmed'])
+            )
             ->pluck('seat_id');
     }
 }
