@@ -25,4 +25,10 @@ class ShowtimePriceRepository extends BaseRepository implements ShowtimePriceRep
     public function deleteByShowtime($showtimeId) {
         return $this->model->where('showtime_id', $showtimeId)->delete();
     }
+
+    public function getKeyBySeatTypeId(string $showtimeId) {
+        return $this->model->where('showtime_id', $showtimeId)
+            ->get()
+            ->keyBy('seat_type_id');
+    }
 }

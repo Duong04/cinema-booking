@@ -167,9 +167,9 @@ class ShowtimeController extends Controller
             ),
         ]
     )]
-    public function paginate(QueryRequest $requet)
+    public function paginate(QueryRequest $request)
     {
-        $query = $requet->validated();
+        $query = $request->validated();
         $limit = $query['limit'] ?? 15;
         $movieId = $query['movie_id'] ?? null;
         $roomId = $query['room_id'] ?? null;

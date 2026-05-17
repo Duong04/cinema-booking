@@ -1,6 +1,7 @@
 <?php 
 namespace App\Services;
 
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Mail\VerifyEmailMail;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\Facades\Mail;
@@ -32,15 +33,15 @@ class AuthService {
         $user = $this->userRepository->getByToken($token);
 
         if (!$user) {
-            throw new \Exception('Token không hợp lệ!');
+            throw new HttpException(400, 'Token không hợp lệ!');
         }
 
         if ($user->is_active) {
-            throw new \Exception('Tài khoản đã được xác minh trước đó!');
+            throw new HttpException(409, 'Tài khoản đã được xác minh trước đó!');
         }
 
         if ($user->token_expired_at && now()->isAfter($user->token_expired_at)) {
-            throw new \Exception('Token đã hết hạn, vui lòng yêu cầu gửi lại!');
+            throw new HttpException(410, 'Token đã hết hạn, vui lòng yêu cầu gửi lại!');
         }
 
         $this->userRepository->update($user->id, [
@@ -57,11 +58,11 @@ class AuthService {
         $user = $this->userRepository->getByEmail($email);
 
         if (!$user) {
-            throw new \Exception('Email không tồn tại!');
+            throw new HttpException(404, 'Email không tồn tại!');
         }
 
         if ($user->is_active) {
-            throw new \Exception('Tài khoản đã được xác minh!');
+            throw new HttpException(409, 'Tài khoản đã được xác minh!');
         }
 
         $newToken = Str::random(64);
@@ -71,7 +72,6 @@ class AuthService {
             'token_expired_at'   => now()->addHours(24),
         ]);
 
-        // Gửi lại email
         Mail::to($user->email)->send(new VerifyEmailMail($user));
 
         return true;
@@ -79,13 +79,13 @@ class AuthService {
 
     public function login($data) {
         if (!Auth::attempt($data)) {
-            throw new \Exception('Email hoặc mật khẩu không đúng!');
+            throw new HttpException(422, 'Email hoặc mật khẩu không đúng!');
         }
 
         $user = Auth::user();
 
         if (!$user->is_active) {
-            throw new \Exception('Tài khoản chưa xác thực email!');
+            throw new HttpException(400, 'Tài khoản chưa xác thực email!');
         }
 
         return Auth::user();

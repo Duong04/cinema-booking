@@ -41,6 +41,12 @@ class SeatRepository extends BaseRepository implements SeatRepositoryInterface
         return $this->model->where('room_id', $roomId)->exists();
     }
 
+    public function getKeyById(array $seatIds, array $with = []) {
+        return $this->model->with($with)->whereIn('id', $seatIds)
+            ->get()
+            ->keyBy('id');
+    }
+
     public function getExistingRowLabels($roomId)
     {
         return $this->model->where('room_id', $roomId)
