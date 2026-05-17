@@ -37,6 +37,16 @@ use App\Repositories\Showtime\ShowtimeRepository;
 use App\Repositories\Showtime\ShowtimeRepositoryInterface;
 use App\Repositories\ShowtimePrice\ShowtimePriceRepository;
 use App\Repositories\ShowtimePrice\ShowtimePriceRepositoryInterface;
+use App\Repositories\Booking\BookingRepository;
+use App\Repositories\Booking\BookingRepositoryInterface;
+use App\Repositories\BookingItem\BookingItemRepository;
+use App\Repositories\BookingItem\BookingItemRepositoryInterface;
+use App\Repositories\Combo\ComboRepository;
+use App\Repositories\Combo\ComboRepositoryInterface;
+use App\Repositories\BookingStatusLog\BookingStatusLogRepository;
+use App\Repositories\BookingStatusLog\BookingStatusLogRepositoryInterface;
+use App\Repositories\SeatHold\SeatHoldRepository;
+use App\Repositories\SeatHold\SeatHoldRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -62,6 +72,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MovieGenreRepositoryInterface::class, MovieGenreRepository::class);
         $this->app->bind(ShowtimeRepositoryInterface::class, ShowtimeRepository::class);
         $this->app->bind(ShowtimePriceRepositoryInterface::class, ShowtimePriceRepository::class);
+        $this->app->bind(BookingRepositoryInterface::class, BookingRepository::class);
+        $this->app->bind(BookingItemRepositoryInterface::class, BookingItemRepository::class);
+        $this->app->bind(ComboRepositoryInterface::class, ComboRepository::class);
+        $this->app->bind(BookingStatusLogRepositoryInterface::class, BookingStatusLogRepository::class);
+        $this->app->bind(SeatHoldRepositoryInterface::class, SeatHoldRepository::class);
     }
 
     /**

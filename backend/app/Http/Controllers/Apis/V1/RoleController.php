@@ -100,9 +100,9 @@ class RoleController extends Controller
             )
         ]
     )]
-    public function paginate(QueryRequest $requet)
+    public function paginate(QueryRequest $request)
     {
-        $query = $requet->validated();
+        $query = $request->validated();
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
 

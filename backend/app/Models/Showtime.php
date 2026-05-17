@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Traits\UsesUuidV7;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Showtime extends Model
 {
-    use UsesUuidV7;
+    use HasFactory, UsesUuidV7;
 
     protected $table = 'showtimes';
     protected $fillable = [

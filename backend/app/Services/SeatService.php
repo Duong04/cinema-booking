@@ -5,6 +5,7 @@ use App\Repositories\Room\RoomRepository;
 use App\Repositories\Room\RoomRepositoryInterface;
 use App\Repositories\Seat\SeatRepositoryInterface;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SeatService {
     private $seatRepository;
@@ -32,9 +33,7 @@ class SeatService {
         $duplicates = array_intersect($existingLabels, $incomingLabels);
 
         if (!empty($duplicates)) {
-            throw new \Exception(
-                'Các hàng đã tồn tại: ' . implode(', ', $duplicates)
-            );
+            throw new HttpException(422, 'Các hàng đã tồn tại: ' . implode(', ', $duplicates));
         }
 
         $seats = [];
@@ -63,12 +62,12 @@ class SeatService {
     {
         $room = $this->roomRepository->find($roomId);
         if (!$room) {
-            throw new \Exception('Phòng không tồn tại.');
+            throw new HttpException(404, 'Phòng không tồn tại.');
         }
 
         $existingLabels = $this->seatRepository->getExistingRowLabels($roomId);
         if (!in_array(strtoupper($rowLabel), $existingLabels)) {
-            throw new \Exception("Hàng {$rowLabel} không tồn tại trong phòng này.");
+            throw new HttpException(422, "Hàng {$rowLabel} không tồn tại trong phòng này.");
         }
 
         $rowLabel  = strtoupper($rowLabel);
@@ -102,12 +101,12 @@ class SeatService {
     {
         $room = $this->roomRepository->find($roomId);
         if (!$room) {
-            throw new \Exception('Phòng không tồn tại.');
+            throw new HttpException(404, 'Phòng không tồn tại.');
         }
 
         $existingLabels = $this->seatRepository->getExistingRowLabels($roomId);
         if (!in_array(strtoupper($rowLabel), $existingLabels)) {
-            throw new \Exception("Hàng {$rowLabel} không tồn tại trong phòng này.");
+            throw new HttpException(422, "Hàng {$rowLabel} không tồn tại trong phòng này.");
         }
 
         $this->seatRepository->deleteRow($roomId, strtoupper($rowLabel));

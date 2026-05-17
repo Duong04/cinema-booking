@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Traits\UsesUuidV7;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Room extends Model
 {
-    use SoftDeletes, UsesUuidV7;
+    use HasFactory, SoftDeletes, UsesUuidV7;
     protected $table = 'rooms';
     protected $fillable = [
         'name',

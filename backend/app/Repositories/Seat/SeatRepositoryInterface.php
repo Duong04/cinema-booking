@@ -8,6 +8,7 @@ interface SeatRepositoryInterface extends BaseRepositoryInterface
     public function getSeatByRoom($roomId);
     public function insert($data);
     public function checkRoomId($roomId);
+    public function getKeyById(array $seatIds, array $with = []);
     public function getExistingRowLabels($roomId);
     public function updateSeatTypeForRow(string $roomId, string $rowLabel, string $seatTypeId);
     public function countByRow(string $roomId, string $rowLabel);
