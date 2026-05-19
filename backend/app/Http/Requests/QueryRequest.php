@@ -26,10 +26,16 @@ class QueryRequest extends FormRequest
             'q' => 'nullable|string|max:255',
             'room_id' => 'nullable|uuid|exists:rooms,id',
             'movie_id' => 'nullable|uuid|exists:movies,id',
+            'genre_id' => 'nullable|uuid|exists:genres,id',
             'show_date' => 'nullable|date',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
             'city_id' => 'nullable|exists:cities,id',
+            'cinema_id' => 'nullable|exists:cinemas,id',
             'cinema_chain_id' => 'nullable|exists:cinema_chains,id',
-            'status' => 'nullable|string'
+            'status' => 'nullable|string',
+            'sort' => 'nullable|string|in:created_at_desc,best_selling',
+            'period' => 'nullable|string|in:7d,30d,all',
         ];
     }
 }

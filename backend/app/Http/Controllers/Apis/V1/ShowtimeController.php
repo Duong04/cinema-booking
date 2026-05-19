@@ -179,6 +179,96 @@ class ShowtimeController extends Controller
 
         return $this->successList($showtimes->items(), $this->paginationMeta($showtimes));
     }
+
+    #[OA\Get(
+        path: "/api/v1/public/showtimes",
+        summary: "Get public showtime list",
+        description: "Returns only showtimes for public movies and public showtime statuses. Cancelled and completed showtimes are never returned.",
+        tags: ["Public"],
+        parameters: [
+            new OA\Parameter(name: "limit", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 15)),
+            new OA\Parameter(name: "page", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 1)),
+            new OA\Parameter(name: "movie_id", in: "query", required: false, description: "Filter by movie", schema: new OA\Schema(type: "string", format: "uuid")),
+            new OA\Parameter(name: "cinema_id", in: "query", required: false, description: "Filter by cinema", schema: new OA\Schema(type: "string", format: "uuid")),
+            new OA\Parameter(name: "city_id", in: "query", required: false, description: "Filter by city", schema: new OA\Schema(type: "string", format: "uuid")),
+            new OA\Parameter(name: "cinema_chain_id", in: "query", required: false, description: "Filter by cinema chain", schema: new OA\Schema(type: "string", format: "uuid")),
+            new OA\Parameter(name: "show_date", in: "query", required: false, description: "Exact show date", schema: new OA\Schema(type: "string", format: "date", example: "2026-05-18")),
+            new OA\Parameter(name: "from_date", in: "query", required: false, description: "Start show date", schema: new OA\Schema(type: "string", format: "date", example: "2026-05-18")),
+            new OA\Parameter(name: "to_date", in: "query", required: false, description: "End show date", schema: new OA\Schema(type: "string", format: "date", example: "2026-05-25")),
+            new OA\Parameter(name: "status", in: "query", required: false, description: "Filter by public showtime status", schema: new OA\Schema(type: "string", enum: ["scheduled", "ongoing"], example: "scheduled")),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Public showtime list retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Success"),
+                        new OA\Property(
+                            property: "data",
+                            type: "array",
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: "id", type: "string", format: "uuid"),
+                                    new OA\Property(property: "movie_id", type: "string", format: "uuid"),
+                                    new OA\Property(property: "room_id", type: "string", format: "uuid"),
+                                    new OA\Property(property: "show_date", type: "string", format: "date"),
+                                    new OA\Property(property: "start_time", type: "string", example: "2026-05-18 10:00:00"),
+                                    new OA\Property(property: "end_time", type: "string", example: "2026-05-18 12:00:00"),
+                                    new OA\Property(property: "base_price", type: "string", example: "100000.00"),
+                                    new OA\Property(property: "status", type: "string", enum: ["scheduled", "ongoing"]),
+                                    new OA\Property(property: "movie", type: "object"),
+                                    new OA\Property(property: "room", type: "object"),
+                                    new OA\Property(property: "prices", type: "array", items: new OA\Items(type: "object")),
+                                ]
+                            )
+                        ),
+                        new OA\Property(property: "meta", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
+    public function getAll(QueryRequest $request)
+    {
+        $query = $request->validated();
+        $limit = $query['limit'] ?? 15;
+        $movieId = $query['movie_id'] ?? null;
+        $cinemaId = $query['cinema_id'] ?? null;
+        $cityId = $query['city_id'] ?? null;
+        $cinemaChainId = $query['cinema_chain_id'] ?? null;
+        $showDate = $query['show_date'] ?? null;
+        $fromDate = $query['from_date'] ?? null;
+        $toDate = $query['to_date'] ?? null;
+        $status = $query['status'] ?? null;
+
+        $showtimes = $this->showtimeService->getPublicShowtimes($limit, $movieId, $cinemaId, $cityId, $cinemaChainId, $showDate, $fromDate, $toDate, $status);
+
+        return $this->successList($showtimes->items(), $this->paginationMeta($showtimes));
+    }
+
+    #[OA\Get(
+        path: "/api/v1/public/showtimes/{id}",
+        summary: "Get public showtime detail",
+        description: "Returns one public showtime with movie, room, cinema, city, cinema chain, and prices.",
+        tags: ["Public"],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string", format: "uuid")),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Public showtime retrieved successfully"),
+            new OA\Response(response: 404, description: "Showtime not found"),
+        ]
+    )]
+    public function showPublic($id)
+    {
+        $showtime = $this->showtimeService->findPublic($id);
+
+        return $this->success($showtime);
+    }
+
     #[OA\Post(
         path: "/api/v1/showtimes",
         summary: "Create a new showtime",

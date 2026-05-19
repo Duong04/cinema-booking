@@ -25,6 +25,10 @@ class ShowtimeService {
         return $showtimes;
     }
 
+    public function getPublicShowtimes($limit, $movieId, $cinemaId, $cityId, $cinemaChainId, $showDate, $fromDate, $toDate, $status) {
+        return $this->showtimeRepository->getPublicShowtimes($limit, $movieId, $cinemaId, $cityId, $cinemaChainId, $showDate, $fromDate, $toDate, $status);
+    }
+
     public function create($data) {
         return DB::transaction(function () use ($data) {
             $movie    = $this->movieRepository->find($data['movie_id']);
@@ -53,6 +57,10 @@ class ShowtimeService {
         $showtime = $this->showtimeRepository->find($id, ['*'], ['movie', 'room.cinema', 'prices.seatType']);
 
         return $showtime;
+    }
+
+    public function findPublic($id) {
+        return $this->showtimeRepository->findPublic($id);
     }
 
     public function update($id, $data) {

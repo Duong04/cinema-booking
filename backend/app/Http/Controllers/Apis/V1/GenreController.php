@@ -98,6 +98,31 @@ class GenreController extends Controller
         return $this->successList($genres->items(), $this->paginationMeta($genres));
     }
 
+    #[OA\Get(
+        path: "/api/v1/public/genres",
+        summary: "Get public genre list",
+        tags: ["Public"],
+        parameters: [
+            new OA\Parameter(name: "limit", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 100)),
+            new OA\Parameter(name: "page", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 1)),
+            new OA\Parameter(name: "q", in: "query", required: false, description: "Search by genre name", schema: new OA\Schema(type: "string", example: "Hành động")),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Public genre list retrieved successfully"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
+    public function getAll(QueryRequest $request)
+    {
+        $query = $request->validated();
+        $limit = $query['limit'] ?? 100;
+        $q = $query['q'] ?? null;
+
+        $genres = $this->genreTypeService->paginate($limit, $q);
+
+        return $this->successList($genres->items(), $this->paginationMeta($genres));
+    }
+
     #[OA\Post(
         path: "/api/v1/genres",
         summary: "Create a new genre",

@@ -157,4 +157,15 @@ Route::prefix('v1')->group(function () {
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'delete');
     });
+
+    Route::prefix('/public')->group(function () {
+        Route::get('/cities', [CityController::class, 'getAll']);
+        Route::get('/cinemas', [CinemaController::class, 'getAll']);
+        Route::get('/cinema-chains', [CinemaChainController::class, 'getAll']);
+        Route::get('/movies', [MovieController::class, 'getAll']);
+        Route::get('/movies/{slug}', [MovieController::class, 'showPublic']);
+        Route::get('/genres', [GenreController::class, 'getAll']);
+        Route::get('/showtimes', [ShowtimeController::class, 'getAll']);
+        Route::get('/showtimes/{id}', [ShowtimeController::class, 'showPublic']);
+    });
 });
