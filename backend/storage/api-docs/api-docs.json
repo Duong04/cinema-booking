@@ -4238,6 +4238,12 @@
                                                         "format": "uri",
                                                         "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                     },
+                                                    "banner_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                        "nullable": true
+                                                    },
                                                     "trailer_url": {
                                                         "type": "string",
                                                         "format": "uri",
@@ -4258,10 +4264,19 @@
                                                         "nullable": true
                                                     },
                                                     "rating": {
+                                                        "type": "string",
+                                                        "example": "T13",
+                                                        "nullable": true
+                                                    },
+                                                    "rating_score": {
                                                         "type": "number",
                                                         "format": "float",
-                                                        "example": null,
+                                                        "example": 8.6,
                                                         "nullable": true
+                                                    },
+                                                    "rating_count": {
+                                                        "type": "integer",
+                                                        "example": 128
                                                     },
                                                     "language": {
                                                         "type": "string",
@@ -4273,7 +4288,8 @@
                                                         "enum": [
                                                             "coming_soon",
                                                             "now_showing",
-                                                            "ended"
+                                                            "ended",
+                                                            "cancelled"
                                                         ]
                                                     },
                                                     "created_at": {
@@ -4398,11 +4414,6 @@
                                 "required": [
                                     "title",
                                     "duration_minutes",
-                                    "poster_url",
-                                    "trailer_url",
-                                    "description",
-                                    "content",
-                                    "language",
                                     "status",
                                     "genres"
                                 ],
@@ -4419,6 +4430,12 @@
                                         "type": "string",
                                         "format": "uri",
                                         "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                    },
+                                    "banner_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                        "nullable": true
                                     },
                                     "trailer_url": {
                                         "type": "string",
@@ -4439,6 +4456,11 @@
                                         "example": "2026-08-08",
                                         "nullable": true
                                     },
+                                    "rating": {
+                                        "type": "string",
+                                        "example": "T13",
+                                        "nullable": true
+                                    },
                                     "language": {
                                         "type": "string",
                                         "example": "Tiếng việt"
@@ -4449,7 +4471,8 @@
                                         "enum": [
                                             "coming_soon",
                                             "now_showing",
-                                            "ended"
+                                            "ended",
+                                            "cancelled"
                                         ]
                                     },
                                     "genres": {
@@ -4505,6 +4528,12 @@
                                                     "format": "uri",
                                                     "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                 },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                    "nullable": true
+                                                },
                                                 "trailer_url": {
                                                     "type": "string",
                                                     "format": "uri",
@@ -4525,10 +4554,19 @@
                                                     "nullable": true
                                                 },
                                                 "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": null,
+                                                    "example": 8.6,
                                                     "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
                                                 },
                                                 "language": {
                                                     "type": "string",
@@ -4540,7 +4578,8 @@
                                                     "enum": [
                                                         "coming_soon",
                                                         "now_showing",
-                                                        "ended"
+                                                        "ended",
+                                                        "cancelled"
                                                     ]
                                                 },
                                                 "created_at": {
@@ -4630,11 +4669,11 @@
                                                         "example": "The duration minutes field is required."
                                                     }
                                                 },
-                                                "poster_url": {
+                                                "banner_url": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The poster url field is required."
+                                                        "example": "Banner không hợp lệ."
                                                     }
                                                 },
                                                 "status": {
@@ -4798,6 +4837,12 @@
                                                         "format": "uri",
                                                         "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                     },
+                                                    "banner_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                        "nullable": true
+                                                    },
                                                     "trailer_url": {
                                                         "type": "string",
                                                         "format": "uri",
@@ -4818,10 +4863,19 @@
                                                         "nullable": true
                                                     },
                                                     "rating": {
+                                                        "type": "string",
+                                                        "example": "T13",
+                                                        "nullable": true
+                                                    },
+                                                    "rating_score": {
                                                         "type": "number",
                                                         "format": "float",
-                                                        "example": 4.8,
+                                                        "example": 8.6,
                                                         "nullable": true
+                                                    },
+                                                    "rating_count": {
+                                                        "type": "integer",
+                                                        "example": 128
                                                     },
                                                     "language": {
                                                         "type": "string",
@@ -4932,6 +4986,11 @@
                                                     "type": "string",
                                                     "format": "uri"
                                                 },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "nullable": true
+                                                },
                                                 "trailer_url": {
                                                     "type": "string",
                                                     "format": "uri"
@@ -4948,9 +5007,19 @@
                                                     "nullable": true
                                                 },
                                                 "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
                                                     "type": "number",
                                                     "format": "float",
+                                                    "example": 8.6,
                                                     "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
                                                 },
                                                 "language": {
                                                     "type": "string",
@@ -5043,6 +5112,12 @@
                                                     "format": "uri",
                                                     "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                 },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                    "nullable": true
+                                                },
                                                 "trailer_url": {
                                                     "type": "string",
                                                     "format": "uri",
@@ -5063,10 +5138,19 @@
                                                     "nullable": true
                                                 },
                                                 "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": null,
+                                                    "example": 8.6,
                                                     "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
                                                 },
                                                 "language": {
                                                     "type": "string",
@@ -5078,7 +5162,8 @@
                                                     "enum": [
                                                         "coming_soon",
                                                         "now_showing",
-                                                        "ended"
+                                                        "ended",
+                                                        "cancelled"
                                                     ]
                                                 },
                                                 "created_at": {
@@ -5187,11 +5272,6 @@
                                 "required": [
                                     "title",
                                     "duration_minutes",
-                                    "poster_url",
-                                    "trailer_url",
-                                    "description",
-                                    "content",
-                                    "language",
                                     "status",
                                     "genres"
                                 ],
@@ -5208,6 +5288,12 @@
                                         "type": "string",
                                         "format": "uri",
                                         "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                    },
+                                    "banner_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                        "nullable": true
                                     },
                                     "trailer_url": {
                                         "type": "string",
@@ -5228,6 +5314,11 @@
                                         "example": "2026-08-08",
                                         "nullable": true
                                     },
+                                    "rating": {
+                                        "type": "string",
+                                        "example": "T13",
+                                        "nullable": true
+                                    },
                                     "language": {
                                         "type": "string",
                                         "example": "Tiếng việt"
@@ -5238,7 +5329,8 @@
                                         "enum": [
                                             "coming_soon",
                                             "now_showing",
-                                            "ended"
+                                            "ended",
+                                            "cancelled"
                                         ]
                                     },
                                     "genres": {
@@ -5294,6 +5386,12 @@
                                                     "format": "uri",
                                                     "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                 },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                    "nullable": true
+                                                },
                                                 "trailer_url": {
                                                     "type": "string",
                                                     "format": "uri",
@@ -5314,10 +5412,19 @@
                                                     "nullable": true
                                                 },
                                                 "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": null,
+                                                    "example": 8.6,
                                                     "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
                                                 },
                                                 "language": {
                                                     "type": "string",
@@ -5329,7 +5436,8 @@
                                                     "enum": [
                                                         "coming_soon",
                                                         "now_showing",
-                                                        "ended"
+                                                        "ended",
+                                                        "cancelled"
                                                     ]
                                                 },
                                                 "created_at": {
@@ -5439,11 +5547,11 @@
                                                         "example": "The duration minutes field is required."
                                                     }
                                                 },
-                                                "poster_url": {
+                                                "banner_url": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The poster url field is required."
+                                                        "example": "Banner không hợp lệ."
                                                     }
                                                 },
                                                 "status": {

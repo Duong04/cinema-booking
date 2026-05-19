@@ -90,6 +90,26 @@ function createColumns(): DataTableColumns<Movie> {
         ),
     },
     {
+      title: 'Rating',
+      key: 'rating',
+      width: 120,
+      render: (row) =>
+        h('div', { style: 'display:flex;flex-direction:column;gap:3px' }, [
+          h(
+            resolveComponent('n-tag'),
+            { size: 'small', round: true, type: 'warning' },
+            () => row.rating || '—',
+          ),
+          h(
+            'span',
+            { style: 'font-size:11px;color:var(--n-text-color-3)' },
+            row.rating_score != null
+              ? `${row.rating_score}/10 (${row.rating_count ?? 0})`
+              : 'Chưa có điểm',
+          ),
+        ]),
+    },
+    {
       title: 'Status',
       key: 'status',
       width: 120,
@@ -249,7 +269,7 @@ onMounted(fetchMovies)
     :loading="loading"
     :pagination="pagination"
     :row-key="(row: Movie) => row.id"
-    :scroll-x="1000"
+    :scroll-x="1120"
     remote
     @update:checked-row-keys="(keys: DataTableRowKey[]) => (checkedRowKeysRef = keys)"
   />

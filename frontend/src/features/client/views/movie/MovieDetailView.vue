@@ -1,29 +1,54 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { MOVIES } from '@/data/mockData'
 import { useLanguageStore } from '@/stores/language'
 import { useBookingStore } from '@/stores/client/booking'
 import { Star, Clock, Play, ChevronLeft, Heart, X } from 'lucide-vue-next'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useMovie } from '@/features/client/composables/useMovie'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Navigation } from 'swiper/modules'
 
 const route = useRoute()
 const router = useRouter()
 const languageStore = useLanguageStore()
 const bookingStore = useBookingStore()
+const { selectedMovie: movie, relatedMovies, fetchMovieDetail, fetchRelatedMovies } = useMovie()
 
-const movie = MOVIES.find((m) => m.id === route.params.id)
 const showTrailer = ref(false)
+const castSliderModules = [Navigation]
+const fallbackCast = [
+  'Timothee Chalamet',
+  'Zendaya',
+  'Rebecca Ferguson',
+  'Austin Butler',
+  'CR7',
+]
 
-const isWishlisted = () => (movie ? bookingStore.wishlist.includes(movie.id) : false)
+const routeMovieSlug = computed(() => String(route.params.id ?? ''))
 
-const otherMovies = computed(() => MOVIES.filter((m) => m.id !== movie?.id).slice(0, 4))
+const isWishlisted = () => (movie.value ? bookingStore.wishlist.includes(movie.value.id) : false)
+
+const movieCast = computed(() => {
+  return movie.value?.cast.length ? movie.value.cast : fallbackCast
+})
 
 const handleBookNow = () => {
-  if (movie) {
-    bookingStore.setCurrentBooking({ movieId: movie.id })
-    router.push(`/booking/showtime/${movie.id}`)
+  if (movie.value) {
+    bookingStore.setCurrentBooking({ movieId: movie.value.id })
+    router.push(`/booking/showtime/${movie.value.id}`)
   }
 }
+
+onMounted(() => {
+  fetchMovieDetail(routeMovieSlug.value)
+  fetchRelatedMovies(routeMovieSlug.value)
+})
+
+watch(routeMovieSlug, (slug) => {
+  showTrailer.value = false
+  fetchMovieDetail(slug)
+  fetchRelatedMovies(slug)
+})
 </script>
 
 <template>
@@ -142,21 +167,54 @@ const handleBookNow = () => {
               <div class="w-1.5 h-6 bg-red-600 rounded-full" />
               {{ languageStore.language === 'en' ? 'Cast' : 'Diễn viên' }}
             </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-              <div v-for="actor in movie.cast" :key="actor" class="group">
-                <div
-                  class="aspect-[3/4] rounded-2xl overflow-hidden bg-zinc-900 mb-3 border border-white/5"
-                >
-                  <img
-                    :src="`https://picsum.photos/seed/${actor}/300/400`"
-                    :alt="actor"
-                    class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                    referrerpolicy="no-referrer"
-                  />
-                </div>
-                <p class="text-white font-bold text-sm">{{ actor }}</p>
-                <p class="text-gray-500 text-xs uppercase font-black tracking-widest">Actor</p>
-              </div>
+            <div class="relative">
+              <Swiper
+                :modules="castSliderModules"
+                :navigation="{
+                  prevEl: '.cast-swiper-prev',
+                  nextEl: '.cast-swiper-next',
+                }"
+                :grabCursor="true"
+                :slidesPerView="2"
+                :spaceBetween="16"
+                :breakpoints="{
+                  640: { slidesPerView: 3, spaceBetween: 20 },
+                  1024: { slidesPerView: 4, spaceBetween: 24 },
+                }"
+                :observer="true"
+                :observeParents="true"
+                class="pb-2"
+              >
+                <SwiperSlide v-for="actor in movieCast" :key="actor">
+                  <div class="group">
+                    <div
+                      class="aspect-[3/4] rounded-2xl overflow-hidden bg-zinc-900 mb-3 border border-white/5"
+                    >
+                      <img
+                        :src="`https://picsum.photos/seed/${actor}/300/400`"
+                        :alt="actor"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                        referrerpolicy="no-referrer"
+                      />
+                    </div>
+                    <p class="text-white font-bold text-sm">{{ actor }}</p>
+                    <p class="text-gray-500 text-xs uppercase font-black tracking-widest">Actor</p>
+                  </div>
+                </SwiperSlide>
+              </Swiper>
+
+              <button
+                class="cast-swiper-prev hidden md:flex absolute left-0 top-[42%] z-10 -translate-x-1/2 -translate-y-1/2 p-3 bg-black/70 border border-white/10 rounded-full text-white hover:bg-red-600 transition-colors"
+                type="button"
+              >
+                <ChevronLeft class="w-5 h-5" />
+              </button>
+              <button
+                class="cast-swiper-next hidden md:flex absolute right-0 top-[42%] z-10 translate-x-1/2 -translate-y-1/2 p-3 bg-black/70 border border-white/10 rounded-full text-white hover:bg-red-600 transition-colors"
+                type="button"
+              >
+                <ChevronLeft class="w-5 h-5 rotate-180" />
+              </button>
             </div>
           </section>
         </div>
@@ -171,12 +229,12 @@ const handleBookNow = () => {
             </h2>
             <div class="space-y-4">
               <div
-                v-for="m in otherMovies"
+                v-for="m in relatedMovies"
                 :key="m.id"
                 @click="
                   router.push({
                     name: 'movie-detail',
-                    params: { id: movie.id },
+                    params: { id: m.id },
                   })
                 "
                 class="flex gap-4 p-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-pointer group"

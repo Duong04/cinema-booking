@@ -1,18 +1,43 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { onMounted } from 'vue'
 import { MOVIES } from '@/data/mockData'
 import { useLanguageStore } from '@/stores/language'
-import { Star, Film, TrendingUp, Newspaper, Gift, ChevronRight } from 'lucide-vue-next'
+import { Film, TrendingUp, Newspaper, Gift, ChevronRight } from 'lucide-vue-next'
 import MovieCard from '../../components/ui/MovieCard.vue'
 import HeroSlider from '@/features/client/views/home/components/HeroSlider.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { useMovie } from '@/features/client/composables/useMovie'
+import { useGenre } from '@/features/client/composables/useGenre'
+import type { ClientMovie } from '@/features/client/types/movie.type'
 
 const languageStore = useLanguageStore()
 const featuredMovies = MOVIES.slice(0, 3)
+const {
+  topMovies,
+  nowPlayingMovies,
+  comingSoonMovies,
+  fetchTopMovies,
+  fetchNowPlayingMovies,
+  fetchComingSoonMovies,
+} = useMovie()
+const { genres, fetchGenres } = useGenre()
 
-const topMovies = computed(() => {
-  return [...MOVIES].sort((a, b) => b.rating - a.rating).slice(0, 5)
+onMounted(() => {
+  fetchTopMovies()
+  fetchNowPlayingMovies()
+  fetchComingSoonMovies()
+  fetchGenres()
 })
+
+const topMovieMetric = (movie: ClientMovie) => {
+  if (typeof movie.soldTicketsCount === 'number') {
+    return languageStore.language === 'en'
+      ? `${movie.soldTicketsCount} tickets`
+      : `${movie.soldTicketsCount} vé`
+  }
+
+  return movie.rating
+}
 
 const news = [
   {
@@ -124,8 +149,8 @@ const promos = [
                       <div
                         class="flex items-center gap-1 text-yellow-500 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg"
                       >
-                        <Star class="w-4 h-4 fill-current" />
-                        <span class="text-sm font-bold">{{ movie.rating }}</span>
+                        <TrendingUp class="w-4 h-4" />
+                        <span class="text-sm font-bold">{{ topMovieMetric(movie) }}</span>
                       </div>
                       <span
                         class="px-2 py-1 bg-red-600 text-white text-[10px] font-black rounded uppercase tracking-widest"
@@ -149,8 +174,8 @@ const promos = [
                   <div
                     class="absolute top-4 right-4 flex items-center gap-1 text-yellow-500 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 group-hover:opacity-0 transition-opacity"
                   >
-                    <Star class="w-4 h-4 fill-current" />
-                    <span class="text-sm font-bold">{{ movie.rating }}</span>
+                    <TrendingUp class="w-4 h-4" />
+                    <span class="text-sm font-bold">{{ topMovieMetric(movie) }}</span>
                   </div>
 
                   <div class="absolute top-4 left-4 flex items-center gap-1.5">
@@ -185,7 +210,7 @@ const promos = [
           </router-link>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <MovieCard v-for="movie in MOVIES.slice(0, 4)" :key="movie.id" :movie="movie" />
+          <MovieCard v-for="movie in nowPlayingMovies" :key="movie.id" :movie="movie" />
         </div>
       </section>
 
@@ -293,12 +318,12 @@ const promos = [
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <button
-            v-for="genre in ['Action', 'Comedy', 'Drama', 'Sci-Fi', 'Horror', 'Romance']"
-            :key="genre"
+            v-for="genre in genres"
+            :key="genre.id"
             class="p-6 bg-zinc-900 rounded-2xl border border-white/5 hover:border-red-600 transition-all text-center group"
           >
             <div class="text-gray-400 group-hover:text-white font-bold transition-colors">
-              {{ genre }}
+              {{ genre.name }}
             </div>
           </button>
         </div>
@@ -316,7 +341,7 @@ const promos = [
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 opacity-80">
           <MovieCard
-            v-for="movie in MOVIES.slice().reverse().slice(0, 4)"
+            v-for="movie in comingSoonMovies"
             :key="`soon-${movie.id}`"
             :movie="movie"
           />

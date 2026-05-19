@@ -3,7 +3,7 @@ import { Film } from 'lucide-vue-next'
 </script>
 
 <template>
-  <footer class="border-t border-white/10 pt-20 pb-10 bg-zinc-950">
+  <footer class="border-t border-white/10 mt-20 pt-20 pb-10 bg-zinc-950">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
         <div class="col-span-1 md:col-span-2">

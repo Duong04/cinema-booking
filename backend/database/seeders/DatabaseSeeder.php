@@ -71,6 +71,7 @@ class DatabaseSeeder extends Seeder
         $this->seedLocations();
         $this->seedRoomsAndSeats();
         $this->seedMovies();
+        $this->seedMovieReviews();
         $this->seedShowtimes();
         $this->seedCombos();
         $this->seedPromotions();
@@ -100,6 +101,7 @@ class DatabaseSeeder extends Seeder
             'bookings',
             'showtime_prices',
             'showtimes',
+            'movie_reviews',
             'movie_genres',
             'genres',
             'movies',
@@ -369,6 +371,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Dune: Part Two',
                 'duration_minutes' => 166,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=Way9Dexny3w',
                 'description' => 'Paul Atreides hop luc cung nguoi Fremen de doi dau the luc da huy hoai gia toc minh.',
                 'content' => 'Mot chuyen phieu luu khoa hoc vien tuong quy mo lon ve long trung thanh, quyen luc va cai gia cua so menh.',
@@ -382,6 +385,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Inside Out 2',
                 'duration_minutes' => 96,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/stKGOm8UyhuLPR9sZLjs5AkmncA.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=LEjhY15eCx0',
                 'description' => 'Riley buoc vao tuoi teen voi nhung cam xuc moi xuat hien day bat ngo.',
                 'content' => 'Bo phim hoat hinh am ap ve truong thanh, gia dinh va cach ta hoc cach song chung voi nhung cam xuc phuc tap.',
@@ -395,6 +399,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Oppenheimer',
                 'duration_minutes' => 181,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=uYPbbksJxIg',
                 'description' => 'Chan dung J. Robert Oppenheimer va nhung quyet dinh lam thay doi lich su nhan loai.',
                 'content' => 'Tac pham tam ly lich su cang thang, tap trung vao tham vong khoa hoc va ganh nang dao duc.',
@@ -408,6 +413,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Mai',
                 'duration_minutes' => 131,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/9t7YTHp0ZbEl1BNgAu5Y9Hhvu0j.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/6uKobmMZa0E47l5YUYJZfK87Ilh.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=EX6clvId19s',
                 'description' => 'Mot nguoi phu nu tung trai tim thay hy vong moi giua nhung dinh kien doi thuong.',
                 'content' => 'Cau chuyen tinh cam Viet Nam ve tinh yeu, gia dinh va noi dau can duoc lang nghe.',
@@ -421,6 +427,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Godzilla x Kong: The New Empire',
                 'duration_minutes' => 115,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/z1p34vh7dEOnLDmyCrlUVLuoDzd.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=lV1OOlGwExM',
                 'description' => 'Hai bieu tuong khong lo hop suc truoc moi de doa tu the gioi rong lon ben duoi Trai Dat.',
                 'content' => 'Phim giai tri toc do cao voi chien truong quai vat, hinh anh hoanh trang va nhieu canh hanh dong.',
@@ -434,6 +441,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Kung Fu Panda 4',
                 'duration_minutes' => 94,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/kYgQzzjNis5jJalYtIHgrom0gOx.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=_inKs4eeHiI',
                 'description' => 'Po tim nguoi ke nhiem Dragon Warrior va doi dau mot ke thu co kha nang bien hinh.',
                 'content' => 'Chuyen phieu luu hai huoc, sang mau, phu hop gia dinh va khan gia nho tuoi.',
@@ -447,6 +455,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'A Quiet Place: Day One',
                 'duration_minutes' => 99,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/yrpPYKijwdMHyTGIOd1iK1h0Xno.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/4yrOyO3N55XazHQXXYoqiiPQd40.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=YPY7J-flzE8',
                 'description' => 'Ngay dau tien cua tham hoa, khi im lang tro thanh cach duy nhat de song sot.',
                 'content' => 'Bo phim kinh di cang thang voi khong khi do thi hon loan va nhung khoang lang day ap luc.',
@@ -460,6 +469,7 @@ class DatabaseSeeder extends Seeder
                 'title' => 'Deadpool & Wolverine',
                 'duration_minutes' => 127,
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
+                'banner_url' => 'https://image.tmdb.org/t/p/w1280/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=73_1biulkYk',
                 'description' => 'Deadpool keo Wolverine vao mot nhiem vu hon loan, vua bao luc vua day mau sac hai huoc.',
                 'content' => 'Phim sieu anh hung co tiet tau nhanh, nhieu tinh huong tu trao va cac man doi dap sac canh.',
@@ -488,6 +498,51 @@ class DatabaseSeeder extends Seeder
             }
 
             $this->movies[] = $model;
+        }
+    }
+
+    private function seedMovieReviews(): void
+    {
+        $customers = array_values(array_filter($this->users, fn (User $user) => $user->role_id === $this->roles['customer']->id));
+        $comments = [
+            'Phim co nhip ke chuyen cuon, hinh anh dep va am thanh rat da.',
+            'Noi dung on, trai nghiem ngoai rap tot hon mong doi.',
+            'Dien vien dien tron vai, mot vai phan hoi dai nhung van dang xem.',
+            'Minh thich cach phim xay dung cam xuc va cao trao.',
+            'Phu hop xem cuoi tuan, giai tri tot va de theo doi.',
+            'Canh hanh dong an tuong, phan am nhac nang tam trai nghiem.',
+            'Phim khong qua moi nhung van lam minh hai long.',
+            'Tiet tau gon, hinh anh sang va co nhieu khoanh khac dang nho.',
+        ];
+
+        foreach ($this->movies as $movieIndex => $movie) {
+            $reviewCount = 10 + ($movieIndex % 5);
+
+            for ($index = 0; $index < $reviewCount; $index++) {
+                $customer = $customers[($movieIndex * 13 + $index) % count($customers)];
+                $score = min(10, 6.8 + (($movieIndex + $index) % 7) * 0.4);
+                $status = $index % 11 === 0 ? 'pending' : ($index % 13 === 0 ? 'rejected' : 'approved');
+
+                DB::table('movie_reviews')->insert([
+                    'id' => (string) Str::uuid7(),
+                    'movie_id' => $movie->id,
+                    'user_id' => $customer->id,
+                    'rating_score' => $score,
+                    'comment' => $comments[($movieIndex + $index) % count($comments)],
+                    'status' => $status,
+                    'created_at' => now()->subDays(($movieIndex * 3) + $index),
+                    'updated_at' => now()->subDays(($movieIndex * 3) + $index),
+                ]);
+            }
+
+            $approvedReviews = DB::table('movie_reviews')
+                ->where('movie_id', $movie->id)
+                ->where('status', 'approved');
+
+            $movie->update([
+                'rating_score' => round((float) $approvedReviews->avg('rating_score'), 1),
+                'rating_count' => (clone $approvedReviews)->count(),
+            ]);
         }
     }
 

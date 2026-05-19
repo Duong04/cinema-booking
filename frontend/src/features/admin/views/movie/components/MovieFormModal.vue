@@ -13,10 +13,12 @@ interface MovieForm {
   title: string
   duration_minutes: number | null
   poster_url: string
+  banner_url: string
   trailer_url: string
   description: string
   content: string
   release_date: string
+  rating: string
   language: string
   status: Status
   genres: string[]
@@ -38,6 +40,7 @@ const isEdit = ref(false)
 const genreOptions = ref<SelectOption[]>([])
 // Upload states
 const posterUploading = ref(false)
+const bannerUploading = ref(false)
 const trailerUploading = ref(false)
 
 const statusOptions: SelectOption[] = [
@@ -47,14 +50,23 @@ const statusOptions: SelectOption[] = [
   { label: 'Đã hủy', value: 'cancelled' },
 ]
 
+const ratingOptions: SelectOption[] = [
+  { label: 'P - Mọi độ tuổi', value: 'P' },
+  { label: 'T13 - Từ 13 tuổi', value: 'T13' },
+  { label: 'T16 - Từ 16 tuổi', value: 'T16' },
+  { label: 'T18 - Từ 18 tuổi', value: 'T18' },
+]
+
 const formData = reactive<MovieForm>({
   title: '',
   duration_minutes: null,
   poster_url: '',
+  banner_url: '',
   trailer_url: '',
   description: '',
   content: '',
   release_date: '',
+  rating: '',
   language: '',
   status: 'coming_soon',
   genres: [],
@@ -111,6 +123,22 @@ async function handlePosterUpload({ file }: { file: UploadFileInfo }) {
   return false
 }
 
+async function handleBannerUpload({ file }: { file: UploadFileInfo }) {
+  if (!file.file) return
+  try {
+    bannerUploading.value = true
+    const res = await uploadService.uploadImage(file.file, 'banners')
+    formData.banner_url = res.data.url
+    clearFieldError('banner_url')
+    message.success('Tải banner thành công')
+  } catch {
+    message.error('Tải banner thất bại')
+  } finally {
+    bannerUploading.value = false
+  }
+  return false
+}
+
 async function handleTrailerUpload({ file }: { file: UploadFileInfo }) {
   if (!file.file) return
   try {
@@ -133,10 +161,12 @@ function syncFormWithProps() {
     formData.title = props.movie.title ?? ''
     formData.duration_minutes = props.movie.duration_minutes ?? null
     formData.poster_url = props.movie.poster_url ?? ''
+    formData.banner_url = props.movie.banner_url ?? ''
     formData.trailer_url = props.movie.trailer_url ?? ''
     formData.description = props.movie.description ?? ''
     formData.content = props.movie.content ?? ''
     formData.release_date = props.movie.release_date ?? ''
+    formData.rating = props.movie.rating ?? ''
     formData.language = props.movie.language ?? ''
     formData.status = props.movie.status ?? 'coming_soon'
     formData.genres = Array.isArray(props.movie.genres)
@@ -147,10 +177,12 @@ function syncFormWithProps() {
     formData.title = ''
     formData.duration_minutes = null
     formData.poster_url = ''
+    formData.banner_url = ''
     formData.trailer_url = ''
     formData.description = ''
     formData.content = ''
     formData.release_date = ''
+    formData.rating = ''
     formData.language = ''
     formData.status = 'coming_soon'
     formData.genres = []
@@ -226,6 +258,18 @@ async function handleDeletePoster() {
     message.warning('Xóa trên cloud thất bại, vẫn xóa khỏi form')
   } finally {
     formData.poster_url = ''
+  }
+}
+
+async function handleDeleteBanner() {
+  if (!formData.banner_url) return
+  try {
+    await uploadService.deleteFile(formData.banner_url)
+    message.success('Đã xóa banner')
+  } catch {
+    message.warning('Xóa trên cloud thất bại, vẫn xóa khỏi form')
+  } finally {
+    formData.banner_url = ''
   }
 }
 
@@ -357,6 +401,24 @@ watch(() => props.movie, syncFormWithProps, { immediate: true })
           </n-form-item-gi>
         </n-grid>
 
+        <!-- Phân loại độ tuổi -->
+        <n-grid :cols="2" :x-gap="16">
+          <n-form-item-gi
+            label="Phân loại độ tuổi"
+            path="rating"
+            :validation-status="backendErrors.rating ? 'error' : undefined"
+            :feedback="backendErrors.rating"
+          >
+            <n-select
+              v-model:value="formData.rating"
+              :options="ratingOptions"
+              placeholder="Chọn phân loại"
+              clearable
+              @update:value="clearFieldError('rating')"
+            />
+          </n-form-item-gi>
+        </n-grid>
+
         <!-- Poster Upload -->
         <n-form-item
           label="Poster phim"
@@ -419,6 +481,69 @@ watch(() => props.movie, syncFormWithProps, { immediate: true })
               placeholder="Hoặc nhập URL poster..."
               size="small"
               @input="clearFieldError('poster_url')"
+            />
+          </n-space>
+        </n-form-item>
+
+        <!-- Banner Upload -->
+        <n-form-item
+          label="Banner phim"
+          path="banner_url"
+          :validation-status="backendErrors.banner_url ? 'error' : undefined"
+          :feedback="backendErrors.banner_url"
+        >
+          <n-space vertical style="width: 100%">
+            <n-upload
+              accept="image/*"
+              :max="1"
+              :show-file-list="false"
+              :custom-request="handleBannerUpload"
+            >
+              <n-button :loading="bannerUploading" secondary>
+                <template #icon>
+                  <n-icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path
+                        d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"
+                      />
+                    </svg>
+                  </n-icon>
+                </template>
+                Tải lên banner
+              </n-button>
+            </n-upload>
+
+            <div
+              v-if="formData.banner_url"
+              style="display: flex; align-items: flex-start; gap: 8px"
+            >
+              <img
+                :src="formData.banner_url"
+                alt="Banner preview"
+                style="
+                  width: 180px;
+                  height: 100px;
+                  object-fit: cover;
+                  border-radius: 6px;
+                  border: 1px solid #e0e0e0;
+                "
+              />
+              <n-button
+                size="small"
+                quaternary
+                type="error"
+                style="margin-top: 4px"
+                @click="handleDeleteBanner"
+              >
+                Xóa
+              </n-button>
+            </div>
+
+            <n-input
+              v-model:value="formData.banner_url"
+              placeholder="Hoặc nhập URL banner..."
+              size="small"
+              @input="clearFieldError('banner_url')"
             />
           </n-space>
         </n-form-item>
