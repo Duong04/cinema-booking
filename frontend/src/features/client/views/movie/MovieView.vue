@@ -1,37 +1,48 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { MOVIES } from '@/data/mockData'
+import { ref, computed, onMounted } from 'vue'
 import { useLanguageStore } from '@/stores/language'
 import MovieCard from '../../components/ui/MovieCard.vue'
 import { Search, SlidersHorizontal, Film, X } from 'lucide-vue-next'
+import { useMovie } from '@/features/client/composables/useMovie'
+import { useGenre } from '@/features/client/composables/useGenre'
 
 const languageStore = useLanguageStore()
 const searchQuery = ref('')
 const selectedGenre = ref('All')
 const sortBy = ref('rating')
-const activeStatus = ref<'now-playing' | 'coming-soon'>('now-playing')
+const activeStatus = ref<'now_showing' | 'coming_soon'>('now_showing')
+const {
+  nowPlayingMovies,
+  comingSoonMovies,
+  fetchNowPlayingMovies,
+  fetchComingSoonMovies,
+} = useMovie()
+const { genres: apiGenres, fetchGenres } = useGenre()
 
 const genres = computed(() => {
-  const allGenres = MOVIES.flatMap((m) => (languageStore.language === 'en' ? m.genres : m.genresVi))
-  return ['All', ...new Set(allGenres)]
+  return ['All', ...apiGenres.value.map((genre) => genre.name)]
 })
 
 const filteredMovies = computed(() => {
-  const result = MOVIES.filter((movie) => {
-    const title = languageStore.language === 'en' ? movie.title : movie.titleVi
-    const matchesSearch = title.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const movieGenres = languageStore.language === 'en' ? movie.genres : movie.genresVi
-    const matchesGenre = selectedGenre.value === 'All' || movieGenres.includes(selectedGenre.value)
-    const matchesStatus = movie.status === activeStatus.value
-    return matchesSearch && matchesGenre && matchesStatus
+  const sourceMovies =
+    activeStatus.value === 'now_showing' ? nowPlayingMovies.value : comingSoonMovies.value
+
+  const result = sourceMovies.filter((movie) => {
+    const matchesSearch = movie.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesGenre =
+      selectedGenre.value === 'All' || movie.genres.some((genre) => genre.name === selectedGenre.value)
+    return matchesSearch && matchesGenre
   })
 
   if (sortBy.value === 'rating') {
-    result.sort((a, b) => b.rating - a.rating)
+    result.sort((a, b) => (b.rating_score ?? 0) - (a.rating_score ?? 0))
   } else if (sortBy.value === 'newest') {
-    result.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
+    result.sort(
+      (a, b) =>
+        new Date(b.release_date ?? '').getTime() - new Date(a.release_date ?? '').getTime(),
+    )
   } else if (sortBy.value === 'duration') {
-    result.sort((a, b) => b.duration - a.duration)
+    result.sort((a, b) => b.duration_minutes - a.duration_minutes)
   }
 
   return result
@@ -42,6 +53,12 @@ const clearFilters = () => {
   selectedGenre.value = 'All'
   sortBy.value = 'rating'
 }
+
+onMounted(() => {
+  fetchNowPlayingMovies()
+  fetchComingSoonMovies()
+  fetchGenres()
+})
 </script>
 
 <template>
@@ -80,10 +97,10 @@ const clearFilters = () => {
         <!-- Status Toggle -->
         <div class="flex items-center justify-center gap-4 mb-12">
           <button
-            @click="activeStatus = 'now-playing'"
+            @click="activeStatus = 'now_showing'"
             :class="[
               'px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-widest transition-all',
-              activeStatus === 'now-playing'
+              activeStatus === 'now_showing'
                 ? 'bg-red-600 text-white shadow-xl shadow-red-600/40'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10',
             ]"
@@ -91,10 +108,10 @@ const clearFilters = () => {
             {{ languageStore.language === 'en' ? 'Now Playing' : 'Đang chiếu' }}
           </button>
           <button
-            @click="activeStatus = 'coming-soon'"
+            @click="activeStatus = 'coming_soon'"
             :class="[
               'px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-widest transition-all',
-              activeStatus === 'coming-soon'
+              activeStatus === 'coming_soon'
                 ? 'bg-red-600 text-white shadow-xl shadow-red-600/40'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10',
             ]"

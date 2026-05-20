@@ -1,44 +1,13 @@
 import { ref } from 'vue'
-import { MOVIES } from '@/data/mockData'
 import { movieService } from '@/features/client/services/movie.service'
-import type { ClientMovie, PublicMovie } from '@/features/client/types/movie.type'
-
-const mockTopMovies = [...MOVIES].sort((a, b) => b.rating - a.rating).slice(0, 5)
-const mockNowPlayingMovies = MOVIES.filter((movie) => movie.status === 'now-playing').slice(0, 4)
-const mockComingSoonMovies = MOVIES.filter((movie) => movie.status === 'coming-soon').slice(0, 4)
-
-const mapPublicMovieToClientMovie = (movie: PublicMovie): ClientMovie => {
-  const genres = movie.genres.map((genre) => genre.name)
-  const ageRating = String(movie.rating ?? 'P')
-
-  return {
-    id: movie.slug ?? movie.id,
-    title: movie.title,
-    titleVi: movie.title,
-    poster: movie.poster_url,
-    backdrop: movie.poster_url,
-    rating: movie.sold_tickets_count ?? 0,
-    duration: movie.duration_minutes,
-    genres: genres.length ? genres : ['Movie'],
-    genresVi: genres.length ? genres : ['Phim'],
-    releaseDate: movie.release_date,
-    description: movie.description,
-    descriptionVi: movie.description,
-    director: '',
-    cast: [],
-    trailerUrl: movie.trailer_url,
-    ageRating,
-    status: movie.status === 'now_showing' ? 'now-playing' : 'coming-soon',
-    soldTicketsCount: movie.sold_tickets_count ?? 0,
-  }
-}
+import type { PublicMovie } from '@/features/client/types/movie.type'
 
 export function useMovie() {
-  const topMovies = ref<ClientMovie[]>(mockTopMovies)
-  const nowPlayingMovies = ref<ClientMovie[]>(mockNowPlayingMovies)
-  const comingSoonMovies = ref<ClientMovie[]>(mockComingSoonMovies)
-  const relatedMovies = ref<ClientMovie[]>(MOVIES.slice(0, 4))
-  const selectedMovie = ref<ClientMovie | null>(null)
+  const topMovies = ref<PublicMovie[]>([])
+  const nowPlayingMovies = ref<PublicMovie[]>([])
+  const comingSoonMovies = ref<PublicMovie[]>([])
+  const relatedMovies = ref<PublicMovie[]>([])
+  const selectedMovie = ref<PublicMovie | null>(null)
   const loadingTopMovies = ref(false)
   const loadingNowPlayingMovies = ref(false)
   const loadingComingSoonMovies = ref(false)
@@ -55,7 +24,7 @@ export function useMovie() {
       })
 
       if (res.data.length > 0) {
-        topMovies.value = res.data.map(mapPublicMovieToClientMovie)
+        topMovies.value = res.data
       }
     } catch (error) {
       console.error('Failed to load top movies:', error)
@@ -73,7 +42,7 @@ export function useMovie() {
       })
 
       if (res.data.length > 0) {
-        nowPlayingMovies.value = res.data.map(mapPublicMovieToClientMovie)
+        nowPlayingMovies.value = res.data
       }
     } catch (error) {
       console.error('Failed to load now playing movies:', error)
@@ -91,7 +60,7 @@ export function useMovie() {
       })
 
       if (res.data.length > 0) {
-        comingSoonMovies.value = res.data.map(mapPublicMovieToClientMovie)
+        comingSoonMovies.value = res.data
       }
     } catch (error) {
       console.error('Failed to load coming soon movies:', error)
@@ -102,11 +71,10 @@ export function useMovie() {
 
   async function fetchMovieDetail(slug: string) {
     loadingMovieDetail.value = true
-    selectedMovie.value = MOVIES.find((movie) => movie.id === slug) ?? null
 
     try {
       const res = await movieService.getPublicMovieBySlug(slug)
-      selectedMovie.value = mapPublicMovieToClientMovie(res.data)
+      selectedMovie.value = res.data
     } catch (error) {
       console.error('Failed to load movie detail:', error)
     } finally {
@@ -121,8 +89,7 @@ export function useMovie() {
         limit: 5,
       })
       const movies = res.data
-        .map(mapPublicMovieToClientMovie)
-        .filter((movie) => movie.id !== currentMovieId)
+        .filter((movie) => movie.id !== currentMovieId && movie.slug !== currentMovieId)
         .slice(0, 4)
 
       if (movies.length > 0) {

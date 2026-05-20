@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { MOVIES } from '@/data/mockData'
+import { computed, onMounted } from 'vue'
 import { useLanguageStore } from '@/stores/language'
-import { Film, TrendingUp, Newspaper, Gift, ChevronRight } from 'lucide-vue-next'
+import { Film, TrendingUp, Newspaper, Gift, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import MovieCard from '../../components/ui/MovieCard.vue'
 import HeroSlider from '@/features/client/views/home/components/HeroSlider.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Navigation } from 'swiper/modules'
 import { useMovie } from '@/features/client/composables/useMovie'
 import { useGenre } from '@/features/client/composables/useGenre'
-import type { ClientMovie } from '@/features/client/types/movie.type'
+import TopMovieCard from '../../components/ui/TopMovieCard.vue'
 
 const languageStore = useLanguageStore()
-const featuredMovies = MOVIES.slice(0, 3)
 const {
   topMovies,
   nowPlayingMovies,
@@ -21,6 +20,8 @@ const {
   fetchComingSoonMovies,
 } = useMovie()
 const { genres, fetchGenres } = useGenre()
+const featuredMovies = computed(() => topMovies.value.length ? topMovies.value : nowPlayingMovies.value)
+const topMovieSliderModules = [Navigation]
 
 onMounted(() => {
   fetchTopMovies()
@@ -28,16 +29,6 @@ onMounted(() => {
   fetchComingSoonMovies()
   fetchGenres()
 })
-
-const topMovieMetric = (movie: ClientMovie) => {
-  if (typeof movie.soldTicketsCount === 'number') {
-    return languageStore.language === 'en'
-      ? `${movie.soldTicketsCount} tickets`
-      : `${movie.soldTicketsCount} vé`
-  }
-
-  return movie.rating
-}
 
 const news = [
   {
@@ -77,7 +68,7 @@ const promos = [
 </script>
 
 <template>
-  <div>
+  <div class="mb-20">
     <!-- Hero Slider -->
     <HeroSlider :movies="featuredMovies" />
 
@@ -92,12 +83,31 @@ const promos = [
             <TrendingUp class="w-10 h-10 text-yellow-500" />
             {{ languageStore.t('home.top_movies') }}
           </h2>
+          <div class="hidden items-center gap-3 md:flex">
+            <button
+              type="button"
+              class="top-movies-prev rounded-full border border-white/10 bg-white/5 p-3 text-white transition-all hover:border-red-500/60 hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft class="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              class="top-movies-next rounded-full border border-white/10 bg-white/5 p-3 text-white transition-all hover:border-red-500/60 hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronRight class="h-5 w-5" />
+            </button>
+          </div>
         </div>
         <Swiper
-          :loop="true"
+          :modules="topMovieSliderModules"
+          :rewind="true"
           :grabCursor="true"
           :slidesPerView="2"
           :spaceBetween="24"
+          :navigation="{
+            prevEl: '.top-movies-prev',
+            nextEl: '.top-movies-next',
+          }"
           :breakpoints="{
             320: { slidesPerView: 2, spaceBetween: 16 },
             640: { slidesPerView: 3, spaceBetween: 20 },
@@ -112,83 +122,7 @@ const promos = [
             :key="movie.id"
             class="transition-all duration-500"
           >
-            <div class="group relative">
-              <div
-                class="absolute -left-12 top-1/2 -translate-y-1/2 text-[16rem] font-black italic z-0 pointer-events-none select-none leading-none transition-all duration-700 group-hover:-translate-x-4"
-              >
-                <span
-                  class="text-transparent bg-clip-text bg-gradient-to-b from-white/20 to-transparent outline-text"
-                >
-                  {{ index + 1 }}
-                </span>
-              </div>
-
-              <!-- GIỮ NGUYÊN -->
-              <router-link
-                :to="{
-                  name: 'movie-detail',
-                  params: { id: movie.id },
-                }"
-                class="relative z-10 block"
-              >
-                <div
-                  class="movie-card relative aspect-[2/3] rounded-3xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group-hover:border-red-600/50 transition-all duration-500"
-                >
-                  <img
-                    :src="movie.poster"
-                    :alt="movie.title"
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    referrerpolicy="no-referrer"
-                  />
-
-                  <!-- Overlay Info -->
-                  <div
-                    class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6"
-                  >
-                    <div class="flex items-center gap-2 mb-2">
-                      <div
-                        class="flex items-center gap-1 text-yellow-500 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg"
-                      >
-                        <TrendingUp class="w-4 h-4" />
-                        <span class="text-sm font-bold">{{ topMovieMetric(movie) }}</span>
-                      </div>
-                      <span
-                        class="px-2 py-1 bg-red-600 text-white text-[10px] font-black rounded uppercase tracking-widest"
-                      >
-                        TOP {{ index + 1 }}
-                      </span>
-                    </div>
-
-                    <h3 class="text-xl font-black text-white uppercase tracking-tight mb-4">
-                      {{ languageStore.language === 'en' ? movie.title : movie.titleVi }}
-                    </h3>
-
-                    <button
-                      class="w-full py-3 bg-white text-black rounded-xl font-black text-sm hover:bg-red-600 hover:text-white transition-colors"
-                    >
-                      {{ languageStore.t('movie.book_now') }}
-                    </button>
-                  </div>
-
-                  <!-- Static Rating -->
-                  <div
-                    class="absolute top-4 right-4 flex items-center gap-1 text-yellow-500 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 group-hover:opacity-0 transition-opacity"
-                  >
-                    <TrendingUp class="w-4 h-4" />
-                    <span class="text-sm font-bold">{{ topMovieMetric(movie) }}</span>
-                  </div>
-
-                  <div class="absolute top-4 left-4 flex items-center gap-1.5">
-                    <span
-                      class="px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-white border border-white/20 backdrop-blur-md"
-                      :class="index === 0 ? 'bg-yellow-500/80 border-yellow-400/50' : 'bg-black/60'"
-                    >
-                      {{ index === 0 ? '🏆 TOP 1' : `TOP ${index + 1}` }}
-                    </span>
-                  </div>
-                </div>
-              </router-link>
-            </div>
+            <TopMovieCard :movie="movie" :index="index" />
           </SwiperSlide>
         </Swiper>
       </section>

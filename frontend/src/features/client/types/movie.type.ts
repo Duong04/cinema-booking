@@ -1,13 +1,8 @@
-import type { Movie as DisplayMovie } from '@/data/mockData'
+import type { Genre } from '@/features/client/types/genre.type'
 
 export type PublicMovieStatus = 'now_showing' | 'coming_soon'
 export type PublicMovieSort = 'created_at_desc' | 'best_selling'
 export type PublicMoviePeriod = '7d' | '30d' | 'all'
-
-export interface PublicMovieGenre {
-  id: string
-  name: string
-}
 
 export interface PublicMovie {
   id: string
@@ -15,15 +10,18 @@ export interface PublicMovie {
   slug?: string
   duration_minutes: number
   poster_url: string
+  banner_url?: string | null
   trailer_url: string
   description: string
   content: string
-  release_date: string
+  release_date?: string | null
   rating?: string | number | null
+  rating_count?: number | null
+  rating_score?: number | null
   language?: string
   status: PublicMovieStatus
   sold_tickets_count?: number | null
-  genres: PublicMovieGenre[]
+  genres: Genre[]
 }
 
 export interface PublicMovieQuery {
@@ -34,8 +32,4 @@ export interface PublicMovieQuery {
   genre_id?: string
   sort?: PublicMovieSort
   period?: PublicMoviePeriod
-}
-
-export type ClientMovie = DisplayMovie & {
-  soldTicketsCount?: number
 }
