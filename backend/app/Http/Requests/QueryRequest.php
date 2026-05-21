@@ -34,7 +34,7 @@ class QueryRequest extends FormRequest
             'cinema_id' => 'nullable|exists:cinemas,id',
             'cinema_chain_id' => 'nullable|exists:cinema_chains,id',
             'status' => 'nullable|string',
-            'sort' => 'nullable|string|in:created_at_desc,best_selling',
+            'sort' => 'nullable|string|in:created_at_desc,best_selling,top_rated,release_date_desc,duration_desc',
             'period' => 'nullable|string|in:7d,30d,all',
         ];
     }

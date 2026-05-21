@@ -19,7 +19,7 @@ export function useGenre() {
     loadingGenres.value = true
     try {
       const res = await genreService.getPublicGenres({
-        limit: 6,
+        limit: 100,
       })
 
       if (res.data.length > 0) {

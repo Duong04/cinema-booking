@@ -9,7 +9,6 @@ import {
   Bell,
   User,
   Globe,
-  Calendar,
   MapPin,
   Menu,
   X,
@@ -32,8 +31,7 @@ const isScrolled = ref(false)
 const navItems = [
   { name: 'nav.home', namepath: 'home', icon: Film },
   { name: 'nav.movies', namepath: 'movies', icon: Film },
-  { name: 'nav.cinemas', namepath: 'cinemas', icon: MapPin },
-  { name: 'nav.schedule', namepath: 'schedule', icon: Calendar },
+  { name: 'nav.cinemas', namepath: 'cinemas', icon: MapPin }
 ]
 
 const handleScroll = () => {

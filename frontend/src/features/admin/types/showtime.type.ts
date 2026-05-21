@@ -32,3 +32,46 @@ export interface Showtime {
   room: Room
   prices: Prices[]
 }
+
+export type ShowtimeSeatStatus = 'available' | 'held' | 'booked'
+
+export interface ShowtimeSeatOverviewItem {
+  id: string
+  room_id: string
+  seat_type_id: string
+  row_label: string
+  seat_number: string | number
+  label: string
+  status: ShowtimeSeatStatus
+  seat_type?: SeatType
+  booking?: {
+    id: string
+    booking_code?: string
+    status?: string
+    user?: {
+      id: string
+      name: string
+      email?: string
+    } | null
+  } | null
+  hold?: {
+    id: string
+    expired_at: string
+    user?: {
+      id: string
+      name: string
+      email?: string
+    } | null
+  } | null
+}
+
+export interface ShowtimeSeatOverview {
+  showtime: Showtime
+  summary: {
+    total: number
+    booked: number
+    held: number
+    available: number
+  }
+  seats: ShowtimeSeatOverviewItem[]
+}

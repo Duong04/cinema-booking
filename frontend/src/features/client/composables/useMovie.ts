@@ -1,14 +1,18 @@
 import { ref } from 'vue'
 import { movieService } from '@/features/client/services/movie.service'
-import type { PublicMovie } from '@/features/client/types/movie.type'
+import type { PublicMovie, PublicMovieQuery } from '@/features/client/types/movie.type'
+import type { Meta } from '@/shared/types/apiResponse'
 
 export function useMovie() {
   const topMovies = ref<PublicMovie[]>([])
+  const allMovies = ref<PublicMovie[]>([])
+  const allMoviesMeta = ref<Meta | null>(null)
   const nowPlayingMovies = ref<PublicMovie[]>([])
   const comingSoonMovies = ref<PublicMovie[]>([])
   const relatedMovies = ref<PublicMovie[]>([])
   const selectedMovie = ref<PublicMovie | null>(null)
   const loadingTopMovies = ref(false)
+  const loadingAllMovies = ref(false)
   const loadingNowPlayingMovies = ref(false)
   const loadingComingSoonMovies = ref(false)
   const loadingRelatedMovies = ref(false)
@@ -30,6 +34,23 @@ export function useMovie() {
       console.error('Failed to load top movies:', error)
     } finally {
       loadingTopMovies.value = false
+    }
+  }
+
+  async function fetchAllMovies(params?: PublicMovieQuery) {
+    loadingAllMovies.value = true
+    try {
+      const res = await movieService.getPublicMovies({
+        limit: 10,
+        ...params,
+      })
+
+      allMovies.value = res.data
+      allMoviesMeta.value = res.meta
+    } catch (error) {
+      console.error('Failed to load movies:', error)
+    } finally {
+      loadingAllMovies.value = false
     }
   }
 
@@ -104,16 +125,20 @@ export function useMovie() {
 
   return {
     topMovies,
+    allMovies,
+    allMoviesMeta,
     nowPlayingMovies,
     comingSoonMovies,
     relatedMovies,
     selectedMovie,
     loadingTopMovies,
+    loadingAllMovies,
     loadingNowPlayingMovies,
     loadingComingSoonMovies,
     loadingRelatedMovies,
     loadingMovieDetail,
     fetchTopMovies,
+    fetchAllMovies,
     fetchNowPlayingMovies,
     fetchComingSoonMovies,
     fetchRelatedMovies,

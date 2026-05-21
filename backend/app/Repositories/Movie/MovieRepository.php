@@ -53,6 +53,25 @@ class MovieRepository extends BaseRepository implements MovieRepositoryInterface
             return $movies->paginate($limit);
         }
 
+        if ($sort === 'top_rated') {
+            return $movies->orderByDesc('rating_score')
+                ->orderByDesc('rating_count')
+                ->orderByDesc('created_at')
+                ->paginate($limit);
+        }
+
+        if ($sort === 'release_date_desc') {
+            return $movies->orderByDesc('release_date')
+                ->orderByDesc('created_at')
+                ->paginate($limit);
+        }
+
+        if ($sort === 'duration_desc') {
+            return $movies->orderByDesc('duration_minutes')
+                ->orderByDesc('created_at')
+                ->paginate($limit);
+        }
+
         return $movies->orderByDesc('created_at')->paginate($limit);
     }
 

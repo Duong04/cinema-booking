@@ -1,7 +1,12 @@
 import type { Genre } from '@/features/client/types/genre.type'
 
 export type PublicMovieStatus = 'now_showing' | 'coming_soon'
-export type PublicMovieSort = 'created_at_desc' | 'best_selling'
+export type PublicMovieSort =
+  | 'created_at_desc'
+  | 'best_selling'
+  | 'top_rated'
+  | 'release_date_desc'
+  | 'duration_desc'
 export type PublicMoviePeriod = '7d' | '30d' | 'all'
 
 export interface PublicMovie {

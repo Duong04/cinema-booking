@@ -10,12 +10,12 @@ export function useShowtime() {
     search: '',
     movie_id: null,
     room_id: null,
-    status: null,
+    status: 'scheduled',
     show_date: null,
   })
   const pagination = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [3, 5, 7],

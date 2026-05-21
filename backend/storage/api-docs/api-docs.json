@@ -4708,7 +4708,7 @@
                     "Public"
                 ],
                 "summary": "Get public movies",
-                "description": "Returns public movies only. Public movies are limited to now_showing and coming_soon. Use sort=best_selling with limit=5 for homepage best-selling movies. Best-selling is calculated by counting booking_items from confirmed bookings. When sort=best_selling, period defaults to 30d.",
+                "description": "Returns public movies only. Public movies are limited to now_showing and coming_soon. Use sort=top_rated to order by rating_score, release_date_desc for newest movies, duration_desc for longest movies. Use sort=best_selling with limit=5 for homepage best-selling movies. Best-selling is calculated by counting booking_items from confirmed bookings. When sort=best_selling, period defaults to 30d.",
                 "operationId": "5f601d2a48fa2b71037ae1a77d1e6646",
                 "parameters": [
                     {
@@ -4769,14 +4769,17 @@
                     {
                         "name": "sort",
                         "in": "query",
-                        "description": "Use best_selling for homepage top selling movies.",
+                        "description": "Use top_rated, release_date_desc, duration_desc, or best_selling.",
                         "required": false,
                         "schema": {
                             "type": "string",
-                            "example": "best_selling",
+                            "example": "top_rated",
                             "enum": [
                                 "created_at_desc",
-                                "best_selling"
+                                "best_selling",
+                                "top_rated",
+                                "release_date_desc",
+                                "duration_desc"
                             ]
                         }
                     },
@@ -8584,6 +8587,22 @@
                             "format": "date",
                             "example": "2026-04-04"
                         }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "scheduled",
+                            "enum": [
+                                "scheduled",
+                                "ongoing",
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
                     }
                 ],
                 "responses": {
@@ -10106,6 +10125,310 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/showtimes/{id}/seat-overview": {
+            "get": {
+                "tags": [
+                    "Showtime"
+                ],
+                "summary": "Get seat overview by showtime",
+                "description": "Admin endpoint. Returns all seats in the showtime room with availability status and private booking or hold details when available.",
+                "operationId": "6d9745ea02e2aa2901881a69cafc2393",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Showtime ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Seat overview retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "showtime": {
+                                                    "type": "object"
+                                                },
+                                                "summary": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 96
+                                                        },
+                                                        "booked": {
+                                                            "type": "integer",
+                                                            "example": 18
+                                                        },
+                                                        "held": {
+                                                            "type": "integer",
+                                                            "example": 4
+                                                        },
+                                                        "available": {
+                                                            "type": "integer",
+                                                            "example": 74
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "seats": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "room_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "seat_type_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "row_label": {
+                                                                "type": "string",
+                                                                "example": "A"
+                                                            },
+                                                            "seat_number": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "A1"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "available",
+                                                                "enum": [
+                                                                    "available",
+                                                                    "held",
+                                                                    "booked"
+                                                                ]
+                                                            },
+                                                            "seat_type": {
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "booking": {
+                                                                "description": "Present only for booked seats.",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid"
+                                                                    },
+                                                                    "booking_code": {
+                                                                        "type": "string",
+                                                                        "example": "BK-20260522-ABC123"
+                                                                    },
+                                                                    "status": {
+                                                                        "type": "string",
+                                                                        "example": "confirmed"
+                                                                    },
+                                                                    "user": {
+                                                                        "type": "object",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "hold": {
+                                                                "description": "Present only for held seats.",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid"
+                                                                    },
+                                                                    "expired_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time"
+                                                                    },
+                                                                    "user": {
+                                                                        "type": "object",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Showtime not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/public/showtimes/{id}/seat-overview": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public seat overview by showtime",
+                "description": "Public endpoint. Returns all seats in the showtime room with availability status only. Private booking and hold details are always hidden.",
+                "operationId": "83003897919aafbb812a9fc0c0d8c06c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Showtime ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public seat overview retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "showtime": {
+                                                    "type": "object"
+                                                },
+                                                "summary": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 96
+                                                        },
+                                                        "booked": {
+                                                            "type": "integer",
+                                                            "example": 18
+                                                        },
+                                                        "held": {
+                                                            "type": "integer",
+                                                            "example": 4
+                                                        },
+                                                        "available": {
+                                                            "type": "integer",
+                                                            "example": 74
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "seats": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "room_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "seat_type_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "row_label": {
+                                                                "type": "string",
+                                                                "example": "A"
+                                                            },
+                                                            "seat_number": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "A1"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "available",
+                                                                "enum": [
+                                                                    "available",
+                                                                    "held",
+                                                                    "booked"
+                                                                ]
+                                                            },
+                                                            "seat_type": {
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "booking": {
+                                                                "type": "object",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "hold": {
+                                                                "type": "object",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Showtime not found"
                     }
                 }
             }

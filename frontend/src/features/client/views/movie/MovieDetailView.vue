@@ -39,6 +39,20 @@ const movieCast = computed(() => {
   return fallbackCast
 })
 
+const statusLabel = computed(() => {
+  if (movie.value?.status === 'now_showing') {
+    return languageStore.language === 'en' ? 'Now Playing' : 'Đang chiếu'
+  }
+
+  return languageStore.language === 'en' ? 'Coming Soon' : 'Sắp chiếu'
+})
+
+const statusClass = computed(() =>
+  movie.value?.status === 'now_showing'
+    ? 'border-emerald-400/40 bg-emerald-500/90 text-white shadow-emerald-500/20'
+    : 'border-amber-300/40 bg-amber-500/90 text-zinc-950 shadow-amber-500/20',
+)
+
 const trailerSource = computed(() => {
   const trailerUrl = movie.value?.trailer_url?.trim()
   if (!trailerUrl) return null
@@ -93,7 +107,6 @@ const trailerSource = computed(() => {
 
 const handleBookNow = () => {
   if (movie.value) {
-    bookingStore.setCurrentBooking({ movieId: movie.value.id })
     router.push(`/booking/showtime/${movie.value.id}`)
   }
 }
@@ -179,6 +192,14 @@ onUnmounted(() => {
             <span class="px-3 py-1 bg-red-600 text-white text-xs font-black rounded uppercase">{{
               movie.rating ?? 'P'
             }}</span>
+            <span
+              :class="[
+                'rounded-lg border px-3 py-1 text-xs font-black uppercase tracking-wider shadow-lg',
+                statusClass,
+              ]"
+            >
+              {{ statusLabel }}
+            </span>
             <div class="flex items-center gap-1 text-yellow-500">
               <Star class="w-5 h-5 fill-current" />
               <span class="text-xl font-bold">{{ movie.rating_score ?? '-' }}</span>

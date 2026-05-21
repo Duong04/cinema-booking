@@ -12,11 +12,12 @@ class ShowtimeRepository extends BaseRepository implements ShowtimeRepositoryInt
         $this->model = $model;
     }
 
-    public function paginate($limit = 15, $movieId, $roomId, $showDate) {
+    public function paginate($limit = 15, $movieId, $roomId, $showDate, $status) {
         $showtimes = $this->model->with(['movie', 'room', 'prices.seatType'])
             ->when($movieId,  fn($q) => $q->where('movie_id', $movieId))
             ->when($roomId,   fn($q) => $q->where('room_id', $roomId))
             ->when($showDate, fn($q) => $q->where('show_date', $showDate))
+            ->when($status, fn($q) => $q->where('status', $status))
             ->orderBy('start_time');
 
         return $showtimes->paginate($limit);

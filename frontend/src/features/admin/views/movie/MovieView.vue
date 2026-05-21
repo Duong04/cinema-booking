@@ -97,7 +97,12 @@ function createColumns(): DataTableColumns<Movie> {
         h('div', { style: 'display:flex;flex-direction:column;gap:3px' }, [
           h(
             resolveComponent('n-tag'),
-            { size: 'small', round: true, type: 'warning' },
+            {
+              size: 'small',
+              round: true,
+              type: 'warning',
+              style: 'width:max-content;max-width:100%;display:inline-flex',
+            },
             () => row.rating || '—',
           ),
           h(
@@ -256,6 +261,18 @@ onMounted(fetchMovies)
           </n-icon>
         </template>
       </n-input>
+      <n-select 
+        v-model:value="filters.status"
+        placeholder="Filter by status"
+        clearable
+        :options="[
+          { label: 'Sắp chiếu', value: 'coming_soon' },
+          { label: 'Đang chiếu', value: 'now_showing' },
+          { label: 'Ngừng chiếu', value: 'ended' },
+          { label: 'Đã hủy', value: 'cancelled' },
+        ]"
+        style="width: 150px"
+      />
       <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>

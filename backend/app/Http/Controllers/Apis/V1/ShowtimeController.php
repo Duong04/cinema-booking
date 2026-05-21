@@ -58,6 +58,13 @@ class ShowtimeController extends Controller
                 description: "Filter by show date (Y-m-d)",
                 required: false,
                 schema: new OA\Schema(type: "string", format: "date", example: "2026-04-04")
+            ),
+            new OA\Parameter(
+                name: "status",
+                in: "query",
+                description: "Filter by status",
+                required: false,
+                schema: new OA\Schema(type: "string", enum: ["scheduled", "ongoing", "completed", "cancelled"], example: "scheduled")
             )
         ],
         responses: [
@@ -174,8 +181,9 @@ class ShowtimeController extends Controller
         $movieId = $query['movie_id'] ?? null;
         $roomId = $query['room_id'] ?? null;
         $showDate = $query['show_date'] ?? null;
+        $status = $query['status'] ?? null;
 
-        $showtimes = $this->showtimeService->paginate($limit, $movieId, $roomId, $showDate);
+        $showtimes = $this->showtimeService->paginate($limit, $movieId, $roomId, $showDate, $status);
 
         return $this->successList($showtimes->items(), $this->paginationMeta($showtimes));
     }
@@ -504,6 +512,170 @@ class ShowtimeController extends Controller
 
         return $this->success($showtime);
     }
+
+    #[OA\Get(
+        path: "/api/v1/showtimes/{id}/seat-overview",
+        summary: "Get seat overview by showtime",
+        description: "Admin endpoint. Returns all seats in the showtime room with availability status and private booking or hold details when available.",
+        tags: ["Showtime"],
+        security: [["sanctum" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                required: true,
+                description: "Showtime ID",
+                schema: new OA\Schema(type: "string", format: "uuid", example: "019d20c8-c81a-70d8-bc76-ef970ddb4a31")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Seat overview retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Success"),
+                        new OA\Property(
+                            property: "data",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "showtime", type: "object"),
+                                new OA\Property(
+                                    property: "summary",
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(property: "total", type: "integer", example: 96),
+                                        new OA\Property(property: "booked", type: "integer", example: 18),
+                                        new OA\Property(property: "held", type: "integer", example: 4),
+                                        new OA\Property(property: "available", type: "integer", example: 74),
+                                    ]
+                                ),
+                                new OA\Property(
+                                    property: "seats",
+                                    type: "array",
+                                    items: new OA\Items(
+                                        properties: [
+                                            new OA\Property(property: "id", type: "string", format: "uuid"),
+                                            new OA\Property(property: "room_id", type: "string", format: "uuid"),
+                                            new OA\Property(property: "seat_type_id", type: "string", format: "uuid"),
+                                            new OA\Property(property: "row_label", type: "string", example: "A"),
+                                            new OA\Property(property: "seat_number", type: "integer", example: 1),
+                                            new OA\Property(property: "label", type: "string", example: "A1"),
+                                            new OA\Property(property: "status", type: "string", enum: ["available", "held", "booked"], example: "available"),
+                                            new OA\Property(property: "seat_type", type: "object", nullable: true),
+                                            new OA\Property(
+                                                property: "booking",
+                                                type: "object",
+                                                nullable: true,
+                                                description: "Present only for booked seats.",
+                                                properties: [
+                                                    new OA\Property(property: "id", type: "string", format: "uuid"),
+                                                    new OA\Property(property: "booking_code", type: "string", example: "BK-20260522-ABC123"),
+                                                    new OA\Property(property: "status", type: "string", example: "confirmed"),
+                                                    new OA\Property(property: "user", type: "object", nullable: true),
+                                                ]
+                                            ),
+                                            new OA\Property(
+                                                property: "hold",
+                                                type: "object",
+                                                nullable: true,
+                                                description: "Present only for held seats.",
+                                                properties: [
+                                                    new OA\Property(property: "id", type: "string", format: "uuid"),
+                                                    new OA\Property(property: "expired_at", type: "string", format: "date-time"),
+                                                    new OA\Property(property: "user", type: "object", nullable: true),
+                                                ]
+                                            ),
+                                        ]
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: "Unauthenticated"),
+            new OA\Response(response: 404, description: "Showtime not found"),
+        ]
+    )]
+    public function seatOverview($id)
+    {
+        $data = $this->showtimeService->seatOverview($id);
+
+        return $this->success($data);
+    }
+
+    #[OA\Get(
+        path: "/api/v1/public/showtimes/{id}/seat-overview",
+        summary: "Get public seat overview by showtime",
+        description: "Public endpoint. Returns all seats in the showtime room with availability status only. Private booking and hold details are always hidden.",
+        tags: ["Public"],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                required: true,
+                description: "Showtime ID",
+                schema: new OA\Schema(type: "string", format: "uuid", example: "019d20c8-c81a-70d8-bc76-ef970ddb4a31")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Public seat overview retrieved successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Success"),
+                        new OA\Property(
+                            property: "data",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "showtime", type: "object"),
+                                new OA\Property(
+                                    property: "summary",
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(property: "total", type: "integer", example: 96),
+                                        new OA\Property(property: "booked", type: "integer", example: 18),
+                                        new OA\Property(property: "held", type: "integer", example: 4),
+                                        new OA\Property(property: "available", type: "integer", example: 74),
+                                    ]
+                                ),
+                                new OA\Property(
+                                    property: "seats",
+                                    type: "array",
+                                    items: new OA\Items(
+                                        properties: [
+                                            new OA\Property(property: "id", type: "string", format: "uuid"),
+                                            new OA\Property(property: "room_id", type: "string", format: "uuid"),
+                                            new OA\Property(property: "seat_type_id", type: "string", format: "uuid"),
+                                            new OA\Property(property: "row_label", type: "string", example: "A"),
+                                            new OA\Property(property: "seat_number", type: "integer", example: 1),
+                                            new OA\Property(property: "label", type: "string", example: "A1"),
+                                            new OA\Property(property: "status", type: "string", enum: ["available", "held", "booked"], example: "available"),
+                                            new OA\Property(property: "seat_type", type: "object", nullable: true),
+                                            new OA\Property(property: "booking", type: "object", nullable: true, example: null),
+                                            new OA\Property(property: "hold", type: "object", nullable: true, example: null),
+                                        ]
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: "Showtime not found"),
+        ]
+    )]
+    public function publicSeatOverview($id)
+    {
+        $data = $this->showtimeService->seatOverview($id, false);
+
+        return $this->success($data);
+    }
+
     #[OA\Put(
         path: "/api/v1/showtimes/{id}",
         summary: "Update showtime by ID",

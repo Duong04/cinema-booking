@@ -132,6 +132,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('showtimes')->controller(ShowtimeController::class)->middleware('auth:sanctum')->group(function () {
         Route::get('/', 'paginate');
         Route::post('/', 'create');
+        Route::get('/{id}/seat-overview', 'seatOverview');
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'delete');
@@ -166,6 +167,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/movies/{slug}', [MovieController::class, 'showPublic']);
         Route::get('/genres', [GenreController::class, 'getAll']);
         Route::get('/showtimes', [ShowtimeController::class, 'getAll']);
+        Route::get('/showtimes/{id}/seat-overview', [ShowtimeController::class, 'publicSeatOverview']);
         Route::get('/showtimes/{id}', [ShowtimeController::class, 'showPublic']);
     });
 });

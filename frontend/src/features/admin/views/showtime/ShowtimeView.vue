@@ -6,6 +6,7 @@ import { useShowtime } from '../../composables/useShowtime'
 import { useMovie } from '../../composables/useMovie'
 import { useRoom } from '../../composables/useRoom'
 import ShowtimeFormModal from './components/ShowtimeFormModal.vue'
+import ShowtimeSeatOverviewModal from './components/ShowtimeSeatOverviewModal.vue'
 import type { Showtime, Status } from '../../types/showtime.type'
 import { Search as SearchIcon } from '@vicons/ionicons5'
 
@@ -16,7 +17,9 @@ const { data: roomData, fetchRooms } = useRoom()
 const message = useMessage()
 const dialog = useDialog()
 const showModal = ref(false)
+const showSeatOverviewModal = ref(false)
 const selectedShowtime = ref<Showtime | null>(null)
+const selectedSeatOverviewShowtime = ref<Showtime | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
@@ -137,7 +140,7 @@ function createColumns(): DataTableColumns<Showtime> {
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 130,
+      width: 190,
       fixed: 'right',
       render: (row) =>
         h(
@@ -145,6 +148,11 @@ function createColumns(): DataTableColumns<Showtime> {
           { size: 8 },
           {
             default: () => [
+              h(
+                NButton,
+                { size: 'small', type: 'info', ghost: true, onClick: () => openSeatOverview(row) },
+                { default: () => 'Ghế' },
+              ),
               h(
                 NButton,
                 { size: 'small', type: 'primary', ghost: true, onClick: () => openEditModal(row) },
@@ -172,6 +180,11 @@ function openCreateModal() {
 function openEditModal(row: Showtime) {
   selectedShowtime.value = row
   showModal.value = true
+}
+
+function openSeatOverview(row: Showtime) {
+  selectedSeatOverviewShowtime.value = row
+  showSeatOverviewModal.value = true
 }
 
 function handleDelete(row: Showtime) {
@@ -236,6 +249,7 @@ onMounted(() => {
         placeholder="Tìm theo phim"
         filterable
         clearable
+        style="width: 220px"
       />
       <n-select
         v-model:value="filters.room_id"
@@ -243,6 +257,7 @@ onMounted(() => {
         placeholder="Tìm theo phòng"
         filterable
         clearable
+        style="width: 180px"
       />
       <n-date-picker
         v-model:formatted-value="filters.show_date"
@@ -250,6 +265,18 @@ onMounted(() => {
         value-format="yyyy-MM-dd"
         placeholder="Chọn ngày chiếu"
         clearable
+      />
+      <n-select
+        v-model:value="filters.status"
+        :options="[
+          { label: 'Sắp chiếu', value: 'scheduled' },
+          { label: 'Đang chiếu', value: 'ongoing' },
+          { label: 'Đã kết thúc', value: 'completed' },
+          { label: 'Đã hủy', value: 'cancelled' },
+        ]"
+        placeholder="Tìm theo trạng thái"
+        clearable
+        style="width: 180px"
       />
       <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
@@ -275,5 +302,10 @@ onMounted(() => {
     @success="fetchShowtimes"
     :movies="movieOptions"
     :rooms="roomOptions"
+  />
+
+  <ShowtimeSeatOverviewModal
+    v-model:show="showSeatOverviewModal"
+    :showtime="selectedSeatOverviewShowtime"
   />
 </template>

@@ -140,7 +140,7 @@ class MovieController extends Controller
     #[OA\Get(
         path: "/api/v1/public/movies",
         summary: "Get public movies",
-        description: "Returns public movies only. Public movies are limited to now_showing and coming_soon. Use sort=best_selling with limit=5 for homepage best-selling movies. Best-selling is calculated by counting booking_items from confirmed bookings. When sort=best_selling, period defaults to 30d.",
+        description: "Returns public movies only. Public movies are limited to now_showing and coming_soon. Use sort=top_rated to order by rating_score, release_date_desc for newest movies, duration_desc for longest movies. Use sort=best_selling with limit=5 for homepage best-selling movies. Best-selling is calculated by counting booking_items from confirmed bookings. When sort=best_selling, period defaults to 30d.",
         tags: ["Public"],
         parameters: [
             new OA\Parameter(
@@ -179,9 +179,9 @@ class MovieController extends Controller
             new OA\Parameter(
                 name: "sort",
                 in: "query",
-                description: "Use best_selling for homepage top selling movies.",
+                description: "Use top_rated, release_date_desc, duration_desc, or best_selling.",
                 required: false,
-                schema: new OA\Schema(type: "string", enum: ["created_at_desc", "best_selling"], example: "best_selling")
+                schema: new OA\Schema(type: "string", enum: ["created_at_desc", "best_selling", "top_rated", "release_date_desc", "duration_desc"], example: "top_rated")
             ),
             new OA\Parameter(
                 name: "period",

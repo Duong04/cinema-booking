@@ -6,6 +6,7 @@ import { movieService } from '@/features/admin/services/movie.service'
 import { genreService } from '@/features/admin/services/genre.service'
 import { uploadService } from '@/features/shared/services/upload.service'
 import { ApiError } from '@/plugins/axios'
+import { getYoutubeThumbnailUrl } from '@/shared/utils/youtube'
 import type { Movie, Status, MoviePayload } from '@/features/admin/types/movie.type'
 import type { Genre } from '@/features/admin/types/genre.type'
 
@@ -242,6 +243,10 @@ const releaseDateTs = computed({
     clearFieldError('release_date')
   },
 })
+
+const youtubeTrailerThumbnail = computed(() => getYoutubeThumbnailUrl(formData.trailer_url))
+const trailerPreviewUrl = computed(() => youtubeTrailerThumbnail.value || formData.trailer_url)
+const isYoutubeTrailerPreview = computed(() => Boolean(youtubeTrailerThumbnail.value))
 
 async function fetchOptions() {
   const genreRes = await genreService.getAllGenres({ limit: 100 })
@@ -578,11 +583,11 @@ watch(() => props.movie, syncFormWithProps, { immediate: true })
 
             <!-- Trailer preview -->
             <div
-              v-if="formData.trailer_url"
+              v-if="trailerPreviewUrl"
               style="display: flex; align-items: flex-start; gap: 8px"
             >
               <img
-                :src="formData.trailer_url"
+                :src="trailerPreviewUrl"
                 alt="Trailer preview"
                 style="
                   width: 140px;
@@ -592,10 +597,17 @@ watch(() => props.movie, syncFormWithProps, { immediate: true })
                   border: 1px solid #e0e0e0;
                 "
               />
+              <span
+                v-if="isYoutubeTrailerPreview"
+                style="font-size: 12px; color: #888; margin-top: 6px"
+              >
+                Thumbnail YouTube mặc định
+              </span>
               <n-button
                 size="small"
                 quaternary
                 type="error"
+                v-if="formData.trailer_url"
                 style="margin-top: 4px"
                 @click="handleDeleteTrailer"
               >

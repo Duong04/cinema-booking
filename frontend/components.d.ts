@@ -28,6 +28,7 @@ declare module 'vue' {
     NInputNumber: typeof import('naive-ui')['NInputNumber']
     NModal: typeof import('naive-ui')['NModal']
     NP: typeof import('naive-ui')['NP']
+    NPagination: typeof import('naive-ui')['NPagination']
     NScrollbar: typeof import('naive-ui')['NScrollbar']
     NSelect: typeof import('naive-ui')['NSelect']
     NSkeleton: typeof import('naive-ui')['NSkeleton']

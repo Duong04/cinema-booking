@@ -1,0 +1,12 @@
+export interface City {
+  id: string
+  name: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CityQuery {
+  page?: number
+  limit?: number
+  q?: string
+}

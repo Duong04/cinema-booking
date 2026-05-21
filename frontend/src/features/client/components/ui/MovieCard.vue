@@ -1,13 +1,28 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { PublicMovie } from '@/features/client/types/movie.type'
 import { useLanguageStore } from '@/stores/language'
 import { Star, Clock, Play } from 'lucide-vue-next'
 
-defineProps<{
+const props = defineProps<{
   movie: PublicMovie
 }>()
 
 const languageStore = useLanguageStore()
+
+const statusLabel = computed(() => {
+  if (props.movie.status === 'now_showing') {
+    return languageStore.language === 'en' ? 'Now Playing' : 'Đang chiếu'
+  }
+
+  return languageStore.language === 'en' ? 'Coming Soon' : 'Sắp chiếu'
+})
+
+const statusClass = computed(() =>
+  props.movie.status === 'now_showing'
+    ? 'border-emerald-400/40 bg-emerald-500/90 text-white shadow-emerald-500/25'
+    : 'border-amber-300/40 bg-amber-500/90 text-zinc-950 shadow-amber-500/25',
+)
 </script>
 
 <template>
@@ -27,6 +42,14 @@ const languageStore = useLanguageStore()
           class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           referrerpolicy="no-referrer"
         />
+        <div
+          :class="[
+            'absolute left-2 bottom-2 rounded-lg border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider shadow-lg backdrop-blur-md',
+            statusClass,
+          ]"
+        >
+          {{ statusLabel }}
+        </div>
         <div
           class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4"
         >

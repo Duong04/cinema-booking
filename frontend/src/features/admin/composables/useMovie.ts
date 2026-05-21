@@ -6,10 +6,10 @@ import type { Movie } from '@/features/admin/types/movie.type'
 export function useMovie() {
   const data = ref<Movie[]>([])
   const loading = ref(false)
-  const filters = reactive({ search: '' })
+  const filters = reactive({ search: '', status: null })
   const pagination = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [3, 5, 7],
@@ -24,6 +24,7 @@ export function useMovie() {
         page: pagination.page,
         limit: pagination.pageSize,
         q: filters.search || undefined,
+        status: filters.status || undefined,
       })
       data.value = res.data
       pagination.itemCount = res.meta.total
@@ -43,6 +44,11 @@ export function useMovie() {
   }, 500)
 
   watch(() => filters.search, debouncedSearch)
+
+  watch(() => filters.status, () => {
+    pagination.page = 1
+    fetchMovies()
+  })
 
   return { data, loading, filters, pagination, fetchMovies, deleteMovie }
 }

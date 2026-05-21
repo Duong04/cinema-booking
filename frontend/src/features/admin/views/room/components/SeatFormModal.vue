@@ -41,6 +41,24 @@ const deletingLabel = ref<string | null>(null)
 
 const sortedRowLabels = computed(() => (seatMap.value ? Object.keys(seatMap.value).sort() : []))
 const hasSeats = computed(() => sortedRowLabels.value.length > 0)
+const seatTypeLegends = computed(() => {
+  const map = new Map<string, { id: string; name: string; className: string }>()
+
+  Object.values(seatMap.value ?? {})
+    .flat()
+    .forEach((seat) => {
+      if (!seat.seat_type_id || map.has(seat.seat_type_id)) return
+
+      const name = seat.seat_type?.name ?? 'Standard'
+      map.set(seat.seat_type_id, {
+        id: seat.seat_type_id,
+        name,
+        className: seatTypeClass(name),
+      })
+    })
+
+  return Array.from(map.values())
+})
 
 async function fetchSeats() {
   if (!props.room?.id) return
@@ -153,6 +171,18 @@ function resetNewRows() {
   newRows.splice(0, newRows.length, { label: '', seats_per_row: 10, seat_type_id: '' })
 }
 
+function seatTypeClass(name?: string) {
+  const normalized = name?.toLowerCase() ?? ''
+
+  if (normalized.includes('imax')) return 'imax'
+  if (normalized.includes('vip')) return 'vip'
+  if (normalized.includes('sweetbox') || normalized.includes('sweet box')) return 'sweetbox'
+  if (normalized.includes('couple') || normalized.includes('đôi')) return 'couple'
+  if (normalized.includes('premium')) return 'premium'
+
+  return 'standard'
+}
+
 watch(
   () => showModal.value,
   (val) => {
@@ -239,7 +269,7 @@ watch(
                     placement="top"
                   >
                     <template #trigger>
-                      <div class="seat" :class="seat.seat_type?.name?.toLowerCase()">
+                      <div class="seat" :class="seatTypeClass(seat.seat_type?.name)">
                         {{ seat.seat_number }}
                       </div>
                     </template>
@@ -270,17 +300,9 @@ watch(
             </div>
 
             <div class="legend">
-              <div class="legend-item">
-                <div class="seat standard" style="pointer-events: none" />
-                <span>Standard</span>
-              </div>
-              <div class="legend-item">
-                <div class="seat vip" style="pointer-events: none" />
-                <span>VIP</span>
-              </div>
-              <div class="legend-item">
-                <div class="seat imax" style="pointer-events: none" />
-                <span>IMAX</span>
+              <div v-for="type in seatTypeLegends" :key="type.id" class="legend-item">
+                <div class="seat" :class="type.className" style="pointer-events: none" />
+                <span>{{ type.name }}</span>
               </div>
             </div>
           </div>
@@ -456,6 +478,21 @@ watch(
   background: #f0fff0;
   color: #18a058;
   border-bottom-color: #18a058;
+}
+.seat.couple {
+  background: #fff0fb;
+  color: #c026d3;
+  border-bottom-color: #c026d3;
+}
+.seat.premium {
+  background: #fff7e6;
+  color: #f0a020;
+  border-bottom-color: #f0a020;
+}
+.seat.sweetbox {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border-bottom-color: #7e22ce;
 }
 
 .legend {
