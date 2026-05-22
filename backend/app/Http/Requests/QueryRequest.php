@@ -36,6 +36,9 @@ class QueryRequest extends FormRequest
             'status' => 'nullable|string',
             'sort' => 'nullable|string|in:created_at_desc,best_selling,top_rated,release_date_desc,duration_desc',
             'period' => 'nullable|string|in:7d,30d,all',
+            'is_active' => 'nullable|boolean',
+            'role_id' => 'nullable|exists:roles,id',
+            'ignore_role_id' => 'nullable|exists:roles,id',
         ];
     }
 }

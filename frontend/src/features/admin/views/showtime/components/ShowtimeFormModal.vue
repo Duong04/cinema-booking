@@ -155,7 +155,6 @@ async function handleSubmit() {
   }
 }
 
-// '2026-04-04 10:00:00' → 'HH:mm'
 function parseTime(datetimeStr?: string | null): string | null {
   if (!datetimeStr) return null
   const timePart = datetimeStr.split(' ')[1]
@@ -190,7 +189,7 @@ function syncFormWithProps() {
     isEdit.value = true
     formData.movie_id = props.showtime.movie_id
     formData.room_id = props.showtime.room_id
-    formData.show_date = props.showtime.show_date // 'YYYY-MM-DD'
+    formData.show_date = props.showtime.show_date 
     formData.start_time = parseTime(props.showtime.start_time)
     formData.base_price = Number(props.showtime.base_price)
     formData.prices = (props.showtime.prices ?? []).map((p) => ({

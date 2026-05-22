@@ -15,7 +15,6 @@ export const authGuard = async (
 
   console.log('Auth Guard After Fetch:', to.meta.guestOnly, authStore.isLoggedIn)
 
-  // Bây giờ isLoggedIn đã chính xác
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: 'login', query: { redirect: to.fullPath } })
     return

@@ -180,12 +180,12 @@ function createColumns(): DataTableColumns<Movie> {
         h('div', { style: 'display:flex;gap:6px' }, [
           h(
             NButton,
-            { size: 'small', type: 'primary', ghost: true, onClick: () => openEditModal(row) },
+            { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
             { default: () => 'Sửa' },
           ),
           h(
             NButton,
-            { size: 'small', type: 'error', ghost: true, onClick: () => handleDelete(row) },
+            { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
             { default: () => 'Xóa' },
           ),
         ]),

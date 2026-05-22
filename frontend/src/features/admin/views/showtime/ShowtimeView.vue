@@ -150,17 +150,17 @@ function createColumns(): DataTableColumns<Showtime> {
             default: () => [
               h(
                 NButton,
-                { size: 'small', type: 'info', ghost: true, onClick: () => openSeatOverview(row) },
+                { size: 'small', type: 'info', secondary: true, onClick: () => openSeatOverview(row) },
                 { default: () => 'Ghế' },
               ),
               h(
                 NButton,
-                { size: 'small', type: 'primary', ghost: true, onClick: () => openEditModal(row) },
+                { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
                 { default: () => 'Sửa' },
               ),
               h(
                 NButton,
-                { size: 'small', type: 'error', ghost: true, onClick: () => handleDelete(row) },
+                { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
                 { default: () => 'Xóa' },
               ),
             ],

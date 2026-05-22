@@ -7,7 +7,9 @@ import {
   LocationOutline as LocationOutlineIcon,
   ColorFilterOutline as ColorFilterOutlineIcon,
   NuclearSharp as NuclearSharpIcon,
-  TvOutline as TvOutlineIcon
+  TvOutline as TvOutlineIcon,
+  PersonCircleSharp as UserIcon,
+  PeopleOutline as PeopleIcon,
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import router from '@/router'
@@ -79,6 +81,16 @@ export const menuOptions: MenuOption[] = [
         key: 'admin-cities',
       },
     ],
+  },
+  {
+    label: 'Nhân sự',
+    key: 'admin-users',
+    icon: renderIcon(UserIcon),
+  },
+  {
+    label: 'Khách hàng',
+    key: 'admin-customers',
+    icon: renderIcon(PeopleIcon),
   },
   {
     label: 'Phân quyền',

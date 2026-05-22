@@ -114,6 +114,32 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'users',
+    name: 'admin-users',
+    component: () => import('@/features/admin/views/user/UserView.vue'),
+    meta: {
+      title: 'Cinema - Admin Staff',
+      userScope: 'staff',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Nhân sự' },
+      ],
+    },
+  },
+  {
+    path: 'customers',
+    name: 'admin-customers',
+    component: () => import('@/features/admin/views/user/UserView.vue'),
+    meta: {
+      title: 'Cinema - Admin Customers',
+      userScope: 'customer',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Khách hàng' },
+      ],
+    },
+  },
+  {
     path: 'roles',
     name: 'admin-roles',
     component: () => import('@/features/admin/views/role/RoleView.vue'),

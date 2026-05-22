@@ -54,12 +54,12 @@ function createColumns(): DataTableColumns<SeatType> {
         h('div', { style: 'display: flex; gap: 8px' }, [
           h(
             NButton,
-            { size: 'small', type: 'primary', onClick: () => openEditModal(row) },
+            { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
             { default: () => 'Edit' },
           ),
           h(
             NButton,
-            { size: 'small', type: 'error', onClick: () => handleDelete(row) },
+            { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
             { default: () => 'Delete' },
           ),
         ]),

@@ -95,7 +95,7 @@ const trailerSource = computed(() => {
       }
     }
   } catch {
-    // Keep the original value for non-absolute URLs.
+    
   }
 
   if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(trailerUrl)) {
