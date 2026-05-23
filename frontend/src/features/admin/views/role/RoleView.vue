@@ -47,12 +47,12 @@ function createColumns(): DataTableColumns<Role> {
           h(
             NButton,
             { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
-            { default: () => 'Sửa' },
+            { default: () => 'Edit' },
           ),
           h(
             NButton,
             { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
-            { default: () => 'Xóa' },
+            { default: () => 'Delete' },
           ),
         ]),
     },

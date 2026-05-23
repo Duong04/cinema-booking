@@ -5,5 +5,5 @@ use App\Repositories\Base\BaseRepositoryInterface;
 
 interface ComboRepositoryInterface extends BaseRepositoryInterface
 {
-    public function paginate($limit = 15, $q, $cinema);
+    public function paginate($limit = 15, $q, $cinema, $status);
 }

@@ -1,22 +1,36 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronLeft, Minus, Plus, ShoppingBag } from 'lucide-vue-next'
+import { ChevronLeft, Loader2, Minus, Plus, ShoppingBag } from 'lucide-vue-next'
 import { useLanguageStore } from '@/stores/language'
 import { useBookingFlow } from '@/features/client/composables/useBookingFlow'
+import { comboService } from '@/features/client/services/combo.service'
+import type { PublicCombo } from '@/features/client/types/combo.type'
 import BookingStepper from './components/BookingStepper.vue'
 
 const router = useRouter()
 const languageStore = useLanguageStore()
-const { draft, demoCombos, seatTotal, setCombos, formatVND } = useBookingFlow()
+const { draft, seatTotal, setCombos, formatVND } = useBookingFlow()
 
+const combos = ref<PublicCombo[]>([])
+const loading = ref(false)
 const selectedCombos = ref<Record<string, number>>(
   Object.fromEntries(draft.value.combos.map((item) => [item.combo.id, item.quantity])),
 )
 
+const cinemaId = computed(() => draft.value.showtime?.room?.cinema?.id)
 const comboSelections = computed(() =>
-  demoCombos
-    .map((combo) => ({ combo, quantity: selectedCombos.value[combo.id] ?? 0 }))
+  combos.value
+    .map((combo) => ({
+      combo: {
+        id: combo.id,
+        name: combo.name,
+        description: combo.description,
+        price: Number(combo.price ?? 0),
+        image: combo.image,
+      },
+      quantity: selectedCombos.value[combo.id] ?? 0,
+    }))
     .filter((item) => item.quantity > 0),
 )
 const selectedComboTotal = computed(() =>
@@ -41,6 +55,26 @@ function confirmCombos() {
   setCombos(comboSelections.value)
   router.push('/booking/checkout')
 }
+
+async function fetchCombos() {
+  loading.value = true
+  try {
+    const res = await comboService.getActiveCombos({
+      cinema_id: cinemaId.value,
+      limit: 100,
+    })
+    combos.value = res.data.filter((combo) => combo.status === 'active')
+    selectedCombos.value = Object.fromEntries(
+      Object.entries(selectedCombos.value).filter(([comboId]) =>
+        combos.value.some((combo) => combo.id === comboId),
+      ),
+    )
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchCombos)
 </script>
 
 <template>
@@ -56,25 +90,55 @@ function confirmCombos() {
           {{ languageStore.language === 'en' ? 'Select Combos' : 'Chọn bắp nước' }}
         </h1>
         <p class="text-gray-500 text-sm">
-          {{ languageStore.language === 'en' ? 'Payment is demo for now.' : 'Thanh toán đang là demo tạm thời.' }}
+          {{ languageStore.language === 'en' ? 'Only active combos are available.' : 'Chỉ hiển thị combo đang hoạt động.' }}
         </p>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div v-if="loading" class="py-24 flex items-center justify-center text-gray-400 gap-3">
+      <Loader2 class="w-6 h-6 animate-spin text-red-500" />
+      {{ languageStore.language === 'en' ? 'Loading combos...' : 'Đang tải combo...' }}
+    </div>
+
+    <div v-else-if="combos.length === 0" class="bg-zinc-900/50 border border-dashed border-white/10 rounded-3xl p-10 text-center">
+      <ShoppingBag class="w-12 h-12 text-red-500 mx-auto mb-4" />
+      <h2 class="text-white font-black text-2xl mb-2">
+        {{ languageStore.language === 'en' ? 'No active combos' : 'Chưa có combo đang hoạt động' }}
+      </h2>
+      <p class="text-gray-500 mb-8">
+        {{ languageStore.language === 'en' ? 'You can continue checkout with seats only.' : 'Bạn vẫn có thể tiếp tục thanh toán chỉ với vé.' }}
+      </p>
+      <button
+        @click="confirmCombos"
+        class="px-8 py-3 bg-red-600 text-white rounded-xl font-black hover:bg-red-700"
+      >
+        {{ languageStore.t('booking.checkout') }}
+      </button>
+    </div>
+
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <div
-        v-for="combo in demoCombos"
+        v-for="combo in combos"
         :key="combo.id"
         class="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden group hover:border-red-600/30 transition-all duration-500"
       >
         <div class="aspect-square relative overflow-hidden">
-          <img :src="combo.image" :alt="combo.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" referrerpolicy="no-referrer" />
+          <img
+            v-if="combo.image"
+            :src="combo.image"
+            :alt="combo.name"
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            referrerpolicy="no-referrer"
+          />
+          <div v-else class="w-full h-full bg-black/40 flex items-center justify-center">
+            <ShoppingBag class="w-16 h-16 text-zinc-700" />
+          </div>
           <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
         <div class="p-6">
           <div class="flex justify-between items-start gap-4 mb-2">
             <h3 class="text-xl font-black text-white uppercase tracking-tight">{{ combo.name }}</h3>
-            <span class="text-red-500 font-black">{{ formatVND(combo.price) }}</span>
+            <span class="text-red-500 font-black">{{ formatVND(Number(combo.price ?? 0)) }}</span>
           </div>
           <p class="text-gray-500 text-sm mb-6 line-clamp-2">{{ combo.description }}</p>
 
@@ -90,7 +154,7 @@ function confirmCombos() {
             </div>
             <div v-if="comboQuantity(combo.id)" class="text-right">
               <p class="text-[10px] text-gray-600 uppercase font-black">Subtotal</p>
-              <p class="text-white font-bold">{{ formatVND(combo.price * comboQuantity(combo.id)) }}</p>
+              <p class="text-white font-bold">{{ formatVND(Number(combo.price ?? 0) * comboQuantity(combo.id)) }}</p>
             </div>
           </div>
         </div>

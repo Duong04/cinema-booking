@@ -13,8 +13,6 @@ export const authGuard = async (
     await authStore.fetchMe() 
   }
 
-  console.log('Auth Guard After Fetch:', to.meta.guestOnly, authStore.isLoggedIn)
-
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: 'login', query: { redirect: to.fullPath } })
     return

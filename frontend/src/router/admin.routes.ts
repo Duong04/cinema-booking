@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const adminRoutes: RouteRecordRaw[] = [
   {
-    path: 'doashboard',
+    path: 'dashboard',
     name: 'dashboard',
     component: () => import('@/features/admin/views/dashboard/DashboardView.vue'),
     meta: {
@@ -71,6 +71,19 @@ export const adminRoutes: RouteRecordRaw[] = [
         { label: 'Dashboard', name: 'dashboard' },
         { label: 'Rạp chiếu phim' },
         { label: 'Lịch chiếu' },
+      ],
+    },
+  },
+  {
+    path: 'combos',
+    name: 'admin-combos',
+    component: () => import('@/features/admin/views/combo/ComboView.vue'),
+    meta: {
+      title: 'Cinema - Admin Combos',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Rạp chiếu phim' },
+        { label: 'Combo bắp nước' },
       ],
     },
   },
@@ -166,7 +179,7 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: 'ations',
+    path: 'actions',
     name: 'admin-actions',
     component: () => import('@/features/admin/views/action/ActionView.vue'),
     meta: {

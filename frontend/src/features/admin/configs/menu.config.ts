@@ -10,6 +10,7 @@ import {
   TvOutline as TvOutlineIcon,
   PersonCircleSharp as UserIcon,
   PeopleOutline as PeopleIcon,
+  FastFoodOutline as ComboIcon,
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import router from '@/router'
@@ -70,6 +71,11 @@ export const menuOptions: MenuOption[] = [
     label: 'Chuỗi rạp',
     key: 'admin-cinema-chains',
     icon: renderIcon(ColorFilterOutlineIcon),
+  },
+  {
+    label: 'Combo bắp nước',
+    key: 'admin-combos',
+    icon: renderIcon(ComboIcon),
   },
   {
     label: 'Khu vực',

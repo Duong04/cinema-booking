@@ -56,7 +56,7 @@ function createColumns(): DataTableColumns<Showtime> {
   return [
     { type: 'selection' },
     {
-      title: 'Phim',
+      title: 'Movie',
       key: 'movie',
       minWidth: 200,
       render: (row) =>
@@ -80,7 +80,7 @@ function createColumns(): DataTableColumns<Showtime> {
         ]),
     },
     {
-      title: 'Phòng chiếu',
+      title: 'Room',
       key: 'room',
       width: 130,
       render: (row) =>
@@ -90,25 +90,25 @@ function createColumns(): DataTableColumns<Showtime> {
         ]),
     },
     {
-      title: 'Ngày chiếu',
+      title: 'Show Date',
       key: 'show_date',
       width: 120,
       render: (row) => h('span', formatShowDate(row.show_date)),
     },
     {
-      title: 'Giờ chiếu',
+      title: 'Start Time',
       key: 'start_time',
       width: 140,
       render: (row) => h('span', `${formatTime(row.start_time)} → ${formatTime(row.end_time)}`),
     },
     {
-      title: 'Giá cơ bản',
+      title: 'Base Price',
       key: 'base_price',
       width: 130,
       render: (row) => h('span', formatVND(row.base_price)),
     },
     {
-      title: 'Loại ghế / Giá',
+      title: 'Seat Type / Price',
       key: 'prices',
       minWidth: 160,
       render: (row) =>
@@ -129,7 +129,7 @@ function createColumns(): DataTableColumns<Showtime> {
         ),
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       key: 'status',
       width: 130,
       render: (row) => {
@@ -138,7 +138,7 @@ function createColumns(): DataTableColumns<Showtime> {
       },
     },
     {
-      title: 'Thao tác',
+      title: 'Actions',
       key: 'actions',
       width: 190,
       fixed: 'right',
@@ -151,17 +151,17 @@ function createColumns(): DataTableColumns<Showtime> {
               h(
                 NButton,
                 { size: 'small', type: 'info', secondary: true, onClick: () => openSeatOverview(row) },
-                { default: () => 'Ghế' },
+                { default: () => 'Seat' },
               ),
               h(
                 NButton,
                 { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
-                { default: () => 'Sửa' },
+                { default: () => 'Edit' },
               ),
               h(
                 NButton,
                 { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
-                { default: () => 'Xóa' },
+                { default: () => 'Delete' },
               ),
             ],
           },

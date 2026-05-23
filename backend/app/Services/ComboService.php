@@ -12,8 +12,8 @@ class ComboService
         $this->comboRepository = $comboRepository;
     }
 
-    public function paginate($limit, $q, $cinema) {
-        $combos = $this->comboRepository->paginate($limit, $q, $cinema);
+    public function paginate($limit, $q, $cinema, $status) {
+        $combos = $this->comboRepository->paginate($limit, $q, $cinema, $status);
 
         return $combos;
     }

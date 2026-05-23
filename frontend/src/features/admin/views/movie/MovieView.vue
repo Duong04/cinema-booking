@@ -181,12 +181,12 @@ function createColumns(): DataTableColumns<Movie> {
           h(
             NButton,
             { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
-            { default: () => 'Sửa' },
+            { default: () => 'Edit' },
           ),
           h(
             NButton,
             { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
-            { default: () => 'Xóa' },
+            { default: () => 'Delete' },
           ),
         ]),
     },
@@ -251,7 +251,7 @@ onMounted(fetchMovies)
     <n-space>
       <n-input
         v-model:value="filters.search"
-        placeholder="Search by name..."
+        placeholder="Tìm kiếm theo tên..."
         clearable
         style="width: 300px"
       >
@@ -263,7 +263,7 @@ onMounted(fetchMovies)
       </n-input>
       <n-select 
         v-model:value="filters.status"
-        placeholder="Filter by status"
+        placeholder="Lọc theo trạng thái"
         clearable
         :options="[
           { label: 'Sắp chiếu', value: 'coming_soon' },
@@ -271,7 +271,7 @@ onMounted(fetchMovies)
           { label: 'Ngừng chiếu', value: 'ended' },
           { label: 'Đã hủy', value: 'cancelled' },
         ]"
-        style="width: 150px"
+        style="width: 190px"
       />
       <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn

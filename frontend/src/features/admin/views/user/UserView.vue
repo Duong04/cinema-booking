@@ -174,7 +174,7 @@ function createColumns(): DataTableColumns<User> {
               secondary: true,
               onClick: () => handleToggleStatus(row),
             },
-            { default: () => (Boolean(row.is_active) ? 'Khóa' : 'Mở') },
+            { default: () => (Boolean(row.is_active) ? 'Lock' : 'Unlock') },
           ),
           h(
             NButton,
@@ -184,7 +184,7 @@ function createColumns(): DataTableColumns<User> {
               secondary: true,
               onClick: () => openEditModal(row),
             },
-            { default: () => 'Sửa' },
+            { default: () => 'Edit' },
           ),
         ]),
     },

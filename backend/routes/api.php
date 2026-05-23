@@ -174,6 +174,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/movies', [MovieController::class, 'getAll']);
         Route::get('/movies/{slug}', [MovieController::class, 'showPublic']);
         Route::get('/genres', [GenreController::class, 'getAll']);
+        Route::get('/combos', [ComboController::class, 'active']);
         Route::get('/showtimes', [ShowtimeController::class, 'getAll']);
         Route::get('/showtimes/{id}/seat-overview', [ShowtimeController::class, 'publicSeatOverview']);
         Route::get('/showtimes/{id}', [ShowtimeController::class, 'showPublic']);

@@ -73,7 +73,6 @@ function openCreateModal() {
 function openEditModal(row: CinemaChain) {
   selectedCinemaChain.value = row
   showModal.value = true
-  console.log(selectedCinemaChain.value);
 }
 
 function handleDelete(row: CinemaChain) {
@@ -122,7 +121,7 @@ onMounted(fetchCinemaChains)
     <n-space>
       <n-input
         v-model:value="filters.search"
-        placeholder="Search by name..."
+        placeholder="Tìm kiếm theo tên..."
         clearable
         style="width: 300px"
       >

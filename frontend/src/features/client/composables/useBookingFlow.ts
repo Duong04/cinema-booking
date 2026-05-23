@@ -13,9 +13,9 @@ export interface BookingSeat {
 export interface BookingCombo {
   id: string
   name: string
-  description: string
+  description?: string | null
   price: number
-  image: string
+  image?: string | null
 }
 
 export interface BookingComboSelection {
@@ -35,30 +35,6 @@ const draft = ref<BookingDraft>({
   seats: [],
   combos: [],
 })
-
-const demoCombos: BookingCombo[] = [
-  {
-    id: 'combo-popcorn',
-    name: 'Popcorn Combo',
-    description: 'Large popcorn and two soft drinks.',
-    price: 89000,
-    image: 'https://images.unsplash.com/photo-1585647347483-22b66260dfff?q=80&w=900&auto=format&fit=crop',
-  },
-  {
-    id: 'combo-couple',
-    name: 'Couple Combo',
-    description: 'Caramel popcorn, nachos, and two drinks.',
-    price: 129000,
-    image: 'https://images.unsplash.com/photo-1578849278619-e73505e9610f?q=80&w=900&auto=format&fit=crop',
-  },
-  {
-    id: 'combo-family',
-    name: 'Family Combo',
-    description: 'Two popcorn buckets and four soft drinks.',
-    price: 199000,
-    image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?q=80&w=900&auto=format&fit=crop',
-  },
-]
 
 function readDraft() {
   if (typeof sessionStorage === 'undefined') return
@@ -124,7 +100,6 @@ export function useBookingFlow() {
 
   return {
     draft,
-    demoCombos,
     seatTotal,
     comboTotal,
     grandTotal,

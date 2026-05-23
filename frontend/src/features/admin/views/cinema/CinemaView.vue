@@ -135,7 +135,7 @@ onMounted(fetchCinemas)
     <n-space>
       <n-input
         v-model:value="filters.search"
-        placeholder="Search by name..."
+        placeholder="Tìm kiếm theo tên..."
         clearable
         style="width: 300px"
       >

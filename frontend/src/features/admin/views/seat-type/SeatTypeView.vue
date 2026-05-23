@@ -77,7 +77,6 @@ function openCreateModal() {
 function openEditModal(row: SeatType) {
   selectedSeatType.value = row
   showModal.value = true
-  console.log(selectedSeatType.value)
 }
 
 function handleDelete(row: SeatType) {
@@ -126,7 +125,7 @@ onMounted(fetchSeatTypes)
     <n-space>
       <n-input
         v-model:value="filters.search"
-        placeholder="Search by name..."
+        placeholder="Tìm kiếm theo tên..."
         clearable
         style="width: 300px"
       >
