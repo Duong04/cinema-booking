@@ -518,7 +518,7 @@ return new class extends Migration {
             $table->integer('usage_limit')->nullable();
             $table->integer('per_user_limit')->nullable();
 
-            $table->string('applicable_to')->nullable();
+            $table->enum('applicable_to', ['booking', 'ticket', 'combo'])->default('combo');
             $table->enum('status', ['active', 'paused', 'expired'])->default('active');
             $table->timestamps();
         });

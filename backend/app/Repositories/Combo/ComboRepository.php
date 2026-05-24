@@ -21,4 +21,13 @@ class ComboRepository extends BaseRepository implements ComboRepositoryInterface
         return $combos->orderByDesc('created_at')->paginate($limit);
     }
 
+    public function getActiveByIds(array $ids)
+    {
+        return $this->model
+            ->whereIn('id', $ids)
+            ->where('status', 'active')
+            ->get()
+            ->keyBy('id');
+    }
+
 }

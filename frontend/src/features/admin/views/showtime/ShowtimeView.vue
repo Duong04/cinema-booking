@@ -140,7 +140,7 @@ function createColumns(): DataTableColumns<Showtime> {
     {
       title: 'Actions',
       key: 'actions',
-      width: 190,
+      width: 230,
       fixed: 'right',
       render: (row) =>
         h(
@@ -291,7 +291,7 @@ onMounted(() => {
     :loading="loading"
     :pagination="pagination"
     :row-key="(row: Showtime) => row.id"
-    :scroll-x="1100"
+    :scroll-x="1350"
     remote
     @update:checked-row-keys="(keys: DataTableRowKey[]) => (checkedRowKeysRef = keys)"
   />

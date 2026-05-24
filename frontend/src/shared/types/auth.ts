@@ -3,7 +3,11 @@ export interface User {
   name: string
   email: string
   role: UserRole
-  avatar?: string
+  phone?: string | null
+  avatar?: string | null
+  date_of_birth?: string | null
+  gender?: 'male' | 'female' | 'other' | null
+  is_active?: boolean
   email_verified_at?: string | null
   created_at?: string
   updated_at?: string
@@ -15,7 +19,11 @@ export interface UserProfile {
     name: string,
     email: string,
     role: UserRole,
-    avatar?: string,
+    phone?: string | null,
+    avatar?: string | null,
+    date_of_birth?: string | null,
+    gender?: 'male' | 'female' | 'other' | null,
+    is_active?: boolean,
     email_verified_at?: string | null,
     created_at?: string,
     updated_at?: string
@@ -58,6 +66,21 @@ export interface RegisterPayload {
 export interface RegisterResponse {
   data: User
   message?: string
+}
+
+export interface UpdateProfilePayload {
+  name: string
+  email: string
+  phone?: string | null
+  avatar?: string | null
+  date_of_birth?: string | null
+  gender?: 'male' | 'female' | 'other' | null
+}
+
+export interface ChangePasswordPayload {
+  current_password: string
+  password: string
+  password_confirmation: string
 }
 
 export interface ValidationError {

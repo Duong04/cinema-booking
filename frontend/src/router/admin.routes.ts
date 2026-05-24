@@ -11,6 +11,30 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'profile',
+    name: 'admin-profile',
+    component: () => import('@/features/admin/views/profile/AdminProfileView.vue'),
+    meta: {
+      title: 'Cinema - Admin Profile',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Hồ sơ quản trị' },
+      ],
+    },
+  },
+  {
+    path: 'settings',
+    name: 'admin-settings',
+    component: () => import('@/features/admin/views/profile/AdminProfileView.vue'),
+    meta: {
+      title: 'Cinema - Admin Settings',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Cài đặt bảo mật' },
+      ],
+    },
+  },
+  {
     path: 'cinema-chains',
     name: 'admin-cinema-chains',
     component: () => import('@/features/admin/views/cinema-chain/CinemaChainView.vue'),

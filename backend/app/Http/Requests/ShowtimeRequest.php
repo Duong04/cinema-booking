@@ -33,12 +33,10 @@ class ShowtimeRequest extends FormRequest
         ];
 
         if ($this->method() === 'PUT') {
-            $rules = [
-                'base_price'            => ['sometimes', 'required', 'numeric', 'min:0'],
-                'prices'                => ['sometimes', 'required', 'array', 'min:1'],
-                'prices.*.seat_type_id' => ['required', 'uuid', 'exists:seat_types,id'],
-                'prices.*.price'        => ['required', 'numeric', 'min:0'],
-            ];
+            $rules['base_price'] = ['sometimes', 'required', 'numeric', 'min:0'];
+            $rules['prices'] = ['sometimes', 'required', 'array', 'min:1'];
+            $rules['prices.*.seat_type_id'] = ['required', 'uuid', 'exists:seat_types,id'];
+            $rules['prices.*.price'] = ['required', 'numeric', 'min:0'];
         }
 
         return $rules;

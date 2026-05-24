@@ -58,6 +58,15 @@ export const clientRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'profile',
+    name: 'profile',
+    component: () => import('@/features/shared/views/ProfileView.vue'),
+    meta: {
+      title: 'Cinema - Tài khoản',
+      requiresAuth: true,
+    },
+  },
+  {
     path: 'booking/showtime/:movieId',
     name: 'booking-showtime',
     component: () => import('@/features/client/views/booking/ShowtimeView.vue'),
@@ -87,6 +96,7 @@ export const clientRoutes: RouteRecordRaw[] = [
     component: () => import('@/features/client/views/booking/CheckoutView.vue'),
     meta: {
       title: 'Cinema - Thanh toán',
+      requiresAuth: true,
     },
   },
   {
@@ -95,6 +105,15 @@ export const clientRoutes: RouteRecordRaw[] = [
     component: () => import('@/features/client/views/booking/PaymentResultView.vue'),
     meta: {
       title: 'Cinema - Kết quả thanh toán',
+    },
+  },
+  {
+    path: 'booking/payment/:id',
+    name: 'booking-payment',
+    component: () => import('@/features/client/views/booking/PaymentView.vue'),
+    meta: {
+      title: 'Cinema - Thanh toán',
+      requiresAuth: true,
     },
   },
   {

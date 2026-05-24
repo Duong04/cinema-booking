@@ -15,7 +15,15 @@ class BookingRepository extends BaseRepository implements BookingRepositoryInter
     public function paginate(int $limit, string $q, string $status)
     {
         $bookings = $this->model
-            ->with(['user:id,name,email,avatar', 'showtime.movie', 'showtime.room', 'items'])
+            ->with([
+                'user:id,name,email,avatar',
+                'showtime.movie',
+                'showtime.room.cinema',
+                'items',
+                'combos',
+                'promotions',
+                'payment',
+            ])
             ->when(
                 $q,
                 fn($query) => $query->where(

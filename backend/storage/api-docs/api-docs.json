@@ -924,6 +924,34 @@
                                         ],
                                         "maxItems": 8,
                                         "minItems": 1
+                                    },
+                                    "combos": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "combo_id",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "combo_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 2,
+                                                    "maximum": 20,
+                                                    "minimum": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "promotion_code": {
+                                        "type": "string",
+                                        "example": "SALE10",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -1018,6 +1046,22 @@
                                                         },
                                                         "type": "object"
                                                     }
+                                                },
+                                                "combos": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "promotions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "payment": {
+                                                    "type": "object",
+                                                    "nullable": true
                                                 }
                                             },
                                             "type": "object"
@@ -1166,6 +1210,77 @@
                     },
                     "404": {
                         "description": "Resource not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Update booking status and timestamps",
+                "operationId": "30e7e3ab3a72dc17ea76071251197a6d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "confirmed",
+                                        "nullable": true,
+                                        "enum": [
+                                            "pending",
+                                            "confirmed",
+                                            "cancelled",
+                                            "expired",
+                                            "refunded"
+                                        ]
+                                    },
+                                    "cancellation_reason": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "maxLength": 500
+                                    },
+                                    "expired_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "confirmed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Resource not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }
@@ -3376,6 +3491,188 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/combos": {
+            "get": {
+                "tags": [
+                    "Combos"
+                ],
+                "summary": "Get active public combos",
+                "description": "Return only active combos for the booking flow. Optionally filter by cinema.",
+                "operationId": "d007dcf994904cb79ed5ba10ac7fa459",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100,
+                            "default": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search active combos by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "popcorn"
+                        }
+                    },
+                    {
+                        "name": "cinema_id",
+                        "in": "query",
+                        "description": "Filter active combos by cinema",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d14e8-de20-7178-acf2-5850afc288f1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Active combos retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Combo Popcorn Couple"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Large popcorn and two soft drinks.",
+                                                        "nullable": true
+                                                    },
+                                                    "price": {
+                                                        "type": "string",
+                                                        "example": "129000.00"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "active",
+                                                        "enum": [
+                                                            "active"
+                                                        ]
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/combo.jpg",
+                                                        "nullable": true
+                                                    },
+                                                    "cinema_id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "cinema": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "CGV Đà Nẵng"
+                                                            },
+                                                            "address": {
+                                                                "type": "string",
+                                                                "example": "Đà Nẵng"
+                                                            }
+                                                        },
+                                                        "type": "object",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }

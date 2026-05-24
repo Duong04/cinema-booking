@@ -23,17 +23,27 @@ class BookingRequest extends FormRequest
     {
         $rules = [];
 
-        if ($this->method() === 'PUT') {
+        if ($this->is('api/v1/bookings/*/cancel')) {
             $rules = [
                 'cancellation_reason' => ['nullable', 'string', 'max:500'],
             ];
-        }else {
+        } elseif ($this->method() === 'PUT') {
+            $rules = [
+                'status' => ['nullable', 'in:pending,confirmed,cancelled,expired,refunded'],
+                'cancellation_reason' => ['nullable', 'string', 'max:500'],
+                'expired_at' => ['nullable', 'date'],
+                'confirmed_at' => ['nullable', 'date'],
+            ];
+        } else {
             $rules = [
                 'showtime_id' => ['required', 'uuid', 'exists:showtimes,id'],
                 'seat_ids'    => ['required', 'array', 'min:1', 'max:8'],
-                'seat_ids.*'  => ['uuid', 'exists:seats,id']
+                'seat_ids.*'  => ['uuid', 'exists:seats,id'],
+                'combos' => ['nullable', 'array'],
+                'combos.*.combo_id' => ['required_with:combos', 'uuid', 'exists:combos,id'],
+                'combos.*.quantity' => ['required_with:combos', 'integer', 'min:1', 'max:20'],
+                'promotion_code' => ['nullable', 'string', 'max:255'],
             ];
-
         }
 
         return $rules;

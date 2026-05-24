@@ -12,7 +12,9 @@ class BookingCombo extends Model
     protected $fillable = [
         'booking_id',
         'combo_id',
+        'combo_name',
         'quantity',
-        'price'
+        'unit_price',
+        'total_price',
     ];
 }

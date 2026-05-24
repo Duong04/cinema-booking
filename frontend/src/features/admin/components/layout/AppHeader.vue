@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { h, ref } from 'vue'
+import { computed, h, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { NAvatar, NDropdown, NIcon, NButton, NBadge, NText, useMessage } from 'naive-ui'
 import {
   PersonCircleOutline,
@@ -15,9 +16,19 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 const message = useMessage()
 const themeStore = useThemeStore()
 const isLoggingOut = ref(false)
+const initials = computed(() => {
+  const source = user.value?.name || user.value?.email || 'A'
+  return source
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+})
 
 const options = [
   {
@@ -56,10 +67,10 @@ async function handleLogout() {
 async function handleSelect(key: string) {
   switch (key) {
     case 'profile':
-      router.push({ name: 'profile' })
+      router.push({ name: 'admin-profile' })
       break
-    case 'admin':
-      router.push({ name: 'settings' })
+    case 'settings':
+      router.push({ name: 'admin-settings' })
       break
     case 'logout':
       await handleLogout()
@@ -108,10 +119,15 @@ async function handleSelect(key: string) {
             border-radius: 8px;
           "
         >
-          <n-avatar round size="small" style="background: #6366f1; color: white; font-size: 13px">
-            T
+          <n-avatar
+            round
+            size="small"
+            :src="user?.avatar || undefined"
+            style="background: #6366f1; color: white; font-size: 13px"
+          >
+            {{ initials }}
           </n-avatar>
-          <n-text style="font-size: 13px; font-weight: 500">Tinh</n-text>
+          <n-text style="font-size: 13px; font-weight: 500">{{ user?.name || 'Admin' }}</n-text>
         </div>
       </n-dropdown>
     </div>
