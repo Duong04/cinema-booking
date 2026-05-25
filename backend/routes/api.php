@@ -165,11 +165,17 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('promotions')->controller(PromotionController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
         Route::post('/check', 'check');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
     });
 
     Route::prefix('payments')->controller(PaymentController::class)->middleware('auth:sanctum')->group(function () {
         Route::post('/', 'create');
+        Route::get('/{id}', 'show');
         Route::post('/{id}/confirm', 'confirm');
     });
 

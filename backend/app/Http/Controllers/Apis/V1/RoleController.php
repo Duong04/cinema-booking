@@ -64,6 +64,40 @@ class RoleController extends Controller
                                     new OA\Property(property: "id", type: "string"),
                                     new OA\Property(property: "name", type: "string", example: "admin"),
                                     new OA\Property(property: "description", type: "string", nullable: true),
+                                    new OA\Property(property: "user_count", type: "integer", example: 3),
+                                    new OA\Property(
+                                        property: "users",
+                                        type: "array",
+                                        items: new OA\Items(
+                                            properties: [
+                                                new OA\Property(property: "id", type: "string"),
+                                                new OA\Property(property: "name", type: "string", example: "Nguyen Van A"),
+                                                new OA\Property(property: "avatar", type: "string", nullable: true, example: "https://example.com/avatar.png"),
+                                            ]
+                                        )
+                                    ),
+                                    new OA\Property(
+                                        property: "permissions",
+                                        type: "array",
+                                        items: new OA\Items(
+                                            properties: [
+                                                new OA\Property(property: "id", type: "string"),
+                                                new OA\Property(property: "name", type: "string", example: "Product Management"),
+                                                new OA\Property(property: "key", type: "string", example: "product_management"),
+                                                new OA\Property(
+                                                    property: "actions",
+                                                    type: "array",
+                                                    items: new OA\Items(
+                                                        properties: [
+                                                            new OA\Property(property: "id", type: "string"),
+                                                            new OA\Property(property: "name", type: "string", example: "View"),
+                                                            new OA\Property(property: "key", type: "string", example: "view"),
+                                                        ]
+                                                    )
+                                                ),
+                                            ]
+                                        )
+                                    ),
                                     new OA\Property(
                                         property: "created_at",
                                         type: "string",
@@ -108,7 +142,7 @@ class RoleController extends Controller
 
         $roles = $this->roleService->paginate($limit, $q);
 
-        return $this->successList($roles->items(), $this->paginationMeta($roles));
+        return $this->successList(RoleResource::collection($roles->items())->resolve(), $this->paginationMeta($roles));
     }
 
     #[OA\Post(
@@ -194,6 +228,18 @@ class RoleController extends Controller
                                 new OA\Property(property: "id", type: "string"),
                                 new OA\Property(property: "name", type: "string"),
                                 new OA\Property(property: "description", type: "string", nullable: true),
+                                new OA\Property(property: "user_count", type: "integer", example: 3),
+                                new OA\Property(
+                                    property: "users",
+                                    type: "array",
+                                    items: new OA\Items(
+                                        properties: [
+                                            new OA\Property(property: "id", type: "string"),
+                                            new OA\Property(property: "name", type: "string", example: "Nguyen Van A"),
+                                            new OA\Property(property: "avatar", type: "string", nullable: true, example: "https://example.com/avatar.png"),
+                                        ]
+                                    )
+                                ),
 
                                 new OA\Property(
                                     property: "permissions",

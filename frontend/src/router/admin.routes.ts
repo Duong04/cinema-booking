@@ -112,6 +112,18 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'promotions',
+    name: 'admin-promotions',
+    component: () => import('@/features/admin/views/promotion/PromotionView.vue'),
+    meta: {
+      title: 'Cinema - Admin Promotions',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Khuyến mãi' },
+      ],
+    },
+  },
+  {
     path: 'movies',
     name: 'admin-movies',
     component: () => import('@/features/admin/views/movie/MovieView.vue'),

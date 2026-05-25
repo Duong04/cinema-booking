@@ -26,6 +26,7 @@ class ActionRequest extends FormRequest
             'name' => ['required', Rule::unique('actions', 'name')],
             'key' => ['required', Rule::unique('actions', 'key')],
             'permissions' => ['nullable', 'array'],
+            'permissions.*.permission_id' => ['required', 'exists:permissions,id'],
         ];
 
         if ($this->method() === 'PUT') {

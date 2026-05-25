@@ -13,4 +13,8 @@ class PermissionActionRepository extends BaseRepository implements PermissionAct
     public function deleteByCol($col, $id) {
         return $this->model->where($col, $id)->delete();
     }
+
+    public function insert(array $data) {
+        return $this->model->insert($data);
+    }
 }

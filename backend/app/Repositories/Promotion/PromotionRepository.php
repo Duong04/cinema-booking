@@ -11,6 +11,16 @@ class PromotionRepository extends BaseRepository implements PromotionRepositoryI
         $this->model = $model;
     }
 
+    public function paginate($limit = 15, $q = null, $status = null, $applicableTo = null)
+    {
+        $promotions = $this->model
+            ->when($q, fn ($query) => $query->where('code', 'like', "%$q%"))
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($applicableTo, fn ($query) => $query->where('applicable_to', $applicableTo));
+
+        return $promotions->orderByDesc('created_at')->paginate($limit);
+    }
+
     public function findActiveByCodeForUpdate(string $code)
     {
         return $this->model

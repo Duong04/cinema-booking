@@ -11,12 +11,12 @@ class PromotionUsageRepository extends BaseRepository implements PromotionUsageR
         $this->model = $model;
     }
 
-    public function countByPromotion(string $promotionId): int
+    public function countByPromotion(string $promotionId)
     {
         return $this->model->where('promotion_id', $promotionId)->count();
     }
 
-    public function countByPromotionAndUser(string $promotionId, string $userId): int
+    public function countByPromotionAndUser(string $promotionId, string $userId)
     {
         return $this->model
             ->where('promotion_id', $promotionId)

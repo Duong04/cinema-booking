@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { HistoryState } from 'vue-router'
 import { CheckCircle2, ChevronLeft, CreditCard, Loader2, QrCode } from 'lucide-vue-next'
 import { paymentService } from '@/features/client/services/payment.service'
 import { useBookingFlow } from '@/features/client/composables/useBookingFlow'
+import {
+  buildBookingSummaryFromBooking,
+  paymentProviderLabel,
+  savePaymentResult,
+} from '@/features/client/utils/payment-summary'
 import type {
   BookingResultSummary,
+  ClientPayment,
   PaymentRouteState,
 } from '@/features/client/types/booking-payment.type'
 
@@ -15,20 +21,20 @@ const router = useRouter()
 const { clearBooking, formatVND } = useBookingFlow()
 
 const routeState = computed(() => window.history.state as PaymentRouteState | null)
-const payment = computed(() => routeState.value?.payment)
-const bookingSummary = computed(() => routeState.value?.bookingSummary)
+const loadedPayment = ref<ClientPayment | null>(null)
+const loading = ref(false)
+const payment = computed(() => routeState.value?.payment ?? loadedPayment.value)
+const bookingSummary = computed(() =>
+  routeState.value?.bookingSummary
+  ?? (payment.value?.booking ? buildBookingSummaryFromBooking(payment.value.booking, payment.value) : null),
+)
 const qrContent = computed(() => routeState.value?.qrContent ?? `PAY ${payment.value?.transaction_code ?? route.params.id}`)
 const processing = ref(false)
 const error = ref('')
 
 const amount = computed(() => Number(payment.value?.amount ?? bookingSummary.value?.totalPrice ?? 0))
-const providerLabel = computed(() => {
-  const provider = payment.value?.provider
-  if (provider === 'momo') return 'MoMo'
-  if (provider === 'zalopay') return 'ZaloPay'
-  if (provider === 'cashier') return 'Cashier'
-  return 'VNPay'
-})
+const providerLabel = computed(() => paymentProviderLabel(payment.value?.provider))
+const discountAmount = computed(() => Number(bookingSummary.value?.discountAmount ?? 0))
 
 const isCashier = computed(() => payment.value?.provider === 'cashier')
 
@@ -40,6 +46,22 @@ function toHistoryState<T>(value: T): HistoryState {
   return value as unknown as HistoryState
 }
 
+async function loadPayment() {
+  if (payment.value) return
+
+  loading.value = true
+  error.value = ''
+
+  try {
+    const response = await paymentService.getById(String(route.params.id))
+    loadedPayment.value = response.data
+  } catch (err: unknown) {
+    error.value = getErrorMessage(err, 'Không thể tải thông tin thanh toán.')
+  } finally {
+    loading.value = false
+  }
+}
+
 async function confirmPayment() {
   if (processing.value) return
 
@@ -49,34 +71,21 @@ async function confirmPayment() {
   try {
     const response = await paymentService.confirm(String(route.params.id))
     const paidBooking = response.data.booking
-    const summary: BookingResultSummary = bookingSummary.value ?? {
-      id: paidBooking.booking_code,
-      movieTitle: paidBooking.showtime?.movie?.title,
-      cinemaName: paidBooking.showtime?.room?.cinema?.name,
-      roomName: paidBooking.showtime?.room?.name,
-      seats: paidBooking.items?.map((item) => ({
-        id: item.id ?? item.seat_label,
-        row: item.seat_label.slice(0, 1),
-        number: item.seat_label.slice(1),
-        label: item.seat_label,
-        type: item.seat_type_name ?? '',
-        price: Number(item.price ?? 0),
-      })) ?? [],
-      combos: [],
-      totalPrice: Number(paidBooking.total_amount),
+    const summary: BookingResultSummary = bookingSummary.value
+      ?? buildBookingSummaryFromBooking(paidBooking, response.data.payment)
+    const resultSummary = {
+      ...summary,
+      id: paidBooking.booking_code ?? summary.id,
       paymentMethod: providerLabel.value,
+      totalPrice: Number(paidBooking.total_amount ?? summary.totalPrice),
     }
 
     clearBooking()
+    savePaymentResult(resultSummary)
     router.push({
       path: '/booking/payment-result',
       state: toHistoryState({
-        booking: {
-          ...summary,
-          id: paidBooking.booking_code ?? summary.id,
-          paymentMethod: providerLabel.value,
-          totalPrice: Number(paidBooking.total_amount ?? summary.totalPrice),
-        },
+        booking: resultSummary,
       }),
     })
   } catch (err: unknown) {
@@ -85,6 +94,8 @@ async function confirmPayment() {
     processing.value = false
   }
 }
+
+onMounted(loadPayment)
 </script>
 
 <template>
@@ -99,7 +110,12 @@ async function confirmPayment() {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-8">
+    <div v-if="loading" class="py-24 flex items-center justify-center text-gray-400 gap-3">
+      <Loader2 class="w-6 h-6 animate-spin text-red-500" />
+      Đang tải thông tin thanh toán...
+    </div>
+
+    <div v-else class="grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-8">
       <section class="bg-zinc-900 border border-white/5 rounded-3xl p-6 sm:p-8">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-12 h-12 rounded-2xl bg-red-600/20 flex items-center justify-center text-red-500">
@@ -133,6 +149,10 @@ async function confirmPayment() {
           <div class="flex justify-between gap-4">
             <span class="text-gray-500">Phim</span>
             <span class="text-white font-bold text-right">{{ bookingSummary?.movieTitle ?? payment?.booking?.showtime?.movie?.title }}</span>
+          </div>
+          <div v-if="discountAmount > 0" class="flex justify-between gap-4">
+            <span class="text-gray-500">Giảm giá {{ bookingSummary?.promotionCode ? `(${bookingSummary.promotionCode})` : '' }}</span>
+            <span class="text-emerald-400 font-bold text-right">-{{ formatVND(discountAmount) }}</span>
           </div>
           <div class="border-t border-white/10 pt-4 flex justify-between items-end">
             <span class="text-gray-500">Tổng tiền</span>

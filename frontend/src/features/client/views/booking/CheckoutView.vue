@@ -2,12 +2,13 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { HistoryState } from 'vue-router'
-import { ChevronLeft, CreditCard, Loader2, ShieldCheck, Ticket } from 'lucide-vue-next'
+import { ChevronLeft, CreditCard, Loader2, ShieldCheck, Tag, Ticket, X } from 'lucide-vue-next'
 import { useLanguageStore } from '@/stores/language'
 import { useBookingFlow } from '@/features/client/composables/useBookingFlow'
 import { bookingService } from '@/features/client/services/booking.service'
 import { paymentService } from '@/features/client/services/payment.service'
-import type { PaymentProvider } from '@/features/client/types/booking-payment.type'
+import { promotionService } from '@/features/client/services/promotion.service'
+import type { PaymentProvider, PromotionCheckResult } from '@/features/client/types/booking-payment.type'
 import BookingStepper from './components/BookingStepper.vue'
 
 const router = useRouter()
@@ -17,12 +18,19 @@ const { draft, seatTotal, comboTotal, grandTotal, formatVND } = useBookingFlow()
 const selectedPayment = ref<PaymentProvider>('vnpay')
 const paying = ref(false)
 const error = ref('')
+const couponCode = ref('')
+const couponResult = ref<PromotionCheckResult | null>(null)
+const couponChecking = ref(false)
+const couponError = ref('')
 
 const showtime = computed(() => draft.value.showtime)
 const movie = computed(() => showtime.value?.movie)
 const cinema = computed(() => showtime.value?.room?.cinema)
 const seatsLabel = computed(() => draft.value.seats.map((seat) => seat.label).join(', '))
 const isReady = computed(() => Boolean(showtime.value && draft.value.seats.length))
+const discountAmount = computed(() => Number(couponResult.value?.discount_amount ?? 0))
+const payableTotal = computed(() => Math.max(grandTotal.value - discountAmount.value, 0))
+const appliedCouponCode = computed(() => couponResult.value?.promotion.code ?? '')
 
 const paymentMethods: Array<{ id: PaymentProvider; label: string; description: string }> = [
   { id: 'vnpay', label: 'VNPay', description: 'Thanh toán qua cổng VNPay' },
@@ -51,6 +59,41 @@ function toHistoryState<T>(value: T): HistoryState {
   return value as unknown as HistoryState
 }
 
+async function applyCoupon() {
+  const code = couponCode.value.trim()
+
+  couponError.value = ''
+  couponResult.value = null
+
+  if (!code) {
+    couponError.value = 'Bạn hãy nhập mã giảm giá.'
+    return
+  }
+
+  couponChecking.value = true
+
+  try {
+    const response = await promotionService.check({
+      code,
+      ticket_amount: seatTotal.value,
+      combo_amount: comboTotal.value,
+    })
+
+    couponResult.value = response.data
+    couponCode.value = response.data.promotion.code
+  } catch (err: unknown) {
+    couponError.value = getErrorMessage(err, 'Mã giảm giá không hợp lệ.')
+  } finally {
+    couponChecking.value = false
+  }
+}
+
+function removeCoupon() {
+  couponCode.value = ''
+  couponResult.value = null
+  couponError.value = ''
+}
+
 async function pay() {
   if (!isReady.value || paying.value) return
 
@@ -65,6 +108,7 @@ async function pay() {
         combo_id: item.combo.id,
         quantity: item.quantity,
       })),
+      promotion_code: appliedCouponCode.value || undefined,
     })
 
     const createdBooking = bookingResponse.data
@@ -84,7 +128,10 @@ async function pay() {
       combos: draft.value.combos,
       seatTotal: seatTotal.value,
       comboTotal: comboTotal.value,
-      totalPrice: Number(createdBooking.total_amount ?? grandTotal.value),
+      subtotal: grandTotal.value,
+      discountAmount: discountAmount.value,
+      promotionCode: appliedCouponCode.value || undefined,
+      totalPrice: Number(createdBooking.total_amount ?? payableTotal.value),
       paymentMethod: paymentLabel(),
     }
 
@@ -156,6 +203,49 @@ async function pay() {
         </div>
 
         <div class="bg-zinc-900 border border-white/5 rounded-3xl p-6">
+          <div class="flex items-center justify-between gap-4 mb-5">
+            <h2 class="text-white font-black text-xl uppercase">Mã giảm giá</h2>
+            <button
+              v-if="couponResult"
+              @click="removeCoupon"
+              class="inline-flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-white"
+            >
+              <X class="w-4 h-4" />
+              Bỏ mã
+            </button>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <Tag class="w-5 h-5 text-gray-500 absolute left-4 top-1/2 -translate-y-1/2" />
+              <input
+                v-model="couponCode"
+                :disabled="couponChecking || Boolean(couponResult)"
+                @keyup.enter="applyCoupon"
+                type="text"
+                placeholder="Nhập coupon / promotion code"
+                class="w-full h-12 bg-black/30 border border-white/10 rounded-2xl pl-12 pr-4 text-white font-bold uppercase outline-none focus:border-red-500 disabled:opacity-70"
+              >
+            </div>
+            <button
+              @click="applyCoupon"
+              :disabled="couponChecking || Boolean(couponResult)"
+              class="h-12 px-6 rounded-2xl bg-white text-black font-black hover:bg-gray-200 disabled:opacity-70 inline-flex items-center justify-center gap-2"
+            >
+              <Loader2 v-if="couponChecking" class="w-5 h-5 animate-spin" />
+              {{ couponChecking ? 'Đang kiểm tra...' : 'Áp dụng' }}
+            </button>
+          </div>
+
+          <p v-if="couponError" class="mt-3 text-sm text-red-400">
+            {{ couponError }}
+          </p>
+          <p v-else-if="couponResult" class="mt-3 text-sm text-emerald-400 font-bold">
+            Đã áp dụng {{ couponResult.promotion.code }} - giảm {{ formatVND(discountAmount) }}.
+          </p>
+        </div>
+
+        <div class="bg-zinc-900 border border-white/5 rounded-3xl p-6">
           <h2 class="text-white font-black text-xl uppercase mb-6">Phương thức thanh toán</h2>
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <button
@@ -188,9 +278,13 @@ async function pay() {
             <span class="text-gray-500">Bắp nước</span>
             <span class="text-white font-bold">{{ formatVND(comboTotal) }}</span>
           </div>
+          <div v-if="discountAmount > 0" class="flex justify-between text-sm">
+            <span class="text-gray-500">Giảm giá {{ appliedCouponCode ? `(${appliedCouponCode})` : '' }}</span>
+            <span class="text-emerald-400 font-bold">-{{ formatVND(discountAmount) }}</span>
+          </div>
           <div class="border-t border-white/10 pt-4 flex justify-between items-end">
-            <span class="text-gray-500 text-sm">Tổng cộng</span>
-            <span class="text-red-500 font-black text-3xl tracking-tighter">{{ formatVND(grandTotal) }}</span>
+            <span class="text-gray-500 text-sm">Tổng thanh toán</span>
+            <span class="text-red-500 font-black text-3xl tracking-tighter">{{ formatVND(payableTotal) }}</span>
           </div>
         </div>
 
@@ -200,7 +294,7 @@ async function pay() {
 
         <button
           @click="pay"
-          :disabled="paying"
+          :disabled="paying || couponChecking"
           class="w-full mt-8 py-4 bg-red-600 text-white rounded-2xl font-black hover:bg-red-700 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
         >
           <Loader2 v-if="paying" class="w-5 h-5 animate-spin" />

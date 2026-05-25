@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ChevronLeft, Clock, Loader2 } from 'lucide-vue-next'
 import { useLanguageStore } from '@/stores/language'
 import { showtimeService } from '@/features/client/services/showtime.service'
+import { seatHoldService } from '@/features/client/services/seat-hold.service'
 import { useBookingFlow, type BookingSeat } from '@/features/client/composables/useBookingFlow'
 import type { PublicShowtime, PublicShowtimeSeat } from '@/features/client/types/showtime.type'
 import BookingStepper from './components/BookingStepper.vue'
@@ -18,6 +19,8 @@ const selectedSeats = ref<BookingSeat[]>([...draft.value.seats])
 const showtime = ref<PublicShowtime | null>(draft.value.showtime)
 const seats = ref<PublicShowtimeSeat[]>([])
 const loading = ref(false)
+const holding = ref(false)
+const holdError = ref('')
 let timer: ReturnType<typeof setInterval> | null = null
 
 const movie = computed(() => showtime.value?.movie)
@@ -126,6 +129,7 @@ function seatTypeClass(seat: PublicShowtimeSeat) {
 
 function toggleSeat(seat: PublicShowtimeSeat) {
   if (isDisabled(seat)) return
+  holdError.value = ''
 
   const index = selectedSeats.value.findIndex((item) => item.id === seat.id)
   if (index >= 0) {
@@ -143,10 +147,28 @@ function toggleSeat(seat: PublicShowtimeSeat) {
   })
 }
 
-function confirmSeats() {
-  if (selectedSeats.value.length === 0) return
-  setSeats(selectedSeats.value)
-  router.push('/booking/combo')
+async function confirmSeats() {
+  if (selectedSeats.value.length === 0 || !showtime.value || holding.value) return
+
+  holding.value = true
+  holdError.value = ''
+
+  try {
+    await seatHoldService.hold({
+      showtime_id: showtime.value.id,
+      seat_ids: selectedSeats.value.map((seat) => seat.id),
+    })
+
+    setSeats(selectedSeats.value)
+    router.push('/booking/combo')
+  } catch (err) {
+    holdError.value = err instanceof Error
+      ? err.message
+      : 'Không thể giữ ghế. Vui lòng chọn lại.'
+    await fetchSeatOverview()
+  } finally {
+    holding.value = false
+  }
 }
 
 async function fetchSeatOverview() {
@@ -267,6 +289,7 @@ onUnmounted(() => {
           <div class="hidden sm:block">
             <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-1">Seats Selected</p>
             <p class="text-white font-black text-lg">{{ selectedSeats.length ? selectedSeats.map((seat) => seat.label).join(', ') : 'None' }}</p>
+            <p v-if="holdError" class="text-red-400 text-xs font-bold mt-2">{{ holdError }}</p>
           </div>
 
           <div class="flex items-center gap-8">
@@ -275,16 +298,19 @@ onUnmounted(() => {
               <p class="text-red-500 font-black text-3xl tracking-tighter">{{ formatVND(totalPrice) }}</p>
             </div>
             <button
-              :disabled="selectedSeats.length === 0"
+              :disabled="selectedSeats.length === 0 || holding"
               @click="confirmSeats"
               :class="[
                 'px-12 py-4 rounded-2xl font-black transition-all transform active:scale-95',
-                selectedSeats.length
+                selectedSeats.length && !holding
                   ? 'bg-red-600 text-white shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:bg-red-700 hover:scale-105'
                   : 'bg-zinc-800 text-gray-500 cursor-not-allowed',
               ]"
             >
-              {{ languageStore.t('common.confirm') }}
+              <span class="inline-flex items-center gap-2">
+                <Loader2 v-if="holding" class="w-5 h-5 animate-spin" />
+                {{ holding ? 'Đang giữ ghế...' : languageStore.t('common.confirm') }}
+              </span>
             </button>
           </div>
         </div>

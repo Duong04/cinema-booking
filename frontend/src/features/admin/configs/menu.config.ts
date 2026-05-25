@@ -11,6 +11,7 @@ import {
   PersonCircleSharp as UserIcon,
   PeopleOutline as PeopleIcon,
   FastFoodOutline as ComboIcon,
+  PricetagOutline as PromotionIcon,
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import router from '@/router'
@@ -76,6 +77,11 @@ export const menuOptions: MenuOption[] = [
     label: 'Combo bắp nước',
     key: 'admin-combos',
     icon: renderIcon(ComboIcon),
+  },
+  {
+    label: 'Khuyến mãi',
+    key: 'admin-promotions',
+    icon: renderIcon(PromotionIcon),
   },
   {
     label: 'Khu vực',

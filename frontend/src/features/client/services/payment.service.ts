@@ -18,6 +18,9 @@ export const paymentService = {
   create: (payload: { booking_id: string; provider: PaymentProvider }) =>
     api.post<ApiResponse<PaymentResponse>>('/payments', payload),
 
+  getById: (paymentId: string) =>
+    api.get<ApiResponse<ClientPayment>>(`/payments/${paymentId}`),
+
   confirm: (paymentId: string) =>
     api.post<ApiResponse<{ payment: ClientPayment; booking: ClientBooking }>>(`/payments/${paymentId}/confirm`),
 }

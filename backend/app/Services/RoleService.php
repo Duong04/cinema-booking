@@ -20,7 +20,7 @@ class RoleService {
     }
 
     public function create($data) {
-        $role = $this->roleRepository->create($data);
+        $role = $this->roleRepository->create($this->rolePayload($data));
         $rows = $this->mapRolePermissions($data, $role->id);
 
         if (!empty($rows)) {
@@ -31,13 +31,16 @@ class RoleService {
     }
 
     public function find($id) {
-        $role = $this->roleRepository->find($id);
+        $role = $this->roleRepository->find($id, ['*'], [
+            'permissions.roleActions',
+            'users:id,role_id,name,avatar',
+        ])->loadCount('users');
 
         return $role;
     }
 
     public function update($id, $data) {
-        $role = $this->roleRepository->update($id, $data);
+        $role = $this->roleRepository->update($id, $this->rolePayload($data));
 
         if (isset($data['permissions'])) {
             $this->rolePermissionRepository->deleteByCol('role_id', $id);
@@ -78,6 +81,13 @@ class RoleService {
         }
 
         return $rows;
+    }
+
+    private function rolePayload(array $data): array
+    {
+        return collect($data)
+            ->only(['name', 'description'])
+            ->toArray();
     }
 
 }

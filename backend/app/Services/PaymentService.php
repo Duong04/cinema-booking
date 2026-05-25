@@ -21,7 +21,7 @@ class PaymentService
     ) {
     }
 
-    public function create(array $data, string $userId): array
+    public function create(array $data, string $userId)
     {
         $booking = $this->bookingRepository->find($data['booking_id'], ['*'], [
             'payment',
@@ -71,7 +71,23 @@ class PaymentService
         ];
     }
 
-    public function confirm(string $paymentId, string $userId): array
+    public function find(string $paymentId, string $userId)
+    {
+        $payment = $this->paymentRepository->find($paymentId, ['*'], [
+            'booking.showtime.movie',
+            'booking.showtime.room.cinema',
+            'booking.items',
+            'booking.combos',
+        ]);
+
+        if (! $payment->booking || $payment->booking->user_id !== $userId) {
+            throw new HttpException(403, 'Bạn không có quyền xem thanh toán này.');
+        }
+
+        return $payment;
+    }
+
+    public function confirm(string $paymentId, string $userId)
     {
         $payment = $this->paymentRepository->find($paymentId, ['*'], [
             'booking.showtime.movie',

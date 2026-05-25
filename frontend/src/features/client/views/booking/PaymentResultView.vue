@@ -3,10 +3,17 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { CheckCircle, Home, Ticket } from 'lucide-vue-next'
 import { useBookingFlow } from '@/features/client/composables/useBookingFlow'
+import { readPaymentResult } from '@/features/client/utils/payment-summary'
+import type {
+  BookingResultSummary,
+  PaymentResultRouteState,
+} from '@/features/client/types/booking-payment.type'
 
 const router = useRouter()
 const { clearBooking, formatVND } = useBookingFlow()
-const booking = computed(() => history.state?.booking)
+const routeState = computed(() => window.history.state as PaymentResultRouteState | null)
+const storedBooking = readPaymentResult()
+const booking = computed<BookingResultSummary | null>(() => routeState.value?.booking ?? storedBooking)
 
 function finishBooking(path: string) {
   clearBooking()
@@ -41,6 +48,10 @@ function finishBooking(path: string) {
         <div class="flex justify-between gap-4">
           <span class="text-gray-500 text-sm">Thanh toán</span>
           <span class="text-white font-bold text-right">{{ booking.paymentMethod }}</span>
+        </div>
+        <div v-if="Number(booking.discountAmount ?? 0) > 0" class="flex justify-between gap-4">
+          <span class="text-gray-500 text-sm">Giảm giá {{ booking.promotionCode ? `(${booking.promotionCode})` : '' }}</span>
+          <span class="text-emerald-400 font-bold text-right">-{{ formatVND(Number(booking.discountAmount)) }}</span>
         </div>
         <div class="flex justify-between gap-4 pt-4 border-t border-white/10">
           <span class="text-gray-500 text-sm">Tổng tiền</span>

@@ -5,7 +5,7 @@ use App\Repositories\Base\BaseRepositoryInterface;
 
 interface PromotionUsageRepositoryInterface extends BaseRepositoryInterface
 {
-    public function countByPromotion(string $promotionId): int;
+    public function countByPromotion(string $promotionId);
 
-    public function countByPromotionAndUser(string $promotionId, string $userId): int;
+    public function countByPromotionAndUser(string $promotionId, string $userId);
 }

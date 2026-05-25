@@ -18,7 +18,15 @@ class RoleResource extends JsonResource
             'id' => $this?->id,
             'name' => $this?->name,
             'description' => $this?->description,
+            'user_count' => $this->users_count ?? $this->users?->count() ?? 0,
+            'users' => $this->whenLoaded('users', fn() => $this->users->map(fn($user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar,
+            ])->values()),
             'permissions' => PermissionResource::collection($this->permissions->unique('id')),
+            'created_at' => $this?->created_at,
+            'updated_at' => $this?->updated_at,
         ];
     }
 }

@@ -16,9 +16,38 @@ class PromotionService
         $this->promotionUsageRepository = $promotionUsageRepository;
     }
 
+    public function paginate(int $limit, ?string $q, ?string $status, ?string $applicableTo)
+    {
+        return $this->promotionRepository->paginate($limit, $q, $status, $applicableTo);
+    }
+
+    public function create(array $data)
+    {
+        $data['code'] = strtoupper($data['code']);
+
+        return $this->promotionRepository->create($data);
+    }
+
+    public function find(string $id)
+    {
+        return $this->promotionRepository->find($id);
+    }
+
+    public function update(string $id, array $data)
+    {
+        $data['code'] = strtoupper($data['code']);
+
+        return $this->promotionRepository->update($id, $data);
+    }
+
+    public function delete(string $id)
+    {
+        return $this->promotionRepository->delete($id);
+    }
+
     public function check(array $data, string $userId): array
     {
-        $promotion = $this->promotionRepository->findActiveByCodeForUpdate($data['code']);
+        $promotion = $this->promotionRepository->findActiveByCodeForUpdate(strtoupper($data['code']));
 
         if (! $promotion) {
             throw new HttpException(422, 'Mã khuyến mãi không hợp lệ hoặc đã hết hạn.');

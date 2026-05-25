@@ -26,6 +26,18 @@ export interface ClientBookingCombo {
   }
 }
 
+export interface ClientBookingPromotion {
+  id: string
+  code: string
+  description?: string | null
+  discount_type?: 'percentage' | 'fixed_amount'
+  discount_value?: string | number
+  pivot?: {
+    discount_amount?: string | number
+    used_at?: string | null
+  }
+}
+
 export interface ClientBooking {
   id: string
   booking_code: string
@@ -34,7 +46,31 @@ export interface ClientBooking {
   showtime?: PublicShowtime
   items?: ClientBookingItem[]
   combos?: ClientBookingCombo[]
+  promotions?: ClientBookingPromotion[]
   payment?: ClientPayment
+}
+
+export interface PromotionCheckPayload {
+  code: string
+  ticket_amount?: number
+  combo_amount?: number
+}
+
+export interface PromotionCheckResult {
+  promotion: {
+    id: string
+    code: string
+    description?: string | null
+    discount_type: 'percentage' | 'fixed_amount'
+    discount_value: number
+    applicable_to?: 'booking' | 'ticket' | 'combo' | null
+    end_date?: string | null
+  }
+  ticket_amount: number
+  combo_amount: number
+  subtotal: number
+  discount_amount: number
+  total_amount: number
 }
 
 export interface ClientPayment {
@@ -59,6 +95,9 @@ export interface BookingResultSummary {
   combos: BookingComboSelection[]
   seatTotal?: number
   comboTotal?: number
+  subtotal?: number
+  discountAmount?: number
+  promotionCode?: string
   totalPrice: number
   paymentMethod: string
 }
@@ -67,4 +106,8 @@ export interface PaymentRouteState {
   payment?: ClientPayment
   bookingSummary?: BookingResultSummary
   qrContent?: string
+}
+
+export interface PaymentResultRouteState {
+  booking?: BookingResultSummary
 }
