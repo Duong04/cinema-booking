@@ -25,6 +25,11 @@ function createColumns(): DataTableColumns<City> {
     { type: 'selection' },
     { title: 'Name', key: 'name' },
     {
+      title: 'Coordinates',
+      key: 'coordinates',
+      render: (row) => h('span', row.latitude != null && row.longitude != null ? `${row.latitude}, ${row.longitude}` : '—'),
+    },
+    {
       title: 'Created At',
       key: 'created_at',
       render: (row) => h('span', formatDate(row.created_at)),

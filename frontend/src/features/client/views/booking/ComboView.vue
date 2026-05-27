@@ -53,7 +53,7 @@ function comboQuantity(comboId: string) {
 
 function confirmCombos() {
   setCombos(comboSelections.value)
-  router.push('/booking/checkout')
+  router.push({ name: 'booking-checkout' })
 }
 
 async function fetchCombos() {

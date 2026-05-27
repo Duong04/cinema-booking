@@ -281,8 +281,16 @@ class DatabaseSeeder extends Seeder
 
     private function seedLocations(): void
     {
-        foreach (['TP. Ho Chi Minh', 'Ha Noi', 'Da Nang', 'Can Tho', 'Hai Phong'] as $cityName) {
-            $this->cities[$cityName] = City::factory()->create(['name' => $cityName]);
+        $cities = [
+            ['name' => 'TP. Ho Chi Minh', 'latitude' => 10.7769, 'longitude' => 106.7009],
+            ['name' => 'Ha Noi', 'latitude' => 21.0278, 'longitude' => 105.8342],
+            ['name' => 'Da Nang', 'latitude' => 16.0544, 'longitude' => 108.2022],
+            ['name' => 'Can Tho', 'latitude' => 10.0452, 'longitude' => 105.7469],
+            ['name' => 'Hai Phong', 'latitude' => 20.8449, 'longitude' => 106.6881],
+        ];
+
+        foreach ($cities as $city) {
+            $this->cities[$city['name']] = City::factory()->create($city);
         }
 
         $chains = [

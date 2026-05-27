@@ -24,7 +24,7 @@ class SeatHoldService
         $user      = auth()->user();
         $showtimeId = $data['showtime_id'];
         $seatIds    = $data['seat_ids'];
-        $expiredAt  = now()->addMinutes(15);
+        $expiredAt  = now()->addMinutes(10);
  
         try {
             DB::beginTransaction();

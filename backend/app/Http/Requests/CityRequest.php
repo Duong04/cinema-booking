@@ -24,6 +24,8 @@ class CityRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'max:255', Rule::unique('cities', 'name')],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
 
         if ($this->method() === 'PUT') {
@@ -45,6 +47,8 @@ class CityRequest extends FormRequest
     {
         return [
             'name' => 'Tên',
+            'latitude' => 'Vĩ độ',
+            'longitude' => 'Kinh độ',
         ];
     }
 
@@ -55,6 +59,8 @@ class CityRequest extends FormRequest
             'unique' => ':attribute này đã tồn tại.',
             'string' => ':attribute phải là chuỗi.',
             'max' => ':attribute không được vượt quá :max ký tự.',
+            'numeric' => ':attribute phải là số.',
+            'between' => ':attribute phải nằm trong khoảng :min đến :max.',
         ];
     }
 }

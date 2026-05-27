@@ -11,7 +11,13 @@ class City extends Model
     use HasFactory, UsesUuidV7;
     protected $table = 'cities';
     protected $fillable = [
-        'name'
+        'name',
+        'latitude',
+        'longitude',
     ];
 
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
 }

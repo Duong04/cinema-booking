@@ -160,7 +160,7 @@ async function confirmSeats() {
     })
 
     setSeats(selectedSeats.value)
-    router.push('/booking/combo')
+    router.push({ name: 'booking-combo' })
   } catch (err) {
     holdError.value = err instanceof Error
       ? err.message

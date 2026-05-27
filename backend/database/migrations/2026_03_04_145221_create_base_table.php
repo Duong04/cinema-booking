@@ -157,6 +157,8 @@ return new class extends Migration {
         Schema::create('cities', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->timestamps();
         });
 

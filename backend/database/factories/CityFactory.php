@@ -13,6 +13,8 @@ class CityFactory extends Factory
     {
         return [
             'name' => fake()->unique()->city(),
+            'latitude' => fake()->latitude(),
+            'longitude' => fake()->longitude(),
         ];
     }
 }

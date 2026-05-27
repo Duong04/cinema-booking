@@ -83,7 +83,7 @@ async function confirmPayment() {
     clearBooking()
     savePaymentResult(resultSummary)
     router.push({
-      path: '/booking/payment-result',
+      name: 'booking-payment-result',
       state: toHistoryState({
         booking: resultSummary,
       }),

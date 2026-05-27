@@ -107,7 +107,7 @@ const trailerSource = computed(() => {
 
 const handleBookNow = () => {
   if (movie.value) {
-    router.push(`/booking/showtime/${movie.value.id}`)
+    router.push({ name: 'booking-showtime', params: { movieId: movie.value.id } })
   }
 }
 
