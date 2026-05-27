@@ -5,11 +5,9 @@ use App\Repositories\Combo\ComboRepositoryInterface;
 
 class ComboService
 {
-    private $comboRepository;
-
-    public function __construct(ComboRepositoryInterface $comboRepository)
-    {
-        $this->comboRepository = $comboRepository;
+    public function __construct(
+        private ComboRepositoryInterface $comboRepository
+    ) {
     }
 
     public function paginate($limit, $q, $cinema, $status) {

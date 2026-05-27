@@ -15,11 +15,9 @@ class GenreController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $genreTypeService;
-
-    public function __construct(GenreService $genreTypeService)
-    {
-        $this->genreTypeService = $genreTypeService;
+    public function __construct(
+        private GenreService $genreTypeService
+    ) {
     }
 
     #[OA\Get(

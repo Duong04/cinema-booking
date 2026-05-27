@@ -61,4 +61,13 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
             )
             ->pluck('seat_id');
     }
+
+    public function getActiveHoldsByShowtime(string $showtimeId)
+    {
+        return $this->model->with('user:id,name,email')
+            ->where('showtime_id', $showtimeId)
+            ->where('expired_at', '>', now())
+            ->get()
+            ->keyBy('seat_id');
+    }
 }

@@ -16,11 +16,9 @@ class RoleController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $roleService;
-
-    public function __construct(RoleService $roleService)
-    {
-        $this->roleService = $roleService;
+    public function __construct(
+        private RoleService $roleService
+    ) {
     }
 
     #[OA\Get(

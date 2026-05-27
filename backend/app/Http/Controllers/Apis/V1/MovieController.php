@@ -15,11 +15,9 @@ class MovieController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $movieService;
-
-    public function __construct(MovieService $movieService)
-    {
-        $this->movieService = $movieService;
+    public function __construct(
+        private MovieService $movieService
+    ) {
     }
     #[OA\Get(
         path: "/api/v1/movies",

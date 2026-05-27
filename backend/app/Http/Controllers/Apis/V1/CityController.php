@@ -15,11 +15,9 @@ class CityController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $cityService;
-
-    public function __construct(CityService $cityService)
-    {
-        $this->cityService = $cityService;
+    public function __construct(
+        private CityService $cityService
+    ) {
     }
 
     #[OA\Get(

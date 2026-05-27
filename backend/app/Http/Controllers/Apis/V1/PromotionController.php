@@ -15,11 +15,9 @@ class PromotionController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $promotionService;
-
-    public function __construct(PromotionService $promotionService)
-    {
-        $this->promotionService = $promotionService;
+    public function __construct(
+        private PromotionService $promotionService
+    ) {
     }
 
     #[OA\Get(

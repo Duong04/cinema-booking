@@ -8,11 +8,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SeatHoldService
 {
-    protected $seatHoldRepository;
 
-    public function __construct(SeatHoldRepositoryInterface $seatHoldRepository)
-    {
-        $this->seatHoldRepository = $seatHoldRepository;
+    public function __construct(
+        private SeatHoldRepositoryInterface $seatHoldRepository
+    ) {
     }
 
     public function getListShowtime(string $showtimeId)

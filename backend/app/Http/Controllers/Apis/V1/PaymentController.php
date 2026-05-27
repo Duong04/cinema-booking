@@ -12,8 +12,9 @@ use App\Traits\ResponseHelper;
 class PaymentController extends Controller
 {
     use ResponseHelper;
-    public function __construct(private PaymentService $paymentService)
-    {
+    public function __construct(
+        private PaymentService $paymentService
+    ) {
     }
 
     #[OA\Post(

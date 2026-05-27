@@ -15,11 +15,9 @@ class RoomController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $roomService;
-
-    public function __construct(RoomService $roomService)
-    {
-        $this->roomService = $roomService;
+    public function __construct(
+        private RoomService $roomService
+    ) {
     }
 
     #[OA\Get(

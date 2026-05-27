@@ -15,11 +15,10 @@ class CinemaChainController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $cinemaChainService;
 
-    public function __construct(CinemaChainService $cinemaChainService)
-    {
-        $this->cinemaChainService = $cinemaChainService;
+    public function __construct(
+        private CinemaChainService $cinemaChainService
+    ) {
     }
 
     #[OA\Get(

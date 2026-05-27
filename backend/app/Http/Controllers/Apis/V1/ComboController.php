@@ -14,11 +14,9 @@ class ComboController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $comboService;
-
-    public function __construct(ComboService $comboService)
-    {
-        $this->comboService = $comboService;
+    public function __construct(
+        private ComboService $comboService
+    ) {
     }
 
     #[OA\Get(

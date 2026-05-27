@@ -4,10 +4,10 @@ namespace App\Services;
 use App\Repositories\City\CityRepositoryInterface;
 
 class CityService {
-    private $cityRepository;
 
-    public function __construct(CityRepositoryInterface $cityRepository) {
-        $this->cityRepository = $cityRepository;
+    public function __construct(
+        private CityRepositoryInterface $cityRepository
+    ) {
     }
 
     public function paginate($limit, $q) {

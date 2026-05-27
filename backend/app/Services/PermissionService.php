@@ -5,11 +5,10 @@ use App\Repositories\Permission\PermissionRepositoryInterface;
 use App\Repositories\PermissionAction\PermissionActionRepositoryInterface;
 
 class PermissionService {
-    private $permissionRepository;
-    private $permissionActionRepository;
-    public function __construct(PermissionRepositoryInterface $permissionRepository, PermissionActionRepositoryInterface $permissionActionRepository) {
-        $this->permissionRepository = $permissionRepository;
-        $this->permissionActionRepository = $permissionActionRepository;
+    public function __construct(
+        private PermissionRepositoryInterface $permissionRepository,
+        private PermissionActionRepositoryInterface $permissionActionRepository
+    ) {
     }
 
     public function paginate($limit) {

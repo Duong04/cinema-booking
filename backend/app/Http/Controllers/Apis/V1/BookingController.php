@@ -15,11 +15,9 @@ class BookingController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $bookingService;
-
-    public function __construct(BookingService $bookingService)
-    {
-        $this->bookingService = $bookingService;
+    public function __construct(
+        private BookingService $bookingService
+    ) {
     }
 
     #[OA\Get(

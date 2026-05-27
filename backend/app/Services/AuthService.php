@@ -5,14 +5,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Mail\VerifyEmailMail;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\Facades\Mail;
-use Str;
-use Auth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class AuthService {
-    private $userRepository;
-    public function __construct(UserRepositoryInterface $userRepository)
-    {
-        $this->userRepository = $userRepository;
+    public function __construct(
+        private UserRepositoryInterface $userRepository
+    ) {
     }
 
     public function register(array $data)

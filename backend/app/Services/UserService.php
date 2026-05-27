@@ -4,10 +4,10 @@ namespace App\Services;
 use App\Repositories\User\UserRepositoryInterface;
 
 class UserService {
-    private $userRepository;
 
-    public function __construct(UserRepositoryInterface $userRepository) {
-        $this->userRepository = $userRepository;
+    public function __construct(
+        private UserRepositoryInterface $userRepository
+    ) {
     }
 
     public function paginate($limit, $q, $roleId, $ignoreRoleId, $isActive) {

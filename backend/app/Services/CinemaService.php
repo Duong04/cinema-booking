@@ -4,10 +4,9 @@ namespace App\Services;
 use App\Repositories\Cinema\CinemaRepositoryInterface;
 
 class CinemaService {
-    private $cinemaRepository;
-
-    public function __construct(CinemaRepositoryInterface $cinemaRepository) {
-        $this->cinemaRepository = $cinemaRepository;
+    public function __construct(
+        private CinemaRepositoryInterface $cinemaRepository
+    ) {
     }
 
     public function paginate($limit, $q, $cityId, $cinemaChainId) {

@@ -5,12 +5,11 @@ use App\Repositories\Action\ActionRepositoryInterface;
 use App\Repositories\PermissionAction\PermissionActionRepositoryInterface;
 
 class ActionService {
-    private $actionRepository;
-    private $permissionActionRepository;
 
-    public function __construct(ActionRepositoryInterface $actionRepository, PermissionActionRepositoryInterface $permissionActionRepository) {
-        $this->actionRepository = $actionRepository;
-        $this->permissionActionRepository = $permissionActionRepository;
+    public function __construct(
+        private ActionRepositoryInterface $actionRepository, 
+        private PermissionActionRepositoryInterface $permissionActionRepository
+    ) {
     }
 
     public function paginate($limit) {

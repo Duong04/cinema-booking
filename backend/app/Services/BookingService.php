@@ -19,42 +19,20 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BookingService
 {
-    private $bookingRepository;
-    private $bookingStatusLogRepository;
-    private $seatHoldRepository;
-    private $showtimeRepository;
-    private $showtimePriceRepository;
-    private $seatRepository;
-    private $bookingItemRepository;
-    private $bookingComboRepository;
-    private $comboRepository;
-    private $promotionRepository;
-    private $promotionUsageRepository;
 
     public function __construct(
-        BookingRepositoryInterface $bookingRepository, 
-        BookingStatusLogRepositoryInterface $bookingStatusLogRepository, 
-        SeatHoldRepositoryInterface $seatHoldRepository, 
-        ShowtimeRepositoryInterface $showtimeRepository, 
-        ShowtimePriceRepositoryInterface $showtimePriceRepository, 
-        SeatRepositoryInterface $seatRepository, 
-        BookingItemRepositoryInterface $bookingItemRepository, 
-        BookingComboRepositoryInterface $bookingComboRepository, 
-        ComboRepositoryInterface $comboRepository, 
-        PromotionRepositoryInterface $promotionRepository, 
-        PromotionUsageRepositoryInterface $promotionUsageRepository)
-    {
-        $this->bookingRepository = $bookingRepository;
-        $this->bookingStatusLogRepository = $bookingStatusLogRepository;
-        $this->seatHoldRepository = $seatHoldRepository;
-        $this->showtimeRepository = $showtimeRepository;
-        $this->showtimePriceRepository = $showtimePriceRepository;
-        $this->seatRepository = $seatRepository;
-        $this->bookingItemRepository = $bookingItemRepository;
-        $this->bookingComboRepository = $bookingComboRepository;
-        $this->comboRepository = $comboRepository;
-        $this->promotionRepository = $promotionRepository;
-        $this->promotionUsageRepository = $promotionUsageRepository;
+        private BookingRepositoryInterface $bookingRepository, 
+        private BookingStatusLogRepositoryInterface $bookingStatusLogRepository, 
+        private SeatHoldRepositoryInterface $seatHoldRepository, 
+        private ShowtimeRepositoryInterface $showtimeRepository, 
+        private ShowtimePriceRepositoryInterface $showtimePriceRepository, 
+        private SeatRepositoryInterface $seatRepository, 
+        private BookingItemRepositoryInterface $bookingItemRepository, 
+        private BookingComboRepositoryInterface $bookingComboRepository, 
+        private ComboRepositoryInterface $comboRepository, 
+        private PromotionRepositoryInterface $promotionRepository, 
+        private PromotionUsageRepositoryInterface $promotionUsageRepository
+    ) {
     }
 
     public function paginate(int $limit, ?string $q, ?string $status): LengthAwarePaginator

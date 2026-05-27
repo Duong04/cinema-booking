@@ -12,11 +12,9 @@ class SeatHoldController extends Controller
 {
     use ResponseHelper;
 
-    private $seatHoldService;
-
-    public function __construct(SeatHoldService $seatHoldService)
-    {
-        $this->seatHoldService = $seatHoldService;
+    public function __construct(
+        private SeatHoldService $seatHoldService
+    ) {
     }
 
     #[OA\Get(

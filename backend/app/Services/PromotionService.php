@@ -7,13 +7,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PromotionService
 {
-    private $promotionRepository;
-    private $promotionUsageRepository;
-
-    public function __construct(PromotionRepositoryInterface $promotionRepository, PromotionUsageRepositoryInterface $promotionUsageRepository)
-    {
-        $this->promotionRepository = $promotionRepository;
-        $this->promotionUsageRepository = $promotionUsageRepository;
+    public function __construct(
+        private PromotionRepositoryInterface $promotionRepository,
+        private PromotionUsageRepositoryInterface $promotionUsageRepository
+    ) {
     }
 
     public function paginate(int $limit, ?string $q, ?string $status, ?string $applicableTo)

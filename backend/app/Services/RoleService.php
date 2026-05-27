@@ -5,12 +5,10 @@ use App\Repositories\Role\RoleRepositoryInterface;
 use App\Repositories\RolePermission\RolePermissionRepositoryInterface;
 
 class RoleService {
-    private $roleRepository;
-    private $rolePermissionRepository;
-
-    public function __construct(RoleRepositoryInterface $roleRepository, RolePermissionRepositoryInterface $rolePermissionRepository) {
-        $this->roleRepository = $roleRepository;
-        $this->rolePermissionRepository = $rolePermissionRepository;
+    public function __construct(
+        private RoleRepositoryInterface $roleRepository,
+        private RolePermissionRepositoryInterface $rolePermissionRepository
+    ) {
     }
 
     public function paginate($limit, $q) {

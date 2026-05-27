@@ -16,11 +16,10 @@ use OpenApi\Attributes as OA;
 class AuthController extends Controller
 {
     use ResponseHelper;
-    private $authService;
 
-    public function __construct(AuthService $authService)
-    {
-        $this->authService = $authService;
+    public function __construct(
+        private AuthService $authService
+    ) {
     }
 
     #[OA\Get(

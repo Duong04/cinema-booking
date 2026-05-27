@@ -14,11 +14,9 @@ class UserController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $userService;
-
-    public function __construct(UserService $userService)
-    {
-        $this->userService = $userService;
+    public function __construct(
+        private UserService $userService
+    ) {
     }
 
     #[OA\Get(

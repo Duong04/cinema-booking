@@ -4,22 +4,22 @@ namespace App\Services;
 use App\Repositories\Showtime\ShowtimeRepositoryInterface;
 use App\Repositories\Movie\MovieRepositoryInterface;
 use App\Repositories\ShowtimePrice\ShowtimePriceRepositoryInterface;
-use App\Models\BookingItem;
-use App\Models\Seat;
-use App\Models\SeatHold;
+use App\Repositories\BookingItem\BookingItemRepositoryInterface;
+use App\Repositories\Seat\SeatRepositoryInterface;
+use App\Repositories\SeatHold\SeatHoldRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ShowtimeService {
-    private $showtimeRepository;
-    private $showtimePriceRepository;
-    private $movieRepository;
-
-    public function __construct(ShowtimeRepositoryInterface $showtimeRepository, ShowtimePriceRepositoryInterface $showtimePriceRepository, MovieRepositoryInterface $movieRepository) {
-        $this->showtimeRepository = $showtimeRepository;
-        $this->showtimePriceRepository = $showtimePriceRepository;
-        $this->movieRepository = $movieRepository;
+    public function __construct(
+        private ShowtimeRepositoryInterface $showtimeRepository,
+        private ShowtimePriceRepositoryInterface $showtimePriceRepository,
+        private MovieRepositoryInterface $movieRepository,
+        private SeatRepositoryInterface $seatRepository,
+        private BookingItemRepositoryInterface $bookingItemRepository,
+        private SeatHoldRepositoryInterface $seatHoldRepository
+    ) {
     }
 
     public function paginate($limit, $movieId, $roomId, $showDate, $status) {
@@ -65,31 +65,9 @@ class ShowtimeService {
     public function seatOverview($id, bool $includePrivateDetails = true) {
         $showtime = $this->showtimeRepository->find($id, ['*'], ['movie', 'room.cinema']);
 
-        $seats = Seat::query()
-            ->with('seatType')
-            ->where('room_id', $showtime->room_id)
-            ->orderBy('row_label')
-            ->orderBy('seat_number')
-            ->get();
-
-        $bookingItems = BookingItem::query()
-            ->with(['booking:id,user_id,showtime_id,booking_code,status,total_amount', 'booking.user:id,name,email'])
-            ->whereIn('seat_id', $seats->pluck('id'))
-            ->whereHas(
-                'booking',
-                fn($query) => $query
-                    ->where('showtime_id', $id)
-                    ->whereIn('status', ['pending', 'confirmed'])
-            )
-            ->get()
-            ->keyBy('seat_id');
-
-        $seatHolds = SeatHold::query()
-            ->with('user:id,name,email')
-            ->where('showtime_id', $id)
-            ->where('expired_at', '>', now())
-            ->get()
-            ->keyBy('seat_id');
+        $seats = $this->seatRepository->getSeatsByRoom($showtime->room_id);
+        $bookingItems = $this->bookingItemRepository->getBookedSeatsByShowtime($seats->pluck('id')->all(), $id);
+        $seatHolds = $this->seatHoldRepository->getActiveHoldsByShowtime($id);
 
         $items = $seats->map(function ($seat) use ($bookingItems, $seatHolds, $includePrivateDetails) {
             $bookingItem = $bookingItems->get($seat->id);

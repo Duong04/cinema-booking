@@ -6,12 +6,11 @@ use App\Repositories\MovieGenre\MovieGenreRepositoryInterface;
 use Illuminate\Support\Str;
 
 class MovieService {
-    private $movieRepository;
-    private $movieGenreRepository;
 
-    public function __construct(MovieRepositoryInterface $movieRepository, MovieGenreRepositoryInterface $movieGenreRepository) {
-        $this->movieRepository = $movieRepository;
-        $this->movieGenreRepository = $movieGenreRepository;
+    public function __construct(
+        private MovieRepositoryInterface $movieRepository,
+        private MovieGenreRepositoryInterface $movieGenreRepository
+    ) {
     }
 
     public function paginate($limit, $q, $status) {

@@ -15,12 +15,11 @@ class ShowtimeController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $showtimeService;
-
-    public function __construct(ShowtimeService $showtimeService)
-    {
-        $this->showtimeService = $showtimeService;
+    public function __construct(
+        private ShowtimeService $showtimeService
+    ) {
     }
+    
     #[OA\Get(
         path: "/api/v1/showtimes",
         summary: "Get list of showtimes",
