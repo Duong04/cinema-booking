@@ -7,6 +7,8 @@ import type { Seat, SeatRow } from '@/features/admin/types/seat.type'
 import type { Room } from '@/features/admin/types/room.type'
 import { seatTypeService } from '@/features/admin/services/seat-type.service'
 import { Pencil, Trash } from 'lucide-vue-next'
+import { useAdminPermission } from '@/features/admin/composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 interface SeatTypeOption {
   label: string
@@ -26,6 +28,7 @@ const props = defineProps<{
 const showModal = defineModel<boolean>('show')
 const message = useMessage()
 const dialog = useDialog()
+const { can } = useAdminPermission()
 
 const seatMap = ref<Record<string, Seat[]> | null>(null)
 const loadingSeats = ref(false)
@@ -41,6 +44,9 @@ const deletingLabel = ref<string | null>(null)
 
 const sortedRowLabels = computed(() => (seatMap.value ? Object.keys(seatMap.value).sort() : []))
 const hasSeats = computed(() => sortedRowLabels.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.SEATS, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.SEATS, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.SEATS, ADMIN_ACTIONS.DELETE))
 const seatTypeLegends = computed(() => {
   const map = new Map<string, { id: string; name: string; className: string }>()
 
@@ -211,7 +217,7 @@ watch(
           <div v-if="!loadingSeats && !hasSeats" class="empty-state">
             <n-empty description="Phòng này chưa có ghế nào" size="large">
               <template #extra>
-                <n-button type="primary" @click="activeTab = 'create'">+ Tạo ghế ngay</n-button>
+                <n-button v-if="canCreate" type="primary" @click="activeTab = 'create'">+ Tạo ghế ngay</n-button>
               </template>
             </n-empty>
           </div>
@@ -282,11 +288,12 @@ watch(
                 </div>
                 <span class="row-label">{{ rowLabel }}</span>
 
-                <div class="row-actions">
-                  <n-button size="tiny" quaternary type="primary" @click="startEdit(rowLabel)">
+                <div v-if="canUpdate || canDelete" class="row-actions">
+                  <n-button v-if="canUpdate" size="tiny" quaternary type="primary" @click="startEdit(rowLabel)">
                     <Pencil :size="16" :stroke-width="2" />
                   </n-button>
                   <n-button
+                    v-if="canDelete"
                     size="tiny"
                     quaternary
                     type="error"
@@ -309,13 +316,13 @@ watch(
         </n-spin>
       </n-tab-pane>
 
-      <n-tab-pane name="create" tab="Tạo hàng ghế mới">
+      <n-tab-pane v-if="canCreate" name="create" tab="Tạo hàng ghế mới">
         <div class="create-section">
           <div v-for="(row, index) in newRows" :key="index" class="row-form-item">
             <n-card size="small" :title="`Hàng ${index + 1}`">
               <template #header-extra>
                 <n-button
-                  v-if="newRows.length > 1"
+                  v-if="newRows.length > 1 && canCreate"
                   text
                   type="error"
                   size="small"
@@ -357,7 +364,7 @@ watch(
               </n-grid>
             </n-card>
           </div>
-          <n-button dashed block @click="addRow">+ Thêm hàng</n-button>
+          <n-button v-if="canCreate" dashed block @click="addRow">+ Thêm hàng</n-button>
         </div>
       </n-tab-pane>
     </n-tabs>
@@ -366,7 +373,7 @@ watch(
       <n-space justify="end">
         <n-button @click="showModal = false">Đóng</n-button>
         <n-button
-          v-if="activeTab === 'create'"
+          v-if="activeTab === 'create' && canCreate"
           type="primary"
           :loading="submitting"
           @click="handleSubmit"

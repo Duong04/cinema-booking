@@ -6,11 +6,14 @@ import { Search as SearchIcon } from '@vicons/ionicons5'
 import { useCombo } from '../../composables/useCombo'
 import { useCinema } from '../../composables/useCinema'
 import type { Combo } from '../../types/combo.type'
-import { formatDate } from '@/shared/utils/formatDate'
+import { formatDateTime } from '@/shared/utils/formatDate'
 import ComboFormModal from './components/ComboFormModal.vue'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchCombos, deleteCombo } = useCombo()
 const { data: cinemas, fetchCinemas } = useCinema()
+const { can } = useAdminPermission()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -19,6 +22,9 @@ const selectedCombo = ref<Combo | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.COMBOS, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.COMBOS, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.COMBOS, ADMIN_ACTIONS.DELETE))
 const cinemaOptions = computed(() =>
   cinemas.value.map((cinema) => ({
     label: cinema.name,
@@ -72,23 +78,31 @@ function createColumns(): DataTableColumns<Combo> {
     {
       title: 'Created At',
       key: 'created_at',
-      render: (row) => h('span', formatDate(row.created_at)),
+      render: (row) => h('span', formatDateTime(row.created_at)),
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (row) =>
         h('div', { style: 'display: flex; gap: 8px' }, [
-          h(
-            NButton,
-            { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
-            { default: () => 'Edit' },
-          ),
-          h(
-            NButton,
-            { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
-            { default: () => 'Delete' },
-          ),
+          ...(canUpdate.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
+                  { default: () => 'Edit' },
+                ),
+              ]
+            : []),
+          ...(canDelete.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
+                  { default: () => 'Delete' },
+                ),
+              ]
+            : []),
         ]),
     },
   ]
@@ -186,12 +200,12 @@ onMounted(() => {
         style="width: 200px"
       />
 
-      <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
+      <n-button v-if="hasChecked && canDelete" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
 
-    <n-button type="primary" @click="openCreateModal">+ Tạo combo</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">+ Tạo combo</n-button>
   </n-space>
 
   <n-data-table

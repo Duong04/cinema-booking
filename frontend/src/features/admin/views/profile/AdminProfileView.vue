@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import type { FormInst, FormRules, UploadCustomRequestOptions } from 'naive-ui'
@@ -7,12 +7,12 @@ import { NIcon, useMessage } from 'naive-ui'
 import {
   CameraOutline,
   KeyOutline,
-  PersonCircleOutline,
   SaveOutline,
   ShieldCheckmarkOutline,
 } from '@vicons/ionicons5'
 import { useAuthStore } from '@/features/shared/stores/auth.store'
 import { uploadService } from '@/features/shared/services/upload.service'
+import { formatDate } from '@/shared/utils/formatDate'
 
 type Gender = 'male' | 'female' | 'other' | null
 type TabName = 'profile' | 'security'
@@ -69,10 +69,6 @@ const initials = computed(() => {
 })
 const roleName = computed(() => user.value?.role?.name ?? 'admin')
 const permissionsCount = computed(() => user.value?.role?.permissions?.length ?? 0)
-
-function renderIcon(icon: unknown) {
-  return () => h(NIcon, null, { default: () => h(icon as never) })
-}
 
 function syncProfileForm() {
   if (!user.value) return
@@ -215,7 +211,7 @@ onMounted(async () => {
               {{ profileForm.phone || 'Chưa cập nhật' }}
             </n-descriptions-item>
             <n-descriptions-item label="Ngày sinh">
-              {{ profileForm.date_of_birth || 'Chưa cập nhật' }}
+              {{ formatDate(profileForm.date_of_birth) || 'Chưa cập nhật' }}
             </n-descriptions-item>
           </n-descriptions>
         </n-card>

@@ -8,11 +8,14 @@ import { useUser } from '../../composables/useUser'
 import { useRole } from '../../composables/useRole'
 import UserFormModal from './components/UserFormModal.vue'
 import type { User } from '../../types/user.type'
-import { formatDate } from '@/shared/utils/formatDate'
+import { formatDateTime } from '@/shared/utils/formatDate'
 import { userService } from '../../services/user.service'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchUsers } = useUser()
 const { data: roleData, fetchRoles } = useRole()
+const { can } = useAdminPermission()
 const message = useMessage()
 const route = useRoute()
 const showModal = ref(false)
@@ -26,6 +29,8 @@ const customerRole = computed(() =>
 )
 const pageTitle = computed(() => (isCustomerScope.value ? 'khách hàng' : 'nhân sự'))
 const createButtonLabel = computed(() => (isCustomerScope.value ? '+ Tạo khách hàng' : '+ Tạo nhân sự'))
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.USERS, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.USERS, ADMIN_ACTIONS.UPDATE))
 
 function getGenderMeta(gender?: User['gender']) {
   if (gender === 'male') return { label: 'Nam', type: 'info' as const }
@@ -151,13 +156,13 @@ function createColumns(): DataTableColumns<User> {
       title: 'Ngày tạo',
       key: 'created_at',
       width: 150,
-      render: (row) => h('span', formatDate(row.created_at)),
+      render: (row) => h('span', formatDateTime(row.created_at)),
     },
     {
       title: 'Cập nhật',
       key: 'updated_at',
       width: 150,
-      render: (row) => h('span', formatDate(row.updated_at)),
+      render: (row) => h('span', formatDateTime(row.updated_at)),
     },
     {
       title: 'Thao tác',
@@ -166,26 +171,30 @@ function createColumns(): DataTableColumns<User> {
       fixed: 'right',
       render: (row) =>
         h('div', { style: 'display:flex;justify-content:flex-end;gap:8px' }, [
-          h(
-            NButton,
-            {
-              size: 'small',
-              type: Boolean(row.is_active) ? 'warning' : 'success',
-              secondary: true,
-              onClick: () => handleToggleStatus(row),
-            },
-            { default: () => (Boolean(row.is_active) ? 'Lock' : 'Unlock') },
-          ),
-          h(
-            NButton,
-            {
-              size: 'small',
-              type: 'primary',
-              secondary: true,
-              onClick: () => openEditModal(row),
-            },
-            { default: () => 'Edit' },
-          ),
+          ...(canUpdate.value
+            ? [
+                h(
+                  NButton,
+                  {
+                    size: 'small',
+                    type: Boolean(row.is_active) ? 'warning' : 'success',
+                    secondary: true,
+                    onClick: () => handleToggleStatus(row),
+                  },
+                  { default: () => (Boolean(row.is_active) ? 'Lock' : 'Unlock') },
+                ),
+                h(
+                  NButton,
+                  {
+                    size: 'small',
+                    type: 'primary',
+                    secondary: true,
+                    onClick: () => openEditModal(row),
+                  },
+                  { default: () => 'Edit' },
+                ),
+              ]
+            : []),
         ]),
     },
   ]
@@ -291,7 +300,7 @@ onMounted(fetchRoles)
         clearable
       />
     </n-space>
-    <n-button type="primary" @click="openCreateModal">{{ createButtonLabel }}</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">{{ createButtonLabel }}</n-button>
   </n-space>
 
   <n-data-table

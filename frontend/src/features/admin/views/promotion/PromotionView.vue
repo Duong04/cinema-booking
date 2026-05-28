@@ -5,10 +5,13 @@ import { NButton, useDialog, useMessage } from 'naive-ui'
 import { Search as SearchIcon } from '@vicons/ionicons5'
 import { usePromotion } from '@/features/admin/composables/usePromotion'
 import type { Promotion } from '@/features/admin/types/promotion.type'
-import { formatDate } from '@/shared/utils/formatDate'
+import { formatDateTime } from '@/shared/utils/formatDate'
 import PromotionFormModal from './components/PromotionFormModal.vue'
+import { useAdminPermission } from '@/features/admin/composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchPromotions, deletePromotion } = usePromotion()
+const { can } = useAdminPermission()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -17,6 +20,9 @@ const selectedPromotion = ref<Promotion | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.PROMOTIONS, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.PROMOTIONS, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.PROMOTIONS, ADMIN_ACTIONS.DELETE))
 
 const statusOptions = [
   { label: 'Hoạt động', value: 'active' },
@@ -89,7 +95,7 @@ function createColumns(): DataTableColumns<Promotion> {
     {
       title: 'Hiệu lực',
       key: 'duration',
-      render: (row) => h('span', `${formatDate(row.start_date)} - ${formatDate(row.end_date)}`),
+      render: (row) => h('span', `${formatDateTime(row.start_date)} - ${formatDateTime(row.end_date)}`),
     },
     {
       title: 'Limit',
@@ -101,16 +107,24 @@ function createColumns(): DataTableColumns<Promotion> {
       key: 'actions',
       render: (row) =>
         h('div', { style: 'display: flex; gap: 8px' }, [
-          h(
-            NButton,
-            { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
-            { default: () => 'Edit' },
-          ),
-          h(
-            NButton,
-            { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
-            { default: () => 'Delete' },
-          ),
+          ...(canUpdate.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
+                  { default: () => 'Edit' },
+                ),
+              ]
+            : []),
+          ...(canDelete.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
+                  { default: () => 'Delete' },
+                ),
+              ]
+            : []),
         ]),
     },
   ]
@@ -201,12 +215,12 @@ onMounted(fetchPromotions)
         style="width: 200px"
       />
 
-      <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
+      <n-button v-if="hasChecked && canDelete" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
 
-    <n-button type="primary" @click="openCreateModal">+ Tạo mã</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">+ Tạo mã</n-button>
   </n-space>
 
   <n-data-table

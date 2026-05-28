@@ -39,10 +39,17 @@ export interface UserRole {
   permissions: Permision[]
 }
 
+export interface PermissionAction {
+  id: string
+  key: string
+  name: string
+}
+
 export interface Permision {
   id: string
   key: string
   name: string
+  actions?: PermissionAction[]
 }
 
 export interface LoginPayload {

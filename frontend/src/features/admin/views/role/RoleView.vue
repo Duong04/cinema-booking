@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRole } from '../../composables/useRole'
 import RoleFormModal from './components/RoleFormModal.vue'
 import type { Role } from '../../types/role.type'
 import { Search as SearchIcon, TrashOutline } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { useMessage, useDialog } from 'naive-ui'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchRoles, deleteRole } = useRole()
+const { can } = useAdminPermission()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -15,6 +18,9 @@ const showModal = ref(false)
 const selectedRole = ref<Role | null>(null)
 
 const visibleAvatarCount = 3
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.ROLES, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.ROLES, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.ROLES, ADMIN_ACTIONS.DELETE))
 
 function openCreateModal() {
   selectedRole.value = null
@@ -73,7 +79,7 @@ onMounted(fetchRoles)
         </template>
       </n-input>
     </n-space>
-    <n-button type="primary" @click="openCreateModal">+ Tạo vai trò</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">+ Tạo vai trò</n-button>
   </n-space>
 
   <n-spin :show="loading">
@@ -120,11 +126,11 @@ onMounted(fetchRoles)
           <p v-if="role.description">{{ role.description }}</p>
         </div>
 
-        <div class="role-card__footer">
-          <button class="role-card__edit" type="button" @click="openEditModal(role)">
+        <div v-if="canUpdate || canDelete" class="role-card__footer">
+          <button v-if="canUpdate" class="role-card__edit" type="button" @click="openEditModal(role)">
             Edit Role
           </button>
-          <button class="role-card__delete" type="button" @click="handleDelete(role)">
+          <button v-if="canDelete" class="role-card__delete" type="button" @click="handleDelete(role)">
             <n-icon size="24">
               <TrashOutline />
             </n-icon>

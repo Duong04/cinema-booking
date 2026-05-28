@@ -9,10 +9,13 @@ import ShowtimeFormModal from './components/ShowtimeFormModal.vue'
 import ShowtimeSeatOverviewModal from './components/ShowtimeSeatOverviewModal.vue'
 import type { Showtime, Status } from '../../types/showtime.type'
 import { Search as SearchIcon } from '@vicons/ionicons5'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchShowtimes, deleteShowtime } = useShowtime()
 const { data: movieData, fetchMovies } = useMovie()
 const { data: roomData, fetchRooms } = useRoom()
+const { can } = useAdminPermission()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -23,6 +26,9 @@ const selectedSeatOverviewShowtime = ref<Showtime | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.SHOWTIMES, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.SHOWTIMES, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.SHOWTIMES, ADMIN_ACTIONS.DELETE))
 
 const STATUS_MAP: Record<
   Status,
@@ -153,16 +159,24 @@ function createColumns(): DataTableColumns<Showtime> {
                 { size: 'small', type: 'info', secondary: true, onClick: () => openSeatOverview(row) },
                 { default: () => 'Seat' },
               ),
-              h(
-                NButton,
-                { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
-                { default: () => 'Edit' },
-              ),
-              h(
-                NButton,
-                { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
-                { default: () => 'Delete' },
-              ),
+              ...(canUpdate.value
+                ? [
+                    h(
+                      NButton,
+                      { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
+                      { default: () => 'Edit' },
+                    ),
+                  ]
+                : []),
+              ...(canDelete.value
+                ? [
+                    h(
+                      NButton,
+                      { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
+                      { default: () => 'Delete' },
+                    ),
+                  ]
+                : []),
             ],
           },
         ),
@@ -278,11 +292,11 @@ onMounted(() => {
         clearable
         style="width: 180px"
       />
-      <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
+      <n-button v-if="hasChecked && canDelete" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
-    <n-button type="primary" @click="openCreateModal">+ Tạo suất chiếu</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">+ Tạo suất chiếu</n-button>
   </n-space>
 
   <n-data-table
