@@ -6,6 +6,7 @@ interface SeatRepositoryInterface extends BaseRepositoryInterface
 {
     public function paginate($limit = 15, $q);
     public function getSeatByRoom($roomId);
+    public function getSeatsByRoom(string $roomId);
     public function insert($data);
     public function checkRoomId($roomId);
     public function getKeyById(array $seatIds, array $with = []);

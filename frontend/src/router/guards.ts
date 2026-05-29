@@ -13,9 +13,6 @@ export const authGuard = async (
     await authStore.fetchMe() 
   }
 
-  console.log('Auth Guard After Fetch:', to.meta.guestOnly, authStore.isLoggedIn)
-
-  // Bây giờ isLoggedIn đã chính xác
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: 'login', query: { redirect: to.fullPath } })
     return
@@ -36,7 +33,7 @@ export const adminGuard = (
 ) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+  if (to.meta.requiresAdmin && authStore.isClient) {
     next({ name: 'home' }) 
     return
   }

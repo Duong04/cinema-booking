@@ -9,7 +9,7 @@ export function useRole() {
   const filters = reactive({ search: '' })
   const pagination = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [3, 5, 7],

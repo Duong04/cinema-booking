@@ -5,12 +5,15 @@ import { NButton } from 'naive-ui'
 import { useCity } from '../../composables/useCity'
 import CityFormModal from './components/CityFormModal.vue'
 import type { City } from '../../types/city.type'
-import { formatDate } from '@/shared/utils/formatDate'
+import { formatDateTime } from '@/shared/utils/formatDate'
 import { Search as SearchIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { useMessage, useDialog } from 'naive-ui'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchCities, deleteCity } = useCity()
+const { can } = useAdminPermission()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -19,36 +22,52 @@ const selectedCity = ref<City | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.CINEMAS, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.CINEMAS, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.CINEMAS, ADMIN_ACTIONS.DELETE))
 
 function createColumns(): DataTableColumns<City> {
   return [
     { type: 'selection' },
     { title: 'Name', key: 'name' },
     {
+      title: 'Coordinates',
+      key: 'coordinates',
+      render: (row) => h('span', row.latitude != null && row.longitude != null ? `${row.latitude}, ${row.longitude}` : '—'),
+    },
+    {
       title: 'Created At',
       key: 'created_at',
-      render: (row) => h('span', formatDate(row.created_at)),
+      render: (row) => h('span', formatDateTime(row.created_at)),
     },
     {
       title: 'Updated At',
       key: 'updated_at',
-      render: (row) => h('span', formatDate(row.updated_at)),
+      render: (row) => h('span', formatDateTime(row.updated_at)),
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (row) =>
         h('div', { style: 'display: flex; gap: 8px' }, [
-          h(
-            NButton,
-            { size: 'small', type: 'primary', onClick: () => openEditModal(row) },
-            { default: () => 'Edit' },
-          ),
-          h(
-            NButton,
-            { size: 'small', type: 'error', onClick: () => handleDelete(row) },
-            { default: () => 'Delete' },
-          ),
+          ...(canUpdate.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
+                  { default: () => 'Edit' },
+                ),
+              ]
+            : []),
+          ...(canDelete.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
+                  { default: () => 'Delete' },
+                ),
+              ]
+            : []),
         ]),
     },
   ]
@@ -112,7 +131,7 @@ onMounted(fetchCities)
     <n-space>
       <n-input
         v-model:value="filters.search"
-        placeholder="Search by name..."
+        placeholder="Tìm kiếm theo tên..."
         clearable
         style="width: 300px"
       >
@@ -123,14 +142,14 @@ onMounted(fetchCities)
         </template>
       </n-input>
       <n-button
-        v-if="hasChecked"
+        v-if="hasChecked && canDelete"
         type="error"
         @click="handleDeleteMultiple"
       >
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
-    <n-button type="primary" @click="openCreateModal">+ Tạo thành phố</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">+ Tạo thành phố</n-button>
   </n-space>
 
   <n-data-table

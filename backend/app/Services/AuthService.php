@@ -5,14 +5,15 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Mail\VerifyEmailMail;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\Facades\Mail;
-use Str;
-use Auth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthService {
-    private $userRepository;
-    public function __construct(UserRepositoryInterface $userRepository)
-    {
-        $this->userRepository = $userRepository;
+    public function __construct(
+        private UserRepositoryInterface $userRepository,
+        private MembershipService $membershipService
+    ) {
     }
 
     public function register(array $data)
@@ -22,7 +23,12 @@ class AuthService {
         $data['token_expired_at'] = now()->addHours(24);
         $data['role_id'] = '019d06bd-ff12-71c8-8234-aa2cc7733011';
 
-        $user = $this->userRepository->create($data);
+        $user = DB::transaction(function () use ($data) {
+            $user = $this->userRepository->create($data);
+            $this->membershipService->createDefaultForUser($user->id);
+
+            return $user;
+        });
 
         Mail::to($user->email)->queue(new VerifyEmailMail($user));
 

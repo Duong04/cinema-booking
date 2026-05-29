@@ -9,7 +9,7 @@ export function useRoom() {
   const filters = reactive({ search: '', cinema_id: null })
   const pagination = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [3, 5, 7],

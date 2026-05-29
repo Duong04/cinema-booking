@@ -18,9 +18,10 @@ class CinemaRepository extends BaseRepository implements CinemaRepositoryInterfa
             ->with(['city:id,name', 'cinemaChain:id,name,logo'])
             ->when(
                 $q,
-                fn($query) => $query
-                    ->where('name', 'like', "%$q%")
-                    ->orWhere('address', 'like', "%$q%")
+                fn($query) => $query->where(function ($query) use ($q) {
+                    $query->where('name', 'like', "%$q%")
+                        ->orWhere('address', 'like', "%$q%");
+                })
             )
             ->when($cityId, fn($query) => $query->where('city_id', $cityId))
             ->when($cinemaChainId, fn($query) => $query->where('cinema_chain_id', $cinemaChainId));

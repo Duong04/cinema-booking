@@ -15,11 +15,10 @@ class CinemaChainController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $cinemaChainService;
 
-    public function __construct(CinemaChainService $cinemaChainService)
-    {
-        $this->cinemaChainService = $cinemaChainService;
+    public function __construct(
+        private CinemaChainService $cinemaChainService
+    ) {
     }
 
     #[OA\Get(
@@ -113,6 +112,31 @@ class CinemaChainController extends Controller
     {
         $query = $request->validated();
         $limit = $query['limit'] ?? 15;
+        $q = $query['q'] ?? null;
+
+        $cinemaChains = $this->cinemaChainService->paginate($limit, $q);
+
+        return $this->successList($cinemaChains->items(), $this->paginationMeta($cinemaChains));
+    }
+
+    #[OA\Get(
+        path: "/api/v1/public/cinema-chains",
+        summary: "Get public cinema chain list",
+        tags: ["Public"],
+        parameters: [
+            new OA\Parameter(name: "limit", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 100)),
+            new OA\Parameter(name: "page", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 1)),
+            new OA\Parameter(name: "q", in: "query", required: false, description: "Search by cinema chain name", schema: new OA\Schema(type: "string", example: "CGV")),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Public cinema chain list retrieved successfully"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
+    public function getAll(QueryRequest $request)
+    {
+        $query = $request->validated();
+        $limit = $query['limit'] ?? 100;
         $q = $query['q'] ?? null;
 
         $cinemaChains = $this->cinemaChainService->paginate($limit, $q);

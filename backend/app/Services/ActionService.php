@@ -5,12 +5,11 @@ use App\Repositories\Action\ActionRepositoryInterface;
 use App\Repositories\PermissionAction\PermissionActionRepositoryInterface;
 
 class ActionService {
-    private $actionRepository;
-    private $permissionActionRepository;
 
-    public function __construct(ActionRepositoryInterface $actionRepository, PermissionActionRepositoryInterface $permissionActionRepository) {
-        $this->actionRepository = $actionRepository;
-        $this->permissionActionRepository = $permissionActionRepository;
+    public function __construct(
+        private ActionRepositoryInterface $actionRepository, 
+        private PermissionActionRepositoryInterface $permissionActionRepository
+    ) {
     }
 
     public function paginate($limit) {
@@ -20,44 +19,64 @@ class ActionService {
     }
 
     public function create($data) {
-        $action = $this->actionRepository->create($data);
+        $action = $this->actionRepository->create($this->actionPayload($data));
 
-        if (isset($data['permissions'])) {
-            foreach ($data['permissions'] as $item) {
-                $this->permissionActionRepository->create([
-                    'action_id' => $action->id,
-                    'permission_id' => $item['permission_id'],
-                ]);
-            }
+        $rows = $this->mapActionPermissions($data, $action->id);
+
+        if (! empty($rows)) {
+            $this->permissionActionRepository->insert($rows);
         }
 
-        return $action;
+        return $action->fresh('permissions');
     }
 
     public function find($id) {
-        $action = $this->actionRepository->find($id);
+        $action = $this->actionRepository->find($id, ['*'], ['permissions']);
 
         return $action;
     }
 
     public function update($id, $data) {
-        $action = $this->actionRepository->update($id, $data);
+        $action = $this->actionRepository->update($id, $this->actionPayload($data));
 
         if (isset($data['permissions'])) {
             $this->permissionActionRepository->deleteByCol('action_id', $id);
-            foreach ($data['permissions'] as $item) {
-                $this->permissionActionRepository->create([
-                    'action_id' => $id,
-                    'permission_id' => $item['permission_id'],
-                ]);
+
+            $rows = $this->mapActionPermissions($data, $id);
+
+            if (! empty($rows)) {
+                $this->permissionActionRepository->insert($rows);
             }
         }
 
-        return $action;
+        return $action->fresh('permissions');
     }
 
     public function delete($id) {
         return $this->actionRepository->delete($id);
+    }
+
+    private function actionPayload(array $data): array
+    {
+        return collect($data)
+            ->only(['name', 'key'])
+            ->toArray();
+    }
+
+    private function mapActionPermissions(array $data, string $actionId): array
+    {
+        if (empty($data['permissions'])) {
+            return [];
+        }
+
+        return collect($data['permissions'])
+            ->unique('permission_id')
+            ->map(fn($item) => [
+                'action_id' => $actionId,
+                'permission_id' => $item['permission_id'],
+            ])
+            ->values()
+            ->toArray();
     }
 
 }

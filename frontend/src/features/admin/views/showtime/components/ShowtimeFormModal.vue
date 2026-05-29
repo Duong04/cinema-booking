@@ -3,6 +3,7 @@ import { ref, reactive, computed, watch, nextTick } from 'vue'
 import type { FormInst, FormRules, SelectOption } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { showtimeService } from '@/features/admin/services/showtime.service'
+import { seatTypeService } from '@/features/admin/services/seat-type.service'
 import { ApiError } from '@/plugins/axios'
 import type { Showtime, Prices } from '@/features/admin/types/showtime.type'
 import type { SeatType } from '@/features/admin/types/seat-type.type'
@@ -56,6 +57,9 @@ const seatTypeOptions = computed(() =>
 )
 
 const usedSeatTypeIds = computed(() => formData.prices.map((p) => p.seat_type_id).filter(Boolean))
+const canAddPriceRow = computed(
+  () => !loadingOptions.value && seatTypes.value.length > 0 && formData.prices.length < seatTypes.value.length,
+)
 
 function getSeatTypeOptionsForRow(index: number) {
   const currentId = formData.prices[index]?.seat_type_id
@@ -79,6 +83,7 @@ function clearFieldError(field: string) {
 }
 
 function addPriceRow() {
+  if (!canAddPriceRow.value) return
   formData.prices.push({ seat_type_id: '', price: null })
 }
 
@@ -150,7 +155,6 @@ async function handleSubmit() {
   }
 }
 
-// '2026-04-04 10:00:00' → 'HH:mm'
 function parseTime(datetimeStr?: string | null): string | null {
   if (!datetimeStr) return null
   const timePart = datetimeStr.split(' ')[1]
@@ -166,12 +170,26 @@ function resetForm() {
   formData.prices = []
 }
 
+async function fetchSeatTypes() {
+  if (seatTypes.value.length > 0 || loadingOptions.value) return
+
+  loadingOptions.value = true
+  try {
+    const res = await seatTypeService.getAllSeatTypes({ limit: 100 })
+    seatTypes.value = res.data
+  } catch {
+    message.error('Không tải được danh sách loại ghế')
+  } finally {
+    loadingOptions.value = false
+  }
+}
+
 function syncFormWithProps() {
   if (props.showtime) {
     isEdit.value = true
     formData.movie_id = props.showtime.movie_id
     formData.room_id = props.showtime.room_id
-    formData.show_date = props.showtime.show_date // 'YYYY-MM-DD'
+    formData.show_date = props.showtime.show_date 
     formData.start_time = parseTime(props.showtime.start_time)
     formData.base_price = Number(props.showtime.base_price)
     formData.prices = (props.showtime.prices ?? []).map((p) => ({
@@ -188,6 +206,9 @@ function syncFormWithProps() {
 }
 
 watch(() => props.showtime, syncFormWithProps, { immediate: true })
+watch(showModal, (visible) => {
+  if (visible) fetchSeatTypes()
+})
 </script>
 
 <template>
@@ -334,10 +355,11 @@ watch(() => props.showtime, syncFormWithProps, { immediate: true })
         <n-button
           dashed
           block
-          :disabled="formData.prices.length >= seatTypes.length"
+          :loading="loadingOptions"
+          :disabled="!canAddPriceRow"
           @click="addPriceRow"
         >
-          + Thêm giá loại ghế
+          {{ seatTypes.length === 0 && !loadingOptions ? 'Chưa có loại ghế' : '+ Thêm giá loại ghế' }}
         </n-button>
       </n-form>
     </n-spin>

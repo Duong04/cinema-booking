@@ -8,12 +8,11 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SeatService {
-    private $seatRepository;
-    private $roomRepository;
 
-    public function __construct(SeatRepositoryInterface $seatRepository, RoomRepositoryInterface $roomRepository) {
-        $this->seatRepository = $seatRepository;
-        $this->roomRepository = $roomRepository;
+    public function __construct(
+        private SeatRepositoryInterface $seatRepository,
+        private RoomRepositoryInterface $roomRepository
+    ) {
     }
 
     public function getSeatByRoom($roomId) {

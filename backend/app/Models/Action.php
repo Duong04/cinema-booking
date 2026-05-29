@@ -19,4 +19,9 @@ class Action extends Model
     public function permissionActions() {
         return $this->hasMany(PermissionAction::class, 'action_id');
     }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'permission_actions', 'action_id', 'permission_id');
+    }
 }

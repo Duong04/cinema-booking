@@ -23,4 +23,9 @@ class Payment extends Model
         'refunded_amount',
         'refund_status',
     ];
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
 }

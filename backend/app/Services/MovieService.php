@@ -3,21 +3,28 @@ namespace App\Services;
 
 use App\Repositories\Movie\MovieRepositoryInterface;
 use App\Repositories\MovieGenre\MovieGenreRepositoryInterface;
-use Str;
+use Illuminate\Support\Str;
 
 class MovieService {
-    private $movieRepository;
-    private $movieGenreRepository;
 
-    public function __construct(MovieRepositoryInterface $movieRepository, MovieGenreRepositoryInterface $movieGenreRepository) {
-        $this->movieRepository = $movieRepository;
-        $this->movieGenreRepository = $movieGenreRepository;
+    public function __construct(
+        private MovieRepositoryInterface $movieRepository,
+        private MovieGenreRepositoryInterface $movieGenreRepository
+    ) {
     }
 
     public function paginate($limit, $q, $status) {
         $movies = $this->movieRepository->paginate($limit, $q, $status);
 
         return $movies;
+    }
+
+    public function getPublicMovies($limit, $q, $status, $sort, $period, $genreId) {
+        return $this->movieRepository->getPublicMovies($limit, $q, $status, $sort, $period, $genreId);
+    }
+
+    public function findPublicBySlug($slug) {
+        return $this->movieRepository->findBySlug($slug);
     }
 
     public function create($data) {

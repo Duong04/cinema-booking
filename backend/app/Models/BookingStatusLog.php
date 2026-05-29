@@ -9,6 +9,8 @@ class BookingStatusLog extends Model
 {
     use UsesUuidV7; 
     protected $table = 'booking_status_logs';
+    public $timestamps = false;
+
     protected $fillable = [
         'booking_id',
         'old_status',

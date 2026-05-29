@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick } from 'vue'
+import { computed, ref, reactive, watch, nextTick } from 'vue'
 import type { FormInst, FormRules } from 'naive-ui'
 import { useMessage } from 'naive-ui'
+import { Checkmark } from '@vicons/ionicons5'
 import { roleService } from '@/features/admin/services/role.service'
+import { permissionService } from '@/features/admin/services/permission.service'
 import { ApiError } from '@/plugins/axios'
-import type { Role } from '@/features/admin/types/role.type'
+import type { Role, RolePayload } from '@/features/admin/types/role.type'
+import type { Permission } from '@/features/admin/types/permission.type'
 
 interface RoleForm {
   name: string
@@ -23,7 +26,9 @@ const message = useMessage()
 const showModal = defineModel<boolean>('show')
 const formRef = ref<FormInst | null>(null)
 const formLoading = ref(false)
+const permissionLoading = ref(false)
 const isEdit = ref(false)
+const allPermissions = ref<Permission[]>([])
 
 const formData = reactive<RoleForm>({
   name: '',
@@ -31,6 +36,28 @@ const formData = reactive<RoleForm>({
 })
 
 const backendErrors = reactive<Record<string, string>>({})
+const selectedActionIdsByPermission = reactive<Record<string, string[]>>({})
+
+const actionColumns = computed(() => {
+  const actions = allPermissions.value.flatMap((permission) => permission.actions ?? [])
+  const uniqueActions = new Map<string, { id: string; name: string }>()
+
+  actions.forEach((action) => {
+    uniqueActions.set(action.id, {
+      id: action.id,
+      name: action.name,
+    })
+  })
+
+  return Array.from(uniqueActions.values())
+})
+
+const permissionRows = computed(() =>
+  allPermissions.value.map((permission) => ({
+    ...permission,
+    allowedActionIds: new Set((permission.actions ?? []).map((action) => action.id)),
+  })),
+)
 
 const formRules: FormRules = {
   name: [
@@ -45,19 +72,96 @@ function clearFieldError(field: keyof RoleForm) {
   }
 }
 
-function syncFormWithProps() {
+function resetPermissionSelection() {
+  Object.keys(selectedActionIdsByPermission).forEach((permissionId) => {
+    delete selectedActionIdsByPermission[permissionId]
+  })
+}
+
+function setSelectedPermissions(role: Role) {
+  resetPermissionSelection()
+
+  role.permissions?.forEach((permission) => {
+    selectedActionIdsByPermission[permission.id] = permission.actions.map((action) => action.id)
+  })
+}
+
+async function loadPermissionMatrix() {
+  if (allPermissions.value.length) return
+
+  permissionLoading.value = true
+  try {
+    const permissionRes = await permissionService.getAllPermissions({ limit: 100 })
+
+    allPermissions.value = permissionRes.data
+    allPermissions.value.forEach((permission) => {
+      selectedActionIdsByPermission[permission.id] ??= []
+    })
+  } finally {
+    permissionLoading.value = false
+  }
+}
+
+async function syncFormWithProps() {
+  await loadPermissionMatrix()
+
   if (props.role) {
     isEdit.value = true
     formData.name = props.role.name
     formData.description = props.role.description ?? ''
+    setSelectedPermissions(props.role)
   } else {
     isEdit.value = false
     formData.name = ''
     formData.description = ''
+    resetPermissionSelection()
   }
   
   Object.keys(backendErrors).forEach((key) => delete backendErrors[key])
   nextTick(() => formRef.value?.restoreValidation())
+}
+
+function selectAllActions(permissionId: string) {
+  const permission = allPermissions.value.find((item) => item.id === permissionId)
+  selectedActionIdsByPermission[permissionId] = permission?.actions?.map((action) => action.id) ?? []
+}
+
+function clearActions(permissionId: string) {
+  selectedActionIdsByPermission[permissionId] = []
+}
+
+function togglePermissionActions(permissionId: string) {
+  const current = selectedActionIdsByPermission[permissionId] ?? []
+  const permission = allPermissions.value.find((item) => item.id === permissionId)
+  const availableActionIds = permission?.actions?.map((action) => action.id) ?? []
+
+  selectedActionIdsByPermission[permissionId] =
+    current.length === availableActionIds.length ? [] : availableActionIds
+}
+
+function selectAllPermissions() {
+  allPermissions.value.forEach((permission) => {
+    selectedActionIdsByPermission[permission.id] = permission.actions?.map((action) => action.id) ?? []
+  })
+}
+
+function clearAllPermissions() {
+  allPermissions.value.forEach((permission) => {
+    selectedActionIdsByPermission[permission.id] = []
+  })
+}
+
+function buildPayload(): RolePayload {
+  return {
+    name: formData.name,
+    description: formData.description || undefined,
+    permissions: Object.entries(selectedActionIdsByPermission)
+      .filter(([, actionIds]) => actionIds.length > 0)
+      .map(([permissionId, actionIds]) => ({
+        id: permissionId,
+        actions: actionIds.map((actionId) => ({ id: actionId })),
+      })),
+  }
 }
 
 async function handleSubmit() {
@@ -67,13 +171,13 @@ async function handleSubmit() {
     formLoading.value = true
     Object.keys(backendErrors).forEach((k) => delete backendErrors[k])
 
-    const payload = { ...formData }
+    const payload = buildPayload()
 
     if (isEdit.value && props.role?.id) {
-      await roleService.updateRole(props.role.id, payload as Role)
+      await roleService.updateRole(props.role.id, payload)
       message.success('Cập nhật vai trò thành công')
     } else {
-      await roleService.createRole(payload as Role)
+      await roleService.createRole(payload)
       message.success('Tạo vai trò mới thành công')
     }
 
@@ -93,7 +197,13 @@ async function handleSubmit() {
   }
 }
 
-watch(() => props.role, syncFormWithProps, { immediate: true })
+watch(
+  () => [props.role?.id, showModal.value],
+  () => {
+    if (showModal.value) syncFormWithProps()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -102,7 +212,7 @@ watch(() => props.role, syncFormWithProps, { immediate: true })
     preset="dialog"
     :title="isEdit ? 'Chỉnh sửa vai trò' : 'Tạo vai trò mới'"
     :show-icon="false"
-    style="width: 550px"
+    style="width: min(980px, 92vw)"
     @after-leave="syncFormWithProps" 
   >
     <n-form
@@ -140,6 +250,85 @@ watch(() => props.role, syncFormWithProps, { immediate: true })
           @input="clearFieldError('description')"
         />
       </n-form-item>
+
+      <section class="permission-section">
+        <div class="permission-section__header">
+          <div class="permission-section__label">
+            Phân quyền theo hành động
+          </div>
+
+          <n-space size="small">
+            <n-button size="small" tertiary @click="selectAllPermissions">
+              Chọn tất cả
+            </n-button>
+            <n-button size="small" tertiary @click="clearAllPermissions">
+              Bỏ chọn tất cả
+            </n-button>
+          </n-space>
+        </div>
+
+        <n-spin :show="permissionLoading">
+          <div class="permission-panel">
+            <n-empty
+              v-if="!allPermissions.length || !actionColumns.length"
+              description="Chưa có quyền để phân quyền"
+            />
+
+            <div
+              v-else
+              class="permission-table"
+              :style="{ '--action-count': actionColumns.length }"
+            >
+              <div class="permission-table__head">
+                <div class="permission-table__permission">Permission</div>
+                <div
+                  v-for="action in actionColumns"
+                  :key="action.id"
+                  class="permission-table__action"
+                >
+                  {{ action.name }}
+                </div>
+                <div class="permission-table__quick"></div>
+              </div>
+
+              <div
+                v-for="permission in permissionRows"
+                :key="permission.id"
+                class="permission-row"
+              >
+                <div class="permission-row__name">
+                  <p>{{ permission.name }}</p>
+                  <span>{{ permission.key }}</span>
+                </div>
+
+                <div
+                  v-for="action in actionColumns"
+                  :key="action.id"
+                  class="permission-row__action"
+                >
+                  <n-checkbox-group
+                    v-if="permission.allowedActionIds.has(action.id)"
+                    v-model:value="selectedActionIdsByPermission[permission.id]"
+                  >
+                    <n-checkbox :value="action.id" />
+                  </n-checkbox-group>
+                  <span v-else class="permission-row__disabled">-</span>
+                </div>
+
+                <button
+                  class="permission-row__quick"
+                  type="button"
+                  @click="togglePermissionActions(permission.id)"
+                >
+                  <n-icon size="18">
+                    <Checkmark />
+                  </n-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </n-spin>
+      </section>
     </n-form>
 
     <template #action>
@@ -156,3 +345,142 @@ watch(() => props.role, syncFormWithProps, { immediate: true })
     </template>
   </n-modal>
 </template>
+
+<style scoped>
+.permission-section {
+  width: 100%;
+  margin-top: 2px;
+}
+
+.permission-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.permission-section__label {
+  color: var(--n-label-text-color);
+  font-size: var(--n-label-font-size);
+  font-weight: var(--n-label-font-weight);
+}
+
+.permission-section :deep(.n-spin-container),
+.permission-section :deep(.n-spin-content) {
+  width: 100%;
+}
+
+.permission-panel {
+  width: 100%;
+  max-height: 420px;
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.permission-panel::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.permission-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.permission-panel::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.permission-table {
+  min-width: 760px;
+}
+
+.permission-table__head,
+.permission-row {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.4fr) repeat(var(--action-count), minmax(92px, 1fr)) 40px;
+  align-items: center;
+  column-gap: 14px;
+}
+
+.permission-table__head {
+  min-height: 42px;
+  padding: 0 12px;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--n-text-color-disabled);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.permission-row {
+  min-height: 64px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.permission-row:last-child {
+  border-bottom: 0;
+}
+
+.permission-row__name {
+  min-width: 0;
+}
+
+.permission-row__name p {
+  margin: 0;
+  color: var(--n-text-color);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.permission-row__name span {
+  display: block;
+  margin-top: 2px;
+  color: var(--n-text-color-disabled);
+  font-size: 12px;
+  word-break: break-word;
+}
+
+.permission-table__action,
+.permission-row__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.permission-row__disabled {
+  color: var(--n-text-color-disabled);
+}
+
+.permission-row__quick {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  color: var(--n-text-color-disabled);
+  background: transparent;
+  cursor: pointer;
+}
+
+.permission-row__quick:hover {
+  color: var(--n-primary-color);
+  background: rgba(148, 163, 184, 0.12);
+}
+
+@media (max-width: 640px) {
+  .permission-section__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+</style>

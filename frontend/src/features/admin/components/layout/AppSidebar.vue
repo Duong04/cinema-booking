@@ -1,6 +1,37 @@
 <script setup lang="ts">
 import { NMenu, NText } from 'naive-ui'
+import { computed } from 'vue'
 import { menuOptions, handleMenuSelect } from '../../configs/menu.config'
+import type { AdminMenuOption } from '../../configs/menu.config'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+
+const { hasPermission } = useAdminPermission()
+
+const canShowMenuItem = (option: AdminMenuOption) => {
+  if (!option.permissionKey) {
+    return true
+  }
+
+  return hasPermission(option.permissionKey)
+}
+
+const filterMenuOptionsByPermission = (options: AdminMenuOption[]): AdminMenuOption[] => {
+  return options.reduce<AdminMenuOption[]>((visibleOptions, option) => {
+    const children = option.children ? filterMenuOptionsByPermission(option.children) : undefined
+    const isVisible = canShowMenuItem(option) && (!option.children || children?.length)
+
+    if (isVisible) {
+      visibleOptions.push({
+        ...option,
+        ...(children ? { children } : {}),
+      })
+    }
+
+    return visibleOptions
+  }, [])
+}
+
+const visibleMenuOptions = computed(() => filterMenuOptionsByPermission(menuOptions))
 </script>
 
 <template>
@@ -36,7 +67,7 @@ import { menuOptions, handleMenuSelect } from '../../configs/menu.config'
     </div>
 
     <div style="flex: 1; padding: 8px">
-      <n-menu :options="menuOptions" @update:value="handleMenuSelect" />
+      <n-menu :options="visibleMenuOptions" @update:value="handleMenuSelect" />
     </div>
   </div>
 </template>

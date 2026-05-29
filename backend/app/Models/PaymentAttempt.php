@@ -10,6 +10,7 @@ class PaymentAttempt extends Model
     use UsesUuidV7;
 
     protected $table = 'payment_attempts';
+    public $timestamps = false;
 
     protected $fillable = [
         'booking_id',

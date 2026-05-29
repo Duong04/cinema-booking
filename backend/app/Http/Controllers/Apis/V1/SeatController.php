@@ -13,11 +13,10 @@ use OpenApi\Attributes as OA;
 class SeatController extends Controller
 {
     use ResponseHelper;
-    private $seatService;
 
-    public function __construct(SeatService $seatService)
-    {
-        $this->seatService = $seatService;
+    public function __construct(
+        private SeatService $seatService
+    ) {
     }
     #[OA\Get(
         path: "/api/v1/rooms/{id}/seats",

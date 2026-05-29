@@ -8,11 +8,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SeatHoldService
 {
-    protected $seatHoldRepository;
 
-    public function __construct(SeatHoldRepositoryInterface $seatHoldRepository)
-    {
-        $this->seatHoldRepository = $seatHoldRepository;
+    public function __construct(
+        private SeatHoldRepositoryInterface $seatHoldRepository
+    ) {
     }
 
     public function getListShowtime(string $showtimeId)
@@ -25,7 +24,7 @@ class SeatHoldService
         $user      = auth()->user();
         $showtimeId = $data['showtime_id'];
         $seatIds    = $data['seat_ids'];
-        $expiredAt  = now()->addMinutes(15);
+        $expiredAt  = now()->addMinutes(10);
  
         try {
             DB::beginTransaction();

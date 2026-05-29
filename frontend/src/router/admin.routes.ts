@@ -2,12 +2,36 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const adminRoutes: RouteRecordRaw[] = [
   {
-    path: 'doashboard',
+    path: 'dashboard',
     name: 'dashboard',
     component: () => import('@/features/admin/views/dashboard/DashboardView.vue'),
     meta: {
       title: 'Cinema - Admin Dashboard',
       breadcrumb: [{ label: 'Dashboard' }],
+    },
+  },
+  {
+    path: 'profile',
+    name: 'admin-profile',
+    component: () => import('@/features/admin/views/profile/AdminProfileView.vue'),
+    meta: {
+      title: 'Cinema - Admin Profile',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Hồ sơ quản trị' },
+      ],
+    },
+  },
+  {
+    path: 'settings',
+    name: 'admin-settings',
+    component: () => import('@/features/admin/views/profile/AdminProfileView.vue'),
+    meta: {
+      title: 'Cinema - Admin Settings',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Cài đặt bảo mật' },
+      ],
     },
   },
   {
@@ -75,6 +99,57 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'combos',
+    name: 'admin-combos',
+    component: () => import('@/features/admin/views/combo/ComboView.vue'),
+    meta: {
+      title: 'Cinema - Admin Combos',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Rạp chiếu phim' },
+        { label: 'Combo bắp nước' },
+      ],
+    },
+  },
+  {
+    path: 'promotions',
+    name: 'admin-promotions',
+    component: () => import('@/features/admin/views/promotion/PromotionView.vue'),
+    meta: {
+      title: 'Cinema - Admin Promotions',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Khuyến mãi' },
+      ],
+    },
+  },
+  {
+    path: 'bookings',
+    name: 'admin-bookings',
+    component: () => import('@/features/admin/views/booking/BookingView.vue'),
+    meta: {
+      title: 'Cinema - Admin Bookings',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Đặt vé & thanh toán' },
+        { label: 'Booking' },
+      ],
+    },
+  },
+  {
+    path: 'payments',
+    name: 'admin-payments',
+    component: () => import('@/features/admin/views/payment/PaymentView.vue'),
+    meta: {
+      title: 'Cinema - Admin Payments',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Đặt vé & thanh toán' },
+        { label: 'Payment' },
+      ],
+    },
+  },
+  {
     path: 'movies',
     name: 'admin-movies',
     component: () => import('@/features/admin/views/movie/MovieView.vue'),
@@ -114,6 +189,32 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'users',
+    name: 'admin-users',
+    component: () => import('@/features/admin/views/user/UserView.vue'),
+    meta: {
+      title: 'Cinema - Admin Staff',
+      userScope: 'staff',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Nhân sự' },
+      ],
+    },
+  },
+  {
+    path: 'customers',
+    name: 'admin-customers',
+    component: () => import('@/features/admin/views/user/UserView.vue'),
+    meta: {
+      title: 'Cinema - Admin Customers',
+      userScope: 'customer',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Khách hàng' },
+      ],
+    },
+  },
+  {
     path: 'roles',
     name: 'admin-roles',
     component: () => import('@/features/admin/views/role/RoleView.vue'),
@@ -140,7 +241,7 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: 'ations',
+    path: 'actions',
     name: 'admin-actions',
     component: () => import('@/features/admin/views/action/ActionView.vue'),
     meta: {

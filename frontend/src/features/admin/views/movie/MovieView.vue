@@ -5,12 +5,15 @@ import { NButton } from 'naive-ui'
 import { useMovie } from '../../composables/useMovie'
 import MovieFormModal from './components/MovieFormModal.vue'
 import type { Movie, Status } from '../../types/movie.type'
-import { formatDate } from '@/shared/utils/formatDate'
+import { formatDateTime } from '@/shared/utils/formatDate'
 import { Search as SearchIcon } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import { useMessage, useDialog } from 'naive-ui'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchMovies, deleteMovie } = useMovie()
+const { can } = useAdminPermission()
 
 const message = useMessage()
 const dialog = useDialog()
@@ -19,6 +22,9 @@ const selectedMovie = ref<Movie | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.MOVIES, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.MOVIES, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.MOVIES, ADMIN_ACTIONS.DELETE))
 
 function createColumns(): DataTableColumns<Movie> {
   return [
@@ -90,6 +96,31 @@ function createColumns(): DataTableColumns<Movie> {
         ),
     },
     {
+      title: 'Rating',
+      key: 'rating',
+      width: 120,
+      render: (row) =>
+        h('div', { style: 'display:flex;flex-direction:column;gap:3px' }, [
+          h(
+            resolveComponent('n-tag'),
+            {
+              size: 'small',
+              round: true,
+              type: 'warning',
+              style: 'width:max-content;max-width:100%;display:inline-flex',
+            },
+            () => row.rating || '—',
+          ),
+          h(
+            'span',
+            { style: 'font-size:11px;color:var(--n-text-color-3)' },
+            row.rating_score != null
+              ? `${row.rating_score}/10 (${row.rating_count ?? 0})`
+              : 'Chưa có điểm',
+          ),
+        ]),
+    },
+    {
       title: 'Status',
       key: 'status',
       width: 120,
@@ -133,7 +164,7 @@ function createColumns(): DataTableColumns<Movie> {
         h(
           'span',
           { style: 'font-size:12px;color:var(--n-text-color-3)' },
-          formatDate(row.release_date),
+          formatDateTime(row.release_date),
         ),
     },
     {
@@ -144,7 +175,7 @@ function createColumns(): DataTableColumns<Movie> {
         h(
           'span',
           { style: 'font-size:12px;color:var(--n-text-color-3)' },
-          formatDate(row.created_at),
+          formatDateTime(row.created_at),
         ),
     },
     {
@@ -153,16 +184,24 @@ function createColumns(): DataTableColumns<Movie> {
       width: 120,
       render: (row) =>
         h('div', { style: 'display:flex;gap:6px' }, [
-          h(
-            NButton,
-            { size: 'small', type: 'primary', ghost: true, onClick: () => openEditModal(row) },
-            { default: () => 'Sửa' },
-          ),
-          h(
-            NButton,
-            { size: 'small', type: 'error', ghost: true, onClick: () => handleDelete(row) },
-            { default: () => 'Xóa' },
-          ),
+          ...(canUpdate.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
+                  { default: () => 'Edit' },
+                ),
+              ]
+            : []),
+          ...(canDelete.value
+            ? [
+                h(
+                  NButton,
+                  { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
+                  { default: () => 'Delete' },
+                ),
+              ]
+            : []),
         ]),
     },
   ]
@@ -226,7 +265,7 @@ onMounted(fetchMovies)
     <n-space>
       <n-input
         v-model:value="filters.search"
-        placeholder="Search by name..."
+        placeholder="Tìm kiếm theo tên..."
         clearable
         style="width: 300px"
       >
@@ -236,11 +275,23 @@ onMounted(fetchMovies)
           </n-icon>
         </template>
       </n-input>
-      <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
+      <n-select 
+        v-model:value="filters.status"
+        placeholder="Lọc theo trạng thái"
+        clearable
+        :options="[
+          { label: 'Sắp chiếu', value: 'coming_soon' },
+          { label: 'Đang chiếu', value: 'now_showing' },
+          { label: 'Ngừng chiếu', value: 'ended' },
+          { label: 'Đã hủy', value: 'cancelled' },
+        ]"
+        style="width: 190px"
+      />
+      <n-button v-if="hasChecked && canDelete" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
-    <n-button type="primary" @click="openCreateModal">+ Thêm phim mới</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">+ Thêm phim mới</n-button>
   </n-space>
 
   <n-data-table
@@ -249,7 +300,7 @@ onMounted(fetchMovies)
     :loading="loading"
     :pagination="pagination"
     :row-key="(row: Movie) => row.id"
-    :scroll-x="1000"
+    :scroll-x="1120"
     remote
     @update:checked-row-keys="(keys: DataTableRowKey[]) => (checkedRowKeysRef = keys)"
   />

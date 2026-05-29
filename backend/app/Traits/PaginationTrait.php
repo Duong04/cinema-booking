@@ -2,9 +2,11 @@
 
 namespace App\Traits;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
 trait PaginationTrait
 {
-    protected function paginationMeta($paginator): array
+    protected function paginationMeta(LengthAwarePaginator $paginator): array
     {
         return [
             'total' => $paginator->total(),

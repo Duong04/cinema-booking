@@ -15,11 +15,9 @@ class BookingController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $bookingService;
-
-    public function __construct(BookingService $bookingService)
-    {
-        $this->bookingService = $bookingService;
+    public function __construct(
+        private BookingService $bookingService
+    ) {
     }
 
     #[OA\Get(
@@ -247,6 +245,24 @@ class BookingController extends Controller
                             "019d06bd-ff12-71c8-8234-aa2cc7733013",
                         ]
                     ),
+                    new OA\Property(
+                        property: "combos",
+                        type: "array",
+                        nullable: true,
+                        items: new OA\Items(
+                            required: ["combo_id", "quantity"],
+                            properties: [
+                                new OA\Property(property: "combo_id", type: "string", format: "uuid"),
+                                new OA\Property(property: "quantity", type: "integer", minimum: 1, maximum: 20, example: 2),
+                            ]
+                        )
+                    ),
+                    new OA\Property(
+                        property: "promotion_code",
+                        type: "string",
+                        nullable: true,
+                        example: "SALE10"
+                    ),
                 ]
             )
         ),
@@ -285,6 +301,17 @@ class BookingController extends Controller
                                         ]
                                     )
                                 ),
+                                new OA\Property(
+                                    property: "combos",
+                                    type: "array",
+                                    items: new OA\Items(type: "object")
+                                ),
+                                new OA\Property(
+                                    property: "promotions",
+                                    type: "array",
+                                    items: new OA\Items(type: "object")
+                                ),
+                                new OA\Property(property: "payment", type: "object", nullable: true),
                             ]
                         ),
                     ]
@@ -300,7 +327,50 @@ class BookingController extends Controller
 
         $booking = $this->bookingService->create($data);
 
-        return $this->success($booking, 'Đặt vé thành công!');
+        return $this->success($booking, 'Đặt vé thành công!', 201);
+    }
+
+    #[OA\Put(
+        path: "/api/v1/bookings/{id}",
+        summary: "Update booking status and timestamps",
+        tags: ["Bookings"],
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "string", format: "uuid")
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(
+                        property: "status",
+                        type: "string",
+                        enum: ["pending", "confirmed", "cancelled", "expired", "refunded"],
+                        nullable: true,
+                        example: "confirmed"
+                    ),
+                    new OA\Property(property: "cancellation_reason", type: "string", nullable: true, maxLength: 500),
+                    new OA\Property(property: "expired_at", type: "string", format: "date-time", nullable: true),
+                    new OA\Property(property: "confirmed_at", type: "string", format: "date-time", nullable: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Updated successfully"),
+            new OA\Response(response: 401, description: "Unauthenticated"),
+            new OA\Response(response: 404, description: "Resource not found"),
+            new OA\Response(response: 422, description: "Validation error")
+        ]
+    )]
+    public function update(BookingRequest $request, string $id)
+    {
+        $booking = $this->bookingService->update($request->validated(), $id);
+
+        return $this->success($booking, 'Cập nhật đặt vé thành công!');
     }
 
     #[OA\Put(

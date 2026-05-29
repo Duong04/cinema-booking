@@ -5,6 +5,8 @@ import type {
   RegisterPayload,
   RegisterResponse,
   UserProfile,
+  UpdateProfilePayload,
+  ChangePasswordPayload,
 } from '@/shared/types/auth'
 
 export const authService = {
@@ -16,6 +18,10 @@ export const authService = {
   logout: () => api.post('/auth/logout'),
 
   getMe: () => api.get<UserProfile>('/auth/profile'),
+
+  updateProfile: (payload: UpdateProfilePayload) => api.put<UserProfile>('/auth/profile', payload),
+
+  changePassword: (payload: ChangePasswordPayload) => api.put('/auth/password', payload),
 
   register: async (payload: RegisterPayload) => {
     await api.csrf()

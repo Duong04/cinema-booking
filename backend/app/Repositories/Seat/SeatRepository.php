@@ -31,6 +31,15 @@ class SeatRepository extends BaseRepository implements SeatRepositoryInterface
         return $seats;
     }
 
+    public function getSeatsByRoom(string $roomId)
+    {
+        return $this->model->with('seatType')
+            ->where('room_id', $roomId)
+            ->orderBy('row_label')
+            ->orderBy('seat_number')
+            ->get();
+    }
+
     public function insert($data)
     {
         return $this->model->insert($data);

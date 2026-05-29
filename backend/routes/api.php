@@ -8,6 +8,7 @@ use App\Http\Controllers\Apis\V1\CityController;
 use App\Http\Controllers\Apis\V1\GenreController;
 use App\Http\Controllers\Apis\V1\MovieController;
 use App\Http\Controllers\Apis\V1\PermissionController;
+use App\Http\Controllers\Apis\V1\PromotionController;
 use App\Http\Controllers\Apis\V1\RoleController;
 use App\Http\Controllers\Apis\V1\RoomController;
 use App\Http\Controllers\Apis\V1\SeatController;
@@ -17,6 +18,8 @@ use App\Http\Controllers\Apis\V1\ShowtimeController;
 use App\Http\Controllers\Apis\V1\UploadController;
 use App\Http\Controllers\Apis\V1\ComboController;
 use App\Http\Controllers\Apis\V1\BookingController;
+use App\Http\Controllers\Apis\V1\PaymentController;
+use App\Http\Controllers\Apis\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +35,15 @@ Route::prefix('v1')->group(function () {
         Route::get('/verify-email/{token}', 'verifyEmail');
         Route::post('/logout', 'logout')->middleware('auth:sanctum');
         Route::get('/profile', 'profile')->middleware('auth:sanctum');
+        Route::put('/profile', 'updateProfile')->middleware('auth:sanctum');
+        Route::put('/password', 'changePassword')->middleware('auth:sanctum');
+    });
+
+    Route::prefix('users')->controller(UserController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
     });
 
     Route::prefix('roles')->controller(RoleController::class)->middleware('auth:sanctum')->group(function () {
@@ -132,6 +144,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('showtimes')->controller(ShowtimeController::class)->middleware('auth:sanctum')->group(function () {
         Route::get('/', 'paginate');
         Route::post('/', 'create');
+        Route::get('/{id}/seat-overview', 'seatOverview');
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'delete');
@@ -147,7 +160,24 @@ Route::prefix('v1')->group(function () {
         Route::get('/', 'paginate');
         Route::post('/', 'create');
         Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
         Route::put('/{id}/cancel', 'cancel');
+    });
+
+    Route::prefix('promotions')->controller(PromotionController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::post('/check', 'check');
+        Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('payments')->controller(PaymentController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}/confirm', 'confirm');
     });
 
     Route::prefix('combos')->controller(ComboController::class)->middleware('auth:sanctum')->group(function () {
@@ -156,5 +186,18 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}', 'show');
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'delete');
+    });
+
+    Route::prefix('/public')->group(function () {
+        Route::get('/cities', [CityController::class, 'getAll']);
+        Route::get('/cinemas', [CinemaController::class, 'getAll']);
+        Route::get('/cinema-chains', [CinemaChainController::class, 'getAll']);
+        Route::get('/movies', [MovieController::class, 'getAll']);
+        Route::get('/movies/{slug}', [MovieController::class, 'showPublic']);
+        Route::get('/genres', [GenreController::class, 'getAll']);
+        Route::get('/combos', [ComboController::class, 'active']);
+        Route::get('/showtimes', [ShowtimeController::class, 'getAll']);
+        Route::get('/showtimes/{id}/seat-overview', [ShowtimeController::class, 'publicSeatOverview']);
+        Route::get('/showtimes/{id}', [ShowtimeController::class, 'showPublic']);
     });
 });
