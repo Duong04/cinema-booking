@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cinema Booking - Feature Todo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #09090b;
+      --panel: #141417;
+      --panel-soft: #1b1b20;
+      --line: #2a2a31;
+      --text: #f5f5f7;
+      --muted: #a1a1aa;
+      --muted-2: #71717a;
+      --red: #dc2626;
+      --red-soft: rgba(220, 38, 38, 0.16);
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.16);
+      --yellow: #eab308;
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(220, 38, 38, 0.18), transparent 34rem),
+        linear-gradient(180deg, #111114 0%, var(--bg) 42%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: #fecaca;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 24px var(--red);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 0.96;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 12px;
+      min-width: 390px;
+    }
+
+    .stat {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(20, 20, 23, 0.76);
+      box-shadow: var(--shadow);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px;
+      margin-bottom: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(9, 9, 11, 0.86);
+      backdrop-filter: blur(18px);
+    }
+
+    .search {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .search:focus {
+      border-color: rgba(220, 38, 38, 0.8);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.16);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+      transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+    }
+
+    .btn:hover {
+      border-color: rgba(255, 255, 255, 0.26);
+      background: #222229;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.danger {
+      border-color: rgba(220, 38, 38, 0.42);
+      color: #fecaca;
+      background: var(--red-soft);
+    }
+
+    .progress-wrap {
+      margin-bottom: 28px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(20, 20, 23, 0.72);
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .progress {
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #27272f;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--red), var(--yellow), var(--green));
+      transition: width 220ms ease;
+    }
+
+    .phase-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .phase {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(20, 20, 23, 0.84);
+      box-shadow: var(--shadow);
+    }
+
+    .phase-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent);
+    }
+
+    .phase-title {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 0;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .phase-summary {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .phase-count {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .task-list {
+      display: grid;
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: start;
+      padding: 16px 18px;
+      background: var(--panel);
+      transition: background 150ms ease;
+    }
+
+    .task:hover {
+      background: #18181d;
+    }
+
+    .task input {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+
+    .task-title {
+      display: block;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .task-desc {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .task.done .task-title,
+    .task.done .task-desc {
+      color: var(--muted-2);
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+
+    .priority {
+      min-width: 70px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .priority.high {
+      color: #fecaca;
+      background: var(--red-soft);
+    }
+
+    .priority.medium {
+      color: #fef3c7;
+      background: rgba(234, 179, 8, 0.16);
+    }
+
+    .priority.low {
+      color: #bbf7d0;
+      background: var(--green-soft);
+    }
+
+    .empty {
+      display: none;
+      padding: 36px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(20, 20, 23, 0.56);
+    }
+
+    @media (max-width: 860px) {
+      .hero,
+      .toolbar,
+      .phase-header {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        min-width: 0;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .task {
+        grid-template-columns: auto 1fr;
+      }
+
+      .priority {
+        grid-column: 2;
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        width: min(100% - 20px, 1180px);
+        padding-top: 24px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .phase-title {
+        font-size: 16px;
+      }
+
+      .task {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Cinema Booking Roadmap</div>
+        <h1>Feature Todo List</h1>
+        <p class="subtitle">
+          Checklist những phần còn thiếu hoặc đang demo. Tick xong sẽ tự lưu trên trình duyệt bằng localStorage.
+        </p>
+      </div>
+      <div class="stats" aria-label="Thống kê tiến độ">
+        <div class="stat">
+          <strong id="doneCount">0</strong>
+          <span>Đã xong</span>
+        </div>
+        <div class="stat">
+          <strong id="todoCount">0</strong>
+          <span>Còn lại</span>
+        </div>
+        <div class="stat">
+          <strong id="percentCount">0%</strong>
+          <span>Tiến độ</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Công cụ">
+      <input id="searchInput" class="search" type="search" placeholder="Tìm tính năng, ví dụ: payment, booking, combo...">
+      <div class="actions">
+        <button id="checkAllBtn" class="btn" type="button">Tick tất cả</button>
+        <button id="clearDoneBtn" class="btn" type="button">Bỏ tick</button>
+        <button id="resetBtn" class="btn danger" type="button">Reset</button>
+      </div>
+    </section>
+
+    <section class="progress-wrap" aria-label="Thanh tiến độ">
+      <div class="progress-meta">
+        <span id="progressText">0/0 task hoàn thành</span>
+        <span id="phaseText">0 phase</span>
+      </div>
+      <div class="progress">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </section>
+
+    <section id="phaseList" class="phase-list"></section>
+    <section id="emptyState" class="empty">Không tìm thấy task nào khớp với từ khóa.</section>
+  </main>
+
+  <script>
+    const storageKey = "cinema_booking_feature_todo_v1";
+
+    const phases = [
+      {
+        id: "phase-0-foundation",
+        title: "Phase 0 - Dọn nền",
+        eta: "0.5-1 ngày",
+        summary: "Sửa lỗi điều hướng, route typo và các phần UI gọi route chưa tồn tại.",
+        tasks: [
+          {
+            id: "fix-admin-route-dashboard",
+            title: "Sửa route admin dashboard",
+            desc: "Đổi path doashboard thành dashboard trong admin.routes.ts.",
+            priority: "high"
+          },
+          {
+            id: "fix-admin-route-actions",
+            title: "Sửa route admin actions",
+            desc: "Đổi path ations thành actions để URL đúng nghĩa.",
+            priority: "high"
+          },
+          {
+            id: "add-profile-settings-routes",
+            title: "Thêm route profile/settings",
+            desc: "Header và payment-result đang điều hướng tới profile/settings nhưng chưa có route.",
+            priority: "high"
+          },
+          {
+            id: "remove-debug-console",
+            title: "Gỡ console.log debug",
+            desc: "Dọn console.log trong guards và một số màn admin.",
+            priority: "medium"
+          },
+          {
+            id: "navigation-smoke-test",
+            title: "Test nhanh toàn bộ navigation",
+            desc: "Click qua menu client/admin để đảm bảo không còn link chết cơ bản.",
+            priority: "medium"
+          }
+        ]
+      },
+      {
+        id: "phase-1-booking-core",
+        title: "Phase 1 - Booking core",
+        eta: "4-6 ngày",
+        summary: "Ưu tiên cao nhất: chọn ghế, giữ ghế, tạo booking thật.",
+        tasks: [
+          {
+            id: "frontend-seat-hold-service",
+            title: "Tạo service frontend cho seat-holds",
+            desc: "Thêm API gọi hold, release, list seat holds theo showtime.",
+            priority: "high"
+          },
+          {
+            id: "seat-hold-on-select",
+            title: "Giữ ghế thật khi chọn ghế",
+            desc: "SeatView gọi /seat-holds/hold thay vì chỉ lưu state local.",
+            priority: "high"
+          },
+          {
+            id: "seat-release-on-unmount",
+            title: "Release ghế khi rời trang hoặc hết giờ",
+            desc: "Gọi /seat-holds/release trong onUnmounted hoặc khi timer kết thúc.",
+            priority: "high"
+          },
+          {
+            id: "seat-timer-from-expiration",
+            title: "Timer dựa trên expired_at thật",
+            desc: "Không hardcode 10 phút; đồng bộ với thời gian giữ ghế backend.",
+            priority: "medium"
+          },
+          {
+            id: "frontend-booking-service",
+            title: "Tạo booking service frontend",
+            desc: "Thêm hàm create/show/cancel booking để client dùng.",
+            priority: "high"
+          },
+          {
+            id: "checkout-create-real-booking",
+            title: "Checkout gọi API tạo booking thật",
+            desc: "Thay payDemo object bằng POST /bookings với showtime_id và seat_ids.",
+            priority: "high"
+          },
+          {
+            id: "payment-result-real-booking",
+            title: "Payment result đọc booking thật",
+            desc: "Không phụ thuộc history.state; dùng booking id từ route/query rồi gọi API.",
+            priority: "high"
+          },
+          {
+            id: "booking-edge-seat-conflict",
+            title: "Xử lý xung đột ghế",
+            desc: "Hiển thị lỗi rõ khi ghế bị người khác giữ hoặc đã đặt.",
+            priority: "medium"
+          }
+        ]
+      },
+      {
+        id: "phase-2-combo",
+        title: "Phase 2 - Combo",
+        eta: "2-3 ngày",
+        summary: "Bỏ demoCombos, quản lý combo từ admin và lưu combo vào booking.",
+        tasks: [
+          {
+            id: "admin-combo-service-type",
+            title: "Tạo type/service/composable admin combo",
+            desc: "Thêm combo.service.ts, combo.type.ts và useCombo.ts.",
+            priority: "high"
+          },
+          {
+            id: "admin-combo-view",
+            title: "Tạo màn admin quản lý combo",
+            desc: "Danh sách, tạo, sửa, xoá, upload ảnh, chọn rạp.",
+            priority: "high"
+          },
+          {
+            id: "admin-combo-menu-route",
+            title: "Thêm route/menu admin combo",
+            desc: "Nối ComboView vào sidebar admin.",
+            priority: "medium"
+          },
+          {
+            id: "client-combo-api",
+            title: "Client combo dùng API thật",
+            desc: "ComboView lấy combo theo cinema/showtime thay vì demoCombos.",
+            priority: "high"
+          },
+          {
+            id: "booking-accept-combos",
+            title: "Backend booking nhận combo",
+            desc: "BookingRequest/BookingService nhận combo_id + quantity và lưu booking_combos.",
+            priority: "high"
+          },
+          {
+            id: "server-total-with-combo",
+            title: "Tính tổng vé + combo ở backend",
+            desc: "Không tin tổng tiền frontend gửi lên.",
+            priority: "high"
+          }
+        ]
+      },
+      {
+        id: "phase-3-payment",
+        title: "Phase 3 - Payment MVP",
+        eta: "2-4 ngày",
+        summary: "Payment có thể giả lập, nhưng phải lưu DB và đổi trạng thái booking thật.",
+        tasks: [
+          {
+            id: "payment-controller-routes",
+            title: "Tạo PaymentController và routes",
+            desc: "Thêm initiate, confirm, show payment.",
+            priority: "high"
+          },
+          {
+            id: "payment-service",
+            title: "Tạo PaymentService",
+            desc: "Ghi payments, payment_attempts và idempotency_key nếu cần.",
+            priority: "high"
+          },
+          {
+            id: "payment-confirm-booking",
+            title: "Confirm payment cập nhật booking",
+            desc: "booking pending -> confirmed, payment pending -> paid.",
+            priority: "high"
+          },
+          {
+            id: "checkout-payment-api",
+            title: "Checkout gọi payment API",
+            desc: "Thay thanh toán demo thuần frontend bằng backend payment MVP.",
+            priority: "high"
+          },
+          {
+            id: "payment-failure-state",
+            title: "Xử lý payment fail/cancel",
+            desc: "Hiển thị trạng thái thất bại và cho thử lại hoặc huỷ booking.",
+            priority: "medium"
+          }
+        ]
+      },
+      {
+        id: "phase-4-admin-dashboard-booking",
+        title: "Phase 4 - Admin dashboard & booking",
+        eta: "2-3 ngày",
+        summary: "Admin cần nhìn được dữ liệu thật: doanh thu, booking, trạng thái.",
+        tasks: [
+          {
+            id: "dashboard-stats-api",
+            title: "Tạo API thống kê dashboard",
+            desc: "Doanh thu, số booking, số phim, suất chiếu, khách hàng.",
+            priority: "medium"
+          },
+          {
+            id: "dashboard-ui",
+            title: "Làm DashboardView thật",
+            desc: "Thay placeholder bằng card thống kê và booking gần đây.",
+            priority: "medium"
+          },
+          {
+            id: "admin-booking-view",
+            title: "Thêm màn admin quản lý booking",
+            desc: "Danh sách, filter trạng thái, xem chi tiết, huỷ booking.",
+            priority: "high"
+          },
+          {
+            id: "admin-booking-menu-route",
+            title: "Thêm route/menu admin booking",
+            desc: "Đưa quản lý booking vào sidebar admin.",
+            priority: "medium"
+          }
+        ]
+      },
+      {
+        id: "phase-5-promotion",
+        title: "Phase 5 - Promotion",
+        eta: "2-3 ngày",
+        summary: "Mã giảm giá thật: quản lý, validate, áp dụng khi checkout.",
+        tasks: [
+          {
+            id: "promotion-backend-crud",
+            title: "Tạo CRUD promotion backend",
+            desc: "Controller, service, request, repository và routes.",
+            priority: "medium"
+          },
+          {
+            id: "promotion-admin-ui",
+            title: "Tạo admin promotion UI",
+            desc: "Danh sách mã, tạo/sửa/xoá, trạng thái, hạn dùng.",
+            priority: "medium"
+          },
+          {
+            id: "checkout-promo-input",
+            title: "Thêm nhập mã giảm giá ở checkout",
+            desc: "Client gọi API validate promotion.",
+            priority: "medium"
+          },
+          {
+            id: "promotion-usage-limit",
+            title: "Validate usage limit",
+            desc: "Kiểm tra hạn, số lượt dùng, per_user_limit, applicable_to.",
+            priority: "high"
+          },
+          {
+            id: "save-promotion-usage",
+            title: "Lưu promotion_usages",
+            desc: "Ghi lại mã đã dùng và discount_amount khi booking/payment thành công.",
+            priority: "high"
+          }
+        ]
+      },
+      {
+        id: "phase-6-profile-history",
+        title: "Phase 6 - Profile & booking history",
+        eta: "2-3 ngày",
+        summary: "Nơi user xem vé, sửa thông tin cá nhân và đổi mật khẩu.",
+        tasks: [
+          {
+            id: "profile-view",
+            title: "Tạo trang profile",
+            desc: "Hiển thị thông tin user đang đăng nhập.",
+            priority: "high"
+          },
+          {
+            id: "update-profile-api-ui",
+            title: "Cập nhật profile/avatar",
+            desc: "Backend endpoint và form frontend.",
+            priority: "medium"
+          },
+          {
+            id: "change-password",
+            title: "Đổi mật khẩu",
+            desc: "Thêm API và UI đổi mật khẩu.",
+            priority: "medium"
+          },
+          {
+            id: "booking-history",
+            title: "Lịch sử đặt vé",
+            desc: "User xem danh sách booking của mình.",
+            priority: "high"
+          },
+          {
+            id: "ticket-detail",
+            title: "Chi tiết vé",
+            desc: "Xem booking detail và thông tin ghế/combo/payment.",
+            priority: "high"
+          }
+        ]
+      },
+      {
+        id: "phase-7-wishlist-notification",
+        title: "Phase 7 - Wishlist & notification",
+        eta: "2-3 ngày",
+        summary: "Hai màn hiện có cần chuyển từ local/static sang dữ liệu thật.",
+        tasks: [
+          {
+            id: "wishlist-backend",
+            title: "Tạo backend wishlist",
+            desc: "Bảng/model/controller lưu phim yêu thích theo user.",
+            priority: "low"
+          },
+          {
+            id: "wishlist-frontend-api",
+            title: "Wishlist frontend dùng API",
+            desc: "Không lưu tạm trong Pinia memory.",
+            priority: "low"
+          },
+          {
+            id: "notification-backend",
+            title: "Tạo backend notification",
+            desc: "Thông báo booking thành công, huỷ, payment fail, sắp chiếu.",
+            priority: "low"
+          },
+          {
+            id: "notification-frontend-api",
+            title: "NotificationView dùng API",
+            desc: "Bỏ array hardcode trong NotificationView.",
+            priority: "low"
+          },
+          {
+            id: "notification-read-state",
+            title: "Đánh dấu đã đọc/chưa đọc",
+            desc: "Badge header phản ánh notification chưa đọc.",
+            priority: "low"
+          }
+        ]
+      },
+      {
+        id: "phase-8-review-membership",
+        title: "Phase 8 - Review & membership",
+        eta: "3-5 ngày",
+        summary: "Tính năng giữ chân user: đánh giá phim, tích điểm, hạng thành viên.",
+        tasks: [
+          {
+            id: "movie-review-backend",
+            title: "Tạo backend review phim",
+            desc: "Model/controller/service cho movie_reviews.",
+            priority: "low"
+          },
+          {
+            id: "review-after-watch-rule",
+            title: "Chỉ user đã xem được review",
+            desc: "Validate booking confirmed/completed trước khi review.",
+            priority: "medium"
+          },
+          {
+            id: "admin-review-moderation",
+            title: "Admin duyệt review",
+            desc: "Pending, approved, rejected.",
+            priority: "low"
+          },
+          {
+            id: "rating-score-sync",
+            title: "Cập nhật rating_score/rating_count",
+            desc: "Đồng bộ điểm phim khi review được duyệt.",
+            priority: "medium"
+          },
+          {
+            id: "membership-create-on-register",
+            title: "Tạo membership khi đăng ký",
+            desc: "User mới có tier bronze và points ban đầu.",
+            priority: "low"
+          },
+          {
+            id: "membership-points-on-booking",
+            title: "Cộng điểm khi booking confirmed",
+            desc: "Cập nhật tier bronze/silver/gold/platinum theo điểm.",
+            priority: "low"
+          }
+        ]
+      },
+      {
+        id: "phase-9-hardening",
+        title: "Phase 9 - Hardening",
+        eta: "4-7 ngày",
+        summary: "Test, edge cases và dọn phần mock còn sót trước khi demo final.",
+        tasks: [
+          {
+            id: "backend-tests-booking",
+            title: "Test backend booking",
+            desc: "Tạo booking, giữ ghế, xung đột ghế, huỷ booking.",
+            priority: "high"
+          },
+          {
+            id: "backend-tests-payment",
+            title: "Test backend payment",
+            desc: "Payment success/fail và đổi trạng thái booking.",
+            priority: "medium"
+          },
+          {
+            id: "backend-tests-promotion",
+            title: "Test promotion",
+            desc: "Mã hết hạn, quá limit, discount đúng.",
+            priority: "medium"
+          },
+          {
+            id: "frontend-flow-test",
+            title: "Test frontend flow chính",
+            desc: "Chọn phim -> suất -> ghế -> combo -> checkout -> xem vé.",
+            priority: "high"
+          },
+          {
+            id: "remove-client-mock-schedule",
+            title: "Bỏ mockData khỏi ScheduleView",
+            desc: "Lịch chiếu client phải dùng API thật.",
+            priority: "medium"
+          },
+          {
+            id: "reload-back-browser-cases",
+            title: "Xử lý reload/back browser",
+            desc: "Reload checkout, back từ payment, hết hạn ghế, mất session.",
+            priority: "medium"
+          },
+          {
+            id: "final-smoke-test",
+            title: "Smoke test bản demo cuối",
+            desc: "Chạy qua các vai trò admin/customer và kiểm tra route 404.",
+            priority: "high"
+          }
+        ]
+      }
+    ];
+
+    const saved = loadState();
+    const phaseList = document.getElementById("phaseList");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const doneCount = document.getElementById("doneCount");
+    const todoCount = document.getElementById("todoCount");
+    const percentCount = document.getElementById("percentCount");
+    const progressText = document.getElementById("progressText");
+    const phaseText = document.getElementById("phaseText");
+    const progressBar = document.getElementById("progressBar");
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey) || "{}");
+      } catch {
+        localStorage.removeItem(storageKey);
+        return {};
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(storageKey, JSON.stringify(saved));
+    }
+
+    function allTasks() {
+      return phases.flatMap((phase) => phase.tasks);
+    }
+
+    function priorityLabel(priority) {
+      if (priority === "high") return "Cao";
+      if (priority === "medium") return "Vừa";
+      return "Sau";
+    }
+
+    function render() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      phaseList.innerHTML = "";
+
+      let visibleTasks = 0;
+
+      phases.forEach((phase) => {
+        const tasks = phase.tasks.filter((task) => {
+          const haystack = `${phase.title} ${phase.summary} ${task.title} ${task.desc} ${task.priority}`.toLowerCase();
+          return haystack.includes(keyword);
+        });
+
+        if (!tasks.length) return;
+
+        visibleTasks += tasks.length;
+
+        const phaseDone = phase.tasks.filter((task) => saved[task.id]).length;
+        const article = document.createElement("article");
+        article.className = "phase";
+        article.innerHTML = `
+          <header class="phase-header">
+            <div>
+              <h2 class="phase-title">
+                ${phase.title}
+                <span class="badge">${phase.eta}</span>
+              </h2>
+              <p class="phase-summary">${phase.summary}</p>
+            </div>
+            <div class="phase-count">${phaseDone}/${phase.tasks.length} done</div>
+          </header>
+          <div class="task-list"></div>
+        `;
+
+        const taskList = article.querySelector(".task-list");
+
+        tasks.forEach((task) => {
+          const label = document.createElement("label");
+          label.className = `task ${saved[task.id] ? "done" : ""}`;
+          label.innerHTML = `
+            <input type="checkbox" ${saved[task.id] ? "checked" : ""} data-task-id="${task.id}">
+            <span>
+              <span class="task-title">${task.title}</span>
+              <span class="task-desc">${task.desc}</span>
+            </span>
+            <span class="priority ${task.priority}">${priorityLabel(task.priority)}</span>
+          `;
+          taskList.appendChild(label);
+        });
+
+        phaseList.appendChild(article);
+      });
+
+      emptyState.style.display = visibleTasks ? "none" : "block";
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const tasks = allTasks();
+      const done = tasks.filter((task) => saved[task.id]).length;
+      const total = tasks.length;
+      const todo = total - done;
+      const percent = total ? Math.round((done / total) * 100) : 0;
+
+      doneCount.textContent = String(done);
+      todoCount.textContent = String(todo);
+      percentCount.textContent = `${percent}%`;
+      progressText.textContent = `${done}/${total} task hoàn thành`;
+      phaseText.textContent = `${phases.length} phase`;
+      progressBar.style.width = `${percent}%`;
+    }
+
+    phaseList.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("input[type='checkbox'][data-task-id]");
+      if (!checkbox) return;
+
+      saved[checkbox.dataset.taskId] = checkbox.checked;
+      saveState();
+      render();
+    });
+
+    searchInput.addEventListener("input", render);
+
+    document.getElementById("checkAllBtn").addEventListener("click", () => {
+      allTasks().forEach((task) => {
+        saved[task.id] = true;
+      });
+      saveState();
+      render();
+    });
+
+    document.getElementById("clearDoneBtn").addEventListener("click", () => {
+      allTasks().forEach((task) => {
+        saved[task.id] = false;
+      });
+      saveState();
+      render();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (!confirm("Reset toàn bộ checklist về chưa làm?")) return;
+      localStorage.removeItem(storageKey);
+      Object.keys(saved).forEach((key) => {
+        delete saved[key];
+      });
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
