@@ -53,7 +53,7 @@ docker compose version
 Clone project
 
 ```bash
-git clone <your-repository-url>
+git clone <repository-url>
 cd cinema-booking
 ```
 
