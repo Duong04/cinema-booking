@@ -631,6 +631,183 @@
                         "sanctum": []
                     }
                 ]
+            },
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update authenticated user profile",
+                "operationId": "bb40b12b0e14ad16d03354e5efe2cff7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nguyen Van A",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "customer@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "0909123456",
+                                        "nullable": true,
+                                        "maxLength": 20
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "https://example.com/avatar.png",
+                                        "nullable": true,
+                                        "maxLength": 255
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2000-01-01",
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "nullable": true,
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật hồ sơ thành công!"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/password": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Change authenticated user password",
+                "operationId": "1279c607351452d0b7fbf43dd10dda44",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "old-password"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "new-password",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "new-password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password changed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Đổi mật khẩu thành công!"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation errors or current password is incorrect"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/auth/logout": {
@@ -924,6 +1101,34 @@
                                         ],
                                         "maxItems": 8,
                                         "minItems": 1
+                                    },
+                                    "combos": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "combo_id",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "combo_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 2,
+                                                    "maximum": 20,
+                                                    "minimum": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "promotion_code": {
+                                        "type": "string",
+                                        "example": "SALE10",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -1018,6 +1223,22 @@
                                                         },
                                                         "type": "object"
                                                     }
+                                                },
+                                                "combos": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "promotions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "payment": {
+                                                    "type": "object",
+                                                    "nullable": true
                                                 }
                                             },
                                             "type": "object"
@@ -1166,6 +1387,77 @@
                     },
                     "404": {
                         "description": "Resource not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Update booking status and timestamps",
+                "operationId": "30e7e3ab3a72dc17ea76071251197a6d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "confirmed",
+                                        "nullable": true,
+                                        "enum": [
+                                            "pending",
+                                            "confirmed",
+                                            "cancelled",
+                                            "expired",
+                                            "refunded"
+                                        ]
+                                    },
+                                    "cancellation_reason": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "maxLength": 500
+                                    },
+                                    "expired_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "confirmed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Resource not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }
@@ -1574,6 +1866,53 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/cinema-chains": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public cinema chain list",
+                "operationId": "5ba062af7be02a658bda501e51cafda6",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by cinema chain name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "CGV"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public cinema chain list retrieved successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }
@@ -2291,6 +2630,73 @@
                 }
             }
         },
+        "/api/v1/public/cinemas": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public cinema list",
+                "operationId": "f3d94720f36094f6a0613d5a8c31f261",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by cinema name or address",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "CGV"
+                        }
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "query",
+                        "description": "Filter by city",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "cinema_chain_id",
+                        "in": "query",
+                        "description": "Filter by cinema chain",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public cinema list retrieved successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/api/v1/cinemas/{id}": {
             "get": {
                 "tags": [
@@ -2826,6 +3232,53 @@
                 }
             }
         },
+        "/api/v1/public/cities": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public city list",
+                "operationId": "dcd3f9ffe48473a9e5f175fcaf88bb1b",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by city name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Đà Nẵng"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public city list retrieved successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/api/v1/cities/{id}": {
             "get": {
                 "tags": [
@@ -3215,6 +3668,188 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/combos": {
+            "get": {
+                "tags": [
+                    "Combos"
+                ],
+                "summary": "Get active public combos",
+                "description": "Return only active combos for the booking flow. Optionally filter by cinema.",
+                "operationId": "d007dcf994904cb79ed5ba10ac7fa459",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100,
+                            "default": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search active combos by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "popcorn"
+                        }
+                    },
+                    {
+                        "name": "cinema_id",
+                        "in": "query",
+                        "description": "Filter active combos by cinema",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d14e8-de20-7178-acf2-5850afc288f1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Active combos retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Combo Popcorn Couple"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Large popcorn and two soft drinks.",
+                                                        "nullable": true
+                                                    },
+                                                    "price": {
+                                                        "type": "string",
+                                                        "example": "129000.00"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "active",
+                                                        "enum": [
+                                                            "active"
+                                                        ]
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/combo.jpg",
+                                                        "nullable": true
+                                                    },
+                                                    "cinema_id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "cinema": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "CGV Đà Nẵng"
+                                                            },
+                                                            "address": {
+                                                                "type": "string",
+                                                                "example": "Đà Nẵng"
+                                                            }
+                                                        },
+                                                        "type": "object",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }
@@ -3645,6 +4280,53 @@
                 }
             }
         },
+        "/api/v1/public/genres": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public genre list",
+                "operationId": "584a57dcc3fc6992c26c36fe51be6dc7",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by genre name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Hành động"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public genre list retrieved successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/api/v1/genres/{id}": {
             "get": {
                 "tags": [
@@ -4030,6 +4712,12 @@
                                                         "format": "uri",
                                                         "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                     },
+                                                    "banner_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                        "nullable": true
+                                                    },
                                                     "trailer_url": {
                                                         "type": "string",
                                                         "format": "uri",
@@ -4050,10 +4738,19 @@
                                                         "nullable": true
                                                     },
                                                     "rating": {
+                                                        "type": "string",
+                                                        "example": "T13",
+                                                        "nullable": true
+                                                    },
+                                                    "rating_score": {
                                                         "type": "number",
                                                         "format": "float",
-                                                        "example": null,
+                                                        "example": 8.6,
                                                         "nullable": true
+                                                    },
+                                                    "rating_count": {
+                                                        "type": "integer",
+                                                        "example": 128
                                                     },
                                                     "language": {
                                                         "type": "string",
@@ -4065,7 +4762,8 @@
                                                         "enum": [
                                                             "coming_soon",
                                                             "now_showing",
-                                                            "ended"
+                                                            "ended",
+                                                            "cancelled"
                                                         ]
                                                     },
                                                     "created_at": {
@@ -4190,11 +4888,6 @@
                                 "required": [
                                     "title",
                                     "duration_minutes",
-                                    "poster_url",
-                                    "trailer_url",
-                                    "description",
-                                    "content",
-                                    "language",
                                     "status",
                                     "genres"
                                 ],
@@ -4211,6 +4904,12 @@
                                         "type": "string",
                                         "format": "uri",
                                         "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                    },
+                                    "banner_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                        "nullable": true
                                     },
                                     "trailer_url": {
                                         "type": "string",
@@ -4231,6 +4930,11 @@
                                         "example": "2026-08-08",
                                         "nullable": true
                                     },
+                                    "rating": {
+                                        "type": "string",
+                                        "example": "T13",
+                                        "nullable": true
+                                    },
                                     "language": {
                                         "type": "string",
                                         "example": "Tiếng việt"
@@ -4241,7 +4945,8 @@
                                         "enum": [
                                             "coming_soon",
                                             "now_showing",
-                                            "ended"
+                                            "ended",
+                                            "cancelled"
                                         ]
                                     },
                                     "genres": {
@@ -4297,6 +5002,12 @@
                                                     "format": "uri",
                                                     "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                 },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                    "nullable": true
+                                                },
                                                 "trailer_url": {
                                                     "type": "string",
                                                     "format": "uri",
@@ -4317,10 +5028,19 @@
                                                     "nullable": true
                                                 },
                                                 "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": null,
+                                                    "example": 8.6,
                                                     "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
                                                 },
                                                 "language": {
                                                     "type": "string",
@@ -4332,7 +5052,8 @@
                                                     "enum": [
                                                         "coming_soon",
                                                         "now_showing",
-                                                        "ended"
+                                                        "ended",
+                                                        "cancelled"
                                                     ]
                                                 },
                                                 "created_at": {
@@ -4422,11 +5143,11 @@
                                                         "example": "The duration minutes field is required."
                                                     }
                                                 },
-                                                "poster_url": {
+                                                "banner_url": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The poster url field is required."
+                                                        "example": "Banner không hợp lệ."
                                                     }
                                                 },
                                                 "status": {
@@ -4451,6 +5172,360 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/movies": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public movies",
+                "description": "Returns public movies only. Public movies are limited to now_showing and coming_soon. Use sort=top_rated to order by rating_score, release_date_desc for newest movies, duration_desc for longest movies. Use sort=best_selling with limit=5 for homepage best-selling movies. Best-selling is calculated by counting booking_items from confirmed bookings. When sort=best_selling, period defaults to 30d.",
+                "operationId": "5f601d2a48fa2b71037ae1a77d1e6646",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by title",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Báu vật trời cho"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by public movie status. cancelled and ended are never returned from this endpoint.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "now_showing",
+                            "enum": [
+                                "now_showing",
+                                "coming_soon"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "genre_id",
+                        "in": "query",
+                        "description": "Filter by genre ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Use top_rated, release_date_desc, duration_desc, or best_selling.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "top_rated",
+                            "enum": [
+                                "created_at_desc",
+                                "best_selling",
+                                "top_rated",
+                                "release_date_desc",
+                                "duration_desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "description": "Sales period used only with sort=best_selling. Defaults to 30d.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "30d",
+                            "enum": [
+                                "7d",
+                                "30d",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public movie list retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "example": "019d1b15-14c1-7195-abf2-33f252dc10b6"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Báu vật trời cho"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "bau-vat-troi-cho"
+                                                    },
+                                                    "duration_minutes": {
+                                                        "type": "integer",
+                                                        "example": 198
+                                                    },
+                                                    "poster_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                                    },
+                                                    "banner_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                        "nullable": true
+                                                    },
+                                                    "trailer_url": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://i.pinimg.com/736x/38/ac/35/38ac350c758e5b2d950d37f503aa33ce.jpg"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Mô tả"
+                                                    },
+                                                    "content": {
+                                                        "type": "string",
+                                                        "example": "Nội dung"
+                                                    },
+                                                    "release_date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-08-08",
+                                                        "nullable": true
+                                                    },
+                                                    "rating": {
+                                                        "type": "string",
+                                                        "example": "T13",
+                                                        "nullable": true
+                                                    },
+                                                    "rating_score": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 8.6,
+                                                        "nullable": true
+                                                    },
+                                                    "rating_count": {
+                                                        "type": "integer",
+                                                        "example": 128
+                                                    },
+                                                    "language": {
+                                                        "type": "string",
+                                                        "example": "Tiếng việt"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "now_showing",
+                                                        "enum": [
+                                                            "coming_soon",
+                                                            "now_showing"
+                                                        ]
+                                                    },
+                                                    "sold_tickets_count": {
+                                                        "type": "integer",
+                                                        "example": 128,
+                                                        "nullable": true
+                                                    },
+                                                    "genres": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string",
+                                                                    "format": "uuid",
+                                                                    "example": "019d1b0b-9e90-72ed-8527-f1f966e2a279"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Tình cảm gia đình"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/public/movies/{slug}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public movie detail by slug",
+                "description": "Returns only public movies with now_showing or coming_soon status.",
+                "operationId": "642cb8f967c3124509c392978327b336",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "bau-vat-troi-cho"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public movie retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Báu vật trời cho"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "bau-vat-troi-cho"
+                                                },
+                                                "duration_minutes": {
+                                                    "type": "integer",
+                                                    "example": 198
+                                                },
+                                                "poster_url": {
+                                                    "type": "string",
+                                                    "format": "uri"
+                                                },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "nullable": true
+                                                },
+                                                "trailer_url": {
+                                                    "type": "string",
+                                                    "format": "uri"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "content": {
+                                                    "type": "string"
+                                                },
+                                                "release_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "nullable": true
+                                                },
+                                                "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 8.6,
+                                                    "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
+                                                },
+                                                "language": {
+                                                    "type": "string",
+                                                    "example": "Tiếng việt"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "coming_soon",
+                                                        "now_showing"
+                                                    ]
+                                                },
+                                                "genres": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Movie not found"
                     }
                 }
             }
@@ -4514,6 +5589,12 @@
                                                     "format": "uri",
                                                     "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                 },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                    "nullable": true
+                                                },
                                                 "trailer_url": {
                                                     "type": "string",
                                                     "format": "uri",
@@ -4534,10 +5615,19 @@
                                                     "nullable": true
                                                 },
                                                 "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": null,
+                                                    "example": 8.6,
                                                     "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
                                                 },
                                                 "language": {
                                                     "type": "string",
@@ -4549,7 +5639,8 @@
                                                     "enum": [
                                                         "coming_soon",
                                                         "now_showing",
-                                                        "ended"
+                                                        "ended",
+                                                        "cancelled"
                                                     ]
                                                 },
                                                 "created_at": {
@@ -4658,11 +5749,6 @@
                                 "required": [
                                     "title",
                                     "duration_minutes",
-                                    "poster_url",
-                                    "trailer_url",
-                                    "description",
-                                    "content",
-                                    "language",
                                     "status",
                                     "genres"
                                 ],
@@ -4679,6 +5765,12 @@
                                         "type": "string",
                                         "format": "uri",
                                         "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
+                                    },
+                                    "banner_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                        "nullable": true
                                     },
                                     "trailer_url": {
                                         "type": "string",
@@ -4699,6 +5791,11 @@
                                         "example": "2026-08-08",
                                         "nullable": true
                                     },
+                                    "rating": {
+                                        "type": "string",
+                                        "example": "T13",
+                                        "nullable": true
+                                    },
                                     "language": {
                                         "type": "string",
                                         "example": "Tiếng việt"
@@ -4709,7 +5806,8 @@
                                         "enum": [
                                             "coming_soon",
                                             "now_showing",
-                                            "ended"
+                                            "ended",
+                                            "cancelled"
                                         ]
                                     },
                                     "genres": {
@@ -4765,6 +5863,12 @@
                                                     "format": "uri",
                                                     "example": "https://i.pinimg.com/1200x/b1/a4/b7/b1a4b797511f432e508bd0377f316c57.jpg"
                                                 },
+                                                "banner_url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "example": "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+                                                    "nullable": true
+                                                },
                                                 "trailer_url": {
                                                     "type": "string",
                                                     "format": "uri",
@@ -4785,10 +5889,19 @@
                                                     "nullable": true
                                                 },
                                                 "rating": {
+                                                    "type": "string",
+                                                    "example": "T13",
+                                                    "nullable": true
+                                                },
+                                                "rating_score": {
                                                     "type": "number",
                                                     "format": "float",
-                                                    "example": null,
+                                                    "example": 8.6,
                                                     "nullable": true
+                                                },
+                                                "rating_count": {
+                                                    "type": "integer",
+                                                    "example": 128
                                                 },
                                                 "language": {
                                                     "type": "string",
@@ -4800,7 +5913,8 @@
                                                     "enum": [
                                                         "coming_soon",
                                                         "now_showing",
-                                                        "ended"
+                                                        "ended",
+                                                        "cancelled"
                                                     ]
                                                 },
                                                 "created_at": {
@@ -4910,11 +6024,11 @@
                                                         "example": "The duration minutes field is required."
                                                     }
                                                 },
-                                                "poster_url": {
+                                                "banner_url": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "example": "The poster url field is required."
+                                                        "example": "Banner không hợp lệ."
                                                     }
                                                 },
                                                 "status": {
@@ -5007,6 +6121,90 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/payments": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Create payment",
+                "operationId": "c771f10b7e99ea496a17f100421c66b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "booking_id",
+                                    "provider"
+                                ],
+                                "properties": {
+                                    "booking_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "provider": {
+                                        "type": "string",
+                                        "enum": [
+                                            "vnpay",
+                                            "momo",
+                                            "zalopay",
+                                            "cashier"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Payment created"
+                    },
+                    "422": {
+                        "description": "Booking cannot be paid"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/payments/{id}/confirm": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Confirm payment",
+                "operationId": "83b9f993fa13daea69b2e746b63e2bb5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment confirmed"
+                    },
+                    "422": {
+                        "description": "Payment cannot be confirmed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/permissions": {
@@ -5367,6 +6565,112 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/promotions/check": {
+            "post": {
+                "tags": [
+                    "Promotions"
+                ],
+                "summary": "Check promotion code",
+                "operationId": "436abc6d236baaaf275a707c4fa0cb21",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "SALE10"
+                                    },
+                                    "ticket_amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 180000,
+                                        "nullable": true
+                                    },
+                                    "combo_amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 89000,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Promotion code is valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Mã khuyến mãi hợp lệ."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "promotion": {
+                                                    "type": "object"
+                                                },
+                                                "ticket_amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 180000
+                                                },
+                                                "combo_amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 89000
+                                                },
+                                                "subtotal": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 269000
+                                                },
+                                                "discount_amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 26900
+                                                },
+                                                "total_amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 242100
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Invalid promotion code"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/roles": {
@@ -7947,6 +9251,22 @@
                             "format": "date",
                             "example": "2026-04-04"
                         }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "scheduled",
+                            "enum": [
+                                "scheduled",
+                                "ongoing",
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
                     }
                 ],
                 "responses": {
@@ -8576,6 +9896,235 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/showtimes": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public showtime list",
+                "description": "Returns only showtimes for public movies and public showtime statuses. Cancelled and completed showtimes are never returned.",
+                "operationId": "cbc650a3027aafc35d3f34d6c7d80f53",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "movie_id",
+                        "in": "query",
+                        "description": "Filter by movie",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "cinema_id",
+                        "in": "query",
+                        "description": "Filter by cinema",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "query",
+                        "description": "Filter by city",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "cinema_chain_id",
+                        "in": "query",
+                        "description": "Filter by cinema chain",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "show_date",
+                        "in": "query",
+                        "description": "Exact show date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-05-18"
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "Start show date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-05-18"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "End show date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-05-25"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by public showtime status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "scheduled",
+                            "enum": [
+                                "scheduled",
+                                "ongoing"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public showtime list retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "movie_id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "room_id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "show_date": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    },
+                                                    "start_time": {
+                                                        "type": "string",
+                                                        "example": "2026-05-18 10:00:00"
+                                                    },
+                                                    "end_time": {
+                                                        "type": "string",
+                                                        "example": "2026-05-18 12:00:00"
+                                                    },
+                                                    "base_price": {
+                                                        "type": "string",
+                                                        "example": "100000.00"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "scheduled",
+                                                            "ongoing"
+                                                        ]
+                                                    },
+                                                    "movie": {
+                                                        "type": "object"
+                                                    },
+                                                    "room": {
+                                                        "type": "object"
+                                                    },
+                                                    "prices": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/public/showtimes/{id}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public showtime detail",
+                "description": "Returns one public showtime with movie, room, cinema, city, cinema chain, and prices.",
+                "operationId": "65d22136f27278bdb73499ea5d27bcee",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public showtime retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Showtime not found"
                     }
                 }
             }
@@ -9244,6 +10793,310 @@
                 }
             }
         },
+        "/api/v1/showtimes/{id}/seat-overview": {
+            "get": {
+                "tags": [
+                    "Showtime"
+                ],
+                "summary": "Get seat overview by showtime",
+                "description": "Admin endpoint. Returns all seats in the showtime room with availability status and private booking or hold details when available.",
+                "operationId": "6d9745ea02e2aa2901881a69cafc2393",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Showtime ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Seat overview retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "showtime": {
+                                                    "type": "object"
+                                                },
+                                                "summary": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 96
+                                                        },
+                                                        "booked": {
+                                                            "type": "integer",
+                                                            "example": 18
+                                                        },
+                                                        "held": {
+                                                            "type": "integer",
+                                                            "example": 4
+                                                        },
+                                                        "available": {
+                                                            "type": "integer",
+                                                            "example": 74
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "seats": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "room_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "seat_type_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "row_label": {
+                                                                "type": "string",
+                                                                "example": "A"
+                                                            },
+                                                            "seat_number": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "A1"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "available",
+                                                                "enum": [
+                                                                    "available",
+                                                                    "held",
+                                                                    "booked"
+                                                                ]
+                                                            },
+                                                            "seat_type": {
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "booking": {
+                                                                "description": "Present only for booked seats.",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid"
+                                                                    },
+                                                                    "booking_code": {
+                                                                        "type": "string",
+                                                                        "example": "BK-20260522-ABC123"
+                                                                    },
+                                                                    "status": {
+                                                                        "type": "string",
+                                                                        "example": "confirmed"
+                                                                    },
+                                                                    "user": {
+                                                                        "type": "object",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "hold": {
+                                                                "description": "Present only for held seats.",
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "format": "uuid"
+                                                                    },
+                                                                    "expired_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time"
+                                                                    },
+                                                                    "user": {
+                                                                        "type": "object",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Showtime not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/public/showtimes/{id}/seat-overview": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get public seat overview by showtime",
+                "description": "Public endpoint. Returns all seats in the showtime room with availability status only. Private booking and hold details are always hidden.",
+                "operationId": "83003897919aafbb812a9fc0c0d8c06c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Showtime ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "019d20c8-c81a-70d8-bc76-ef970ddb4a31"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public seat overview retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "showtime": {
+                                                    "type": "object"
+                                                },
+                                                "summary": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 96
+                                                        },
+                                                        "booked": {
+                                                            "type": "integer",
+                                                            "example": 18
+                                                        },
+                                                        "held": {
+                                                            "type": "integer",
+                                                            "example": 4
+                                                        },
+                                                        "available": {
+                                                            "type": "integer",
+                                                            "example": 74
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "seats": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "room_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "seat_type_id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "row_label": {
+                                                                "type": "string",
+                                                                "example": "A"
+                                                            },
+                                                            "seat_number": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "A1"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "available",
+                                                                "enum": [
+                                                                    "available",
+                                                                    "held",
+                                                                    "booked"
+                                                                ]
+                                                            },
+                                                            "seat_type": {
+                                                                "type": "object",
+                                                                "nullable": true
+                                                            },
+                                                            "booking": {
+                                                                "type": "object",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "hold": {
+                                                                "type": "object",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Showtime not found"
+                    }
+                }
+            }
+        },
         "/api/v1/upload/image": {
             "post": {
                 "tags": [
@@ -9530,6 +11383,619 @@
                     }
                 }
             }
+        },
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get list of users",
+                "operationId": "ca4855aba467f699e3e6be3c908f4916",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by user name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Nguyen"
+                        }
+                    },
+                    {
+                        "name": "role_id",
+                        "in": "query",
+                        "description": "Filter users by role id. Use this to list customers only.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "ignore_role_id",
+                        "in": "query",
+                        "description": "Exclude users with this role id. Use this to list staff by excluding customer role.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "Filter by active status. Accepts 1 or 0.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Nguyen Van A"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "format": "email",
+                                                        "example": "user@example.com"
+                                                    },
+                                                    "phone": {
+                                                        "type": "string",
+                                                        "example": "0901234567",
+                                                        "nullable": true
+                                                    },
+                                                    "avatar": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/avatar.jpg",
+                                                        "nullable": true
+                                                    },
+                                                    "date_of_birth": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "1998-06-18",
+                                                        "nullable": true
+                                                    },
+                                                    "gender": {
+                                                        "type": "string",
+                                                        "example": "male",
+                                                        "nullable": true,
+                                                        "enum": [
+                                                            "male",
+                                                            "female",
+                                                            "other"
+                                                        ]
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "role": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "format": "uuid"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "staff"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "current_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create new user",
+                "operationId": "4de04692a1caeb1fac083b8edafb54fd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "role_id",
+                                    "is_active"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nguyen Van A",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123",
+                                        "minLength": 8
+                                    },
+                                    "role_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "0901234567",
+                                        "nullable": true,
+                                        "maxLength": 20
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "nullable": true,
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tạo người dùng thành công"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Nguyen Van A"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "0901234567",
+                                                    "nullable": true
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "male",
+                                                    "nullable": true,
+                                                    "enum": [
+                                                        "male",
+                                                        "female",
+                                                        "other"
+                                                    ]
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "role_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user detail",
+                "operationId": "a4ea5ef093c49079ca204538c1ddaa8c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Nguyen Van A"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "0901234567",
+                                                    "nullable": true
+                                                },
+                                                "avatar": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "date_of_birth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "nullable": true
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "male",
+                                                    "nullable": true,
+                                                    "enum": [
+                                                        "male",
+                                                        "female",
+                                                        "other"
+                                                    ]
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "role": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "format": "uuid"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "staff"
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Resource not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user",
+                "description": "All fields are optional on update. Send only is_active to lock or unlock a user.",
+                "operationId": "9a3e7e47dbe3939427be0ed8c780dec9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nguyen Van A",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "newpassword123",
+                                        "nullable": true,
+                                        "minLength": 8
+                                    },
+                                    "role_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "0901234567",
+                                        "nullable": true,
+                                        "maxLength": 20
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "female",
+                                        "nullable": true,
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cập nhật người dùng thành công"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Nguyen Van A"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "user@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "0901234567",
+                                                    "nullable": true
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "female",
+                                                    "nullable": true,
+                                                    "enum": [
+                                                        "male",
+                                                        "female",
+                                                        "other"
+                                                    ]
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "role_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Resource not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "tags": [
@@ -9554,6 +12020,10 @@
             "description": "Cinema Chain"
         },
         {
+            "name": "Public",
+            "description": "Public"
+        },
+        {
             "name": "Cinema",
             "description": "Cinema"
         },
@@ -9574,8 +12044,16 @@
             "description": "Movie"
         },
         {
+            "name": "Payments",
+            "description": "Payments"
+        },
+        {
             "name": "Permission",
             "description": "Permission"
+        },
+        {
+            "name": "Promotions",
+            "description": "Promotions"
         },
         {
             "name": "Role",
@@ -9604,6 +12082,10 @@
         {
             "name": "Upload",
             "description": "Upload"
+        },
+        {
+            "name": "User",
+            "description": "User"
         }
     ]
 }
