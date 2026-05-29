@@ -22,6 +22,12 @@ class Permission extends Model
 
     public function actions()
     {
-        return $this->belongsToMany(Action::class, 'role_permissions', 'permission_id', 'action_id')->withPivot('role_id', 'permission_id','action_id');
+        return $this->belongsToMany(Action::class, 'permission_actions', 'permission_id', 'action_id');
+    }
+
+    public function roleActions()
+    {
+        return $this->belongsToMany(Action::class, 'role_permissions', 'permission_id', 'action_id')
+            ->withPivot('role_id', 'permission_id', 'action_id');
     }
 }

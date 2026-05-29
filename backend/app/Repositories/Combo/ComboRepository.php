@@ -12,12 +12,22 @@ class ComboRepository extends BaseRepository implements ComboRepositoryInterface
         $this->model = $model;
     }
 
-    public function paginate($limit = 15, $q, $cinema)
+    public function paginate($limit = 15, $q, $cinema, $status)
     {
         $combos = $this->model->with('cinema:id,name,address')->when($q, fn ($query) => $query->where('name', 'like', "%$q%"))
-            ->when($cinema, fn ($query) => $query->where('cinema_id', $cinema));
+            ->when($cinema, fn ($query) => $query->where('cinema_id', $cinema))
+            ->when($status, fn ($query) => $query->where('status', $status));
 
         return $combos->orderByDesc('created_at')->paginate($limit);
+    }
+
+    public function getActiveByIds(array $ids)
+    {
+        return $this->model
+            ->whereIn('id', $ids)
+            ->where('status', 'active')
+            ->get()
+            ->keyBy('id');
     }
 
 }

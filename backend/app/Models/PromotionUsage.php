@@ -10,6 +10,7 @@ class PromotionUsage extends Model
     use UsesUuidV7;
 
     protected $table = 'promotion_usages';
+    public $timestamps = false;
 
     protected $fillable = [
         'promotion_id',

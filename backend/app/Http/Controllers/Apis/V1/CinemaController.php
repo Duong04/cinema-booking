@@ -15,11 +15,9 @@ class CinemaController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $cinemaService;
-
-    public function __construct(CinemaService $cinemaService)
-    {
-        $this->cinemaService = $cinemaService;
+    public function __construct(
+        private CinemaService $cinemaService
+    ) {
     }
 
     #[OA\Get(
@@ -123,6 +121,35 @@ class CinemaController extends Controller
         ]
     )]
     public function paginate(QueryRequest $request)
+    {
+        $query = $request->validated();
+        $limit = $query['limit'] ?? 15;
+        $q = $query['q'] ?? null;
+        $cityId = $query['city_id'] ?? null;
+        $cinemaChainId = $query['cinema_chain_id'] ?? null;
+
+        $cinemas = $this->cinemaService->paginate($limit, $q, $cityId, $cinemaChainId);
+
+        return $this->successList($cinemas->items(), $this->paginationMeta($cinemas));
+    }
+
+    #[OA\Get(
+        path: "/api/v1/public/cinemas",
+        summary: "Get public cinema list",
+        tags: ["Public"],
+        parameters: [
+            new OA\Parameter(name: "limit", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 15)),
+            new OA\Parameter(name: "page", in: "query", required: false, schema: new OA\Schema(type: "integer", example: 1)),
+            new OA\Parameter(name: "q", in: "query", required: false, description: "Search by cinema name or address", schema: new OA\Schema(type: "string", example: "CGV")),
+            new OA\Parameter(name: "city_id", in: "query", required: false, description: "Filter by city", schema: new OA\Schema(type: "string", format: "uuid")),
+            new OA\Parameter(name: "cinema_chain_id", in: "query", required: false, description: "Filter by cinema chain", schema: new OA\Schema(type: "string", format: "uuid")),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Public cinema list retrieved successfully"),
+            new OA\Response(response: 422, description: "Validation error"),
+        ]
+    )]
+    public function getAll(QueryRequest $request)
     {
         $query = $request->validated();
         $limit = $query['limit'] ?? 15;

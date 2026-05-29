@@ -16,11 +16,14 @@ class Movie extends Model
         'slug',
         'duration_minutes',
         'poster_url',
+        'banner_url',
         'trailer_url',
         'description',
         'content',
         'release_date',
         'rating',
+        'rating_score',
+        'rating_count',
         'language',
         'status'
     ];

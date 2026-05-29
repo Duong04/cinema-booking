@@ -15,11 +15,9 @@ class ActionController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $actionService;
-
-    public function __construct(ActionService $actionService)
-    {
-        $this->actionService = $actionService;
+    public function __construct(
+        private ActionService $actionService
+    ) {
     }
 
     #[OA\Get(

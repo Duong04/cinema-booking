@@ -26,10 +26,21 @@ class QueryRequest extends FormRequest
             'q' => 'nullable|string|max:255',
             'room_id' => 'nullable|uuid|exists:rooms,id',
             'movie_id' => 'nullable|uuid|exists:movies,id',
+            'genre_id' => 'nullable|uuid|exists:genres,id',
             'show_date' => 'nullable|date',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
             'city_id' => 'nullable|exists:cities,id',
+            'cinema_id' => 'nullable|exists:cinemas,id',
             'cinema_chain_id' => 'nullable|exists:cinema_chains,id',
-            'status' => 'nullable|string'
+            'status' => 'nullable|string',
+            'provider' => 'nullable|string|in:vnpay,momo,zalopay,cashier',
+            'applicable_to' => 'nullable|string|in:booking,ticket,combo',
+            'sort' => 'nullable|string|in:created_at_desc,best_selling,top_rated,release_date_desc,duration_desc',
+            'period' => 'nullable|string|in:7d,30d,all',
+            'is_active' => 'nullable|boolean',
+            'role_id' => 'nullable|exists:roles,id',
+            'ignore_role_id' => 'nullable|exists:roles,id',
         ];
     }
 }

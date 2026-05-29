@@ -15,12 +15,11 @@ class SeatTypeController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $seatTypeService;
-
-    public function __construct(SeatTypeService $seatTypeService)
-    {
-        $this->seatTypeService = $seatTypeService;
+    public function __construct(
+        private SeatTypeService $seatTypeService
+    ) {
     }
+    
     #[OA\Get(
         path: "/api/v1/seat-types",
         summary: "Get list of seat types",

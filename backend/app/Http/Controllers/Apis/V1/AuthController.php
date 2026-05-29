@@ -7,6 +7,8 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use App\Services\AuthService;
 use App\Traits\ResponseHelper;
 use OpenApi\Attributes as OA;
@@ -14,11 +16,10 @@ use OpenApi\Attributes as OA;
 class AuthController extends Controller
 {
     use ResponseHelper;
-    private $authService;
 
-    public function __construct(AuthService $authService)
-    {
-        $this->authService = $authService;
+    public function __construct(
+        private AuthService $authService
+    ) {
     }
 
     #[OA\Get(
@@ -80,7 +81,10 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return $this->success(new UserResource($user), 'Người dùng đã đăng nhập thành công!');
+        return $this->success(
+            new UserResource($user->load('membership')->loadCount('confirmedBookingItems')),
+            'Người dùng đã đăng nhập thành công!'
+        );
     }
 
     #[OA\Get(
@@ -165,7 +169,119 @@ class AuthController extends Controller
     )]
     public function profile(Request $request)
     {
-        return $this->success(new UserResource($request->user()->load('role.permissions.actions')));
+        return $this->success(
+            new UserResource($request->user()->load('role.permissions.actions', 'membership')->loadCount('confirmedBookingItems'))
+        );
+    }
+
+    #[OA\Put(
+        path: "/api/v1/auth/profile",
+        summary: "Update authenticated user profile",
+        tags: ["Auth"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["name", "email"],
+                properties: [
+                    new OA\Property(property: "name", type: "string", maxLength: 255, example: "Nguyen Van A"),
+                    new OA\Property(property: "email", type: "string", format: "email", example: "customer@example.com"),
+                    new OA\Property(property: "phone", type: "string", nullable: true, maxLength: 20, example: "0909123456"),
+                    new OA\Property(property: "avatar", type: "string", nullable: true, maxLength: 255, example: "https://example.com/avatar.png"),
+                    new OA\Property(property: "date_of_birth", type: "string", format: "date", nullable: true, example: "2000-01-01"),
+                    new OA\Property(property: "gender", type: "string", nullable: true, enum: ["male", "female", "other"], example: "male"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Profile updated successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Cập nhật hồ sơ thành công!"),
+                        new OA\Property(property: "data", type: "object"),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: "Unauthenticated"),
+            new OA\Response(response: 422, description: "Validation errors"),
+        ]
+    )]
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'avatar' => ['nullable', 'string', 'max:255'],
+            'date_of_birth' => ['nullable', 'date'],
+            'gender' => ['nullable', Rule::in(['male', 'female', 'other'])],
+        ]);
+
+        $user->update($data);
+
+        return $this->success(
+            new UserResource($user->fresh()->load('role.permissions.actions', 'membership')->loadCount('confirmedBookingItems')),
+            'Cập nhật hồ sơ thành công!'
+        );
+    }
+
+    #[OA\Put(
+        path: "/api/v1/auth/password",
+        summary: "Change authenticated user password",
+        tags: ["Auth"],
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["current_password", "password", "password_confirmation"],
+                properties: [
+                    new OA\Property(property: "current_password", type: "string", format: "password", example: "old-password"),
+                    new OA\Property(property: "password", type: "string", format: "password", minLength: 8, example: "new-password"),
+                    new OA\Property(property: "password_confirmation", type: "string", format: "password", example: "new-password"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Password changed successfully",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Đổi mật khẩu thành công!"),
+                        new OA\Property(property: "data", type: "object", nullable: true, example: null),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: "Unauthenticated"),
+            new OA\Response(response: 422, description: "Validation errors or current password is incorrect"),
+        ]
+    )]
+    public function changePassword(Request $request)
+    {
+        $data = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($data['current_password'], $user->password)) {
+            return $this->validationError([
+                'current_password' => ['Mật khẩu hiện tại không chính xác'],
+            ]);
+        }
+
+        $user->update([
+            'password' => $data['password'],
+        ]);
+
+        return $this->success(null, 'Đổi mật khẩu thành công!');
     }
 
     #[OA\Post(

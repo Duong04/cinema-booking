@@ -3,7 +3,14 @@ import { ref, computed } from 'vue'
 import { ApiError } from '@/plugins/axios'
 import { authService } from '../services/auth.service'
 import { EnumUserRole } from '@/shared/types/auth'
-import type { User, LoginPayload, RegisterPayload, ValidationError } from '@/shared/types/auth'
+import type {
+  User,
+  LoginPayload,
+  RegisterPayload,
+  ValidationError,
+  UpdateProfilePayload,
+  ChangePasswordPayload,
+} from '@/shared/types/auth'
 import { STORAGE_KEYS } from '@/shared/constants/storage'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -87,5 +94,50 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, loading, error, validationErrors, isLoggedIn, isAdmin, isClient, login, register, logout, fetchMe, isInitialized, resetError }
+  async function updateProfile(payload: UpdateProfilePayload) {
+    loading.value = true
+    resetError()
+    try {
+      const res = await authService.updateProfile(payload)
+      user.value = res.data
+      return true
+    } catch (err) {
+      handleError(err)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function changePassword(payload: ChangePasswordPayload) {
+    loading.value = true
+    resetError()
+    try {
+      await authService.changePassword(payload)
+      return true
+    } catch (err) {
+      handleError(err)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    user,
+    loading,
+    error,
+    validationErrors,
+    isLoggedIn,
+    isAdmin,
+    isClient,
+    login,
+    register,
+    logout,
+    fetchMe,
+    updateProfile,
+    changePassword,
+    isInitialized,
+    resetError,
+  }
 })

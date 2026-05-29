@@ -8,6 +8,7 @@ import router from './router'
 
 import 'swiper/css'
 import 'swiper/css/effect-coverflow'
+import 'swiper/css/navigation'
 
 const app = createApp(App)
 

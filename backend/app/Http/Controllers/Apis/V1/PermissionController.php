@@ -15,11 +15,9 @@ class PermissionController extends Controller
 {
     use ResponseHelper, PaginationTrait;
 
-    private $permissionService;
-
-    public function __construct(PermissionService $permissionService)
-    {
-        $this->permissionService = $permissionService;
+    public function __construct(
+        private PermissionService $permissionService
+    ) {
     }
 
     #[OA\Get(

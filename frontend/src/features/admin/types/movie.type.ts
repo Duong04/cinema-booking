@@ -6,11 +6,14 @@ export interface Movie {
     slug?: string
     duration_minutes: number
     poster_url: string
+    banner_url?: string
     trailer_url: string
     description: string
     content: string
     release_date: string
-    rating: number
+    rating?: string
+    rating_score?: number | null
+    rating_count?: number
     language?: string
     status: Status
     created_at?: string
@@ -23,11 +26,12 @@ export type MoviePayload = {
   title: string
   duration_minutes: number | null
   poster_url: string
+  banner_url: string
   trailer_url: string
   description: string
   content: string
   release_date: string
-  rating: number
+  rating: string
   language: string
   status: Status
   genres: string[] 

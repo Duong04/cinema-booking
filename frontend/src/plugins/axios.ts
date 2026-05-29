@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance } from 'axios'
+import router from '@/router'
 
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost'
 
@@ -36,8 +37,8 @@ instance.interceptors.response.use(
 
     const status = error.response?.status ?? 0
 
-    if (status === 401) window.location.href = '/login'
-    if (status === 403) window.location.href = '/'
+    if (status === 401) router.push({ name: 'login' })
+    if (status === 403) router.push({ name: 'home' })
     if (status >= 500) console.error('Server error:', error.response?.data?.message)
 
     return Promise.reject(

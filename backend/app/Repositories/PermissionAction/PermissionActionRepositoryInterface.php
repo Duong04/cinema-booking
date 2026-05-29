@@ -5,4 +5,5 @@ use App\Repositories\Base\BaseRepositoryInterface;
 
 interface PermissionActionRepositoryInterface extends BaseRepositoryInterface {
     public function deleteByCol($col, $id);
+    public function insert(array $data);
 }

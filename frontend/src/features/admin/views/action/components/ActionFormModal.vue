@@ -3,8 +3,10 @@ import { ref, reactive, watch, nextTick } from 'vue'
 import type { FormInst, FormRules } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { actionService } from '@/features/admin/services/action.service'
+import { permissionService } from '@/features/admin/services/permission.service'
 import { ApiError } from '@/plugins/axios'
-import type { Action } from '@/features/admin/types/action.type'
+import type { Action, ActionPayload } from '@/features/admin/types/action.type'
+import type { Permission } from '@/features/admin/types/permission.type'
 
 interface ActionForm {
   name: string
@@ -23,7 +25,10 @@ const message = useMessage()
 const showModal = defineModel<boolean>('show')
 const formRef = ref<FormInst | null>(null)
 const formLoading = ref(false)
+const permissionLoading = ref(false)
 const isEdit = ref(false)
+const allPermissions = ref<Permission[]>([])
+const selectedPermissionIds = ref<string[]>([])
 
 const formData = reactive<ActionForm>({
   name: '',
@@ -58,10 +63,42 @@ function syncFormWithProps() {
     isEdit.value = false
     formData.name = ''
     formData.key = ''
+    selectedPermissionIds.value = []
   }
   
   Object.keys(backendErrors).forEach((key) => delete backendErrors[key])
   nextTick(() => formRef.value?.restoreValidation())
+}
+
+async function loadPermissions() {
+  if (allPermissions.value.length) return
+
+  permissionLoading.value = true
+  try {
+    const response = await permissionService.getAllPermissions({ limit: 100 })
+    allPermissions.value = response.data
+  } finally {
+    permissionLoading.value = false
+  }
+}
+
+async function syncActionPermissions() {
+  await loadPermissions()
+
+  if (!props.action?.id) return
+
+  const response = await actionService.getActionById(props.action.id)
+  selectedPermissionIds.value = response.data.permissions?.map((permission) => permission.id) ?? []
+}
+
+function buildPayload(): ActionPayload {
+  return {
+    name: formData.name,
+    key: formData.key,
+    permissions: selectedPermissionIds.value.map((permissionId) => ({
+      permission_id: permissionId,
+    })),
+  }
 }
 
 async function handleSubmit() {
@@ -71,13 +108,13 @@ async function handleSubmit() {
     formLoading.value = true
     Object.keys(backendErrors).forEach((k) => delete backendErrors[k])
 
-    const payload = { ...formData }
+    const payload = buildPayload()
 
     if (isEdit.value && props.action?.id) {
-      await actionService.updateAction(props.action.id, payload as Action)
+      await actionService.updateAction(props.action.id, payload)
       message.success('Cập nhật hành động thành công')
     } else {
-      await actionService.createAction(payload as Action)
+      await actionService.createAction(payload)
       message.success('Tạo hành động mới thành công')
     }
 
@@ -97,7 +134,16 @@ async function handleSubmit() {
   }
 }
 
-watch(() => props.action, syncFormWithProps, { immediate: true })
+watch(
+  () => [props.action?.id, showModal.value],
+  async () => {
+    if (!showModal.value) return
+
+    syncFormWithProps()
+    await syncActionPermissions()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -142,6 +188,23 @@ watch(() => props.action, syncFormWithProps, { immediate: true })
           @input="clearFieldError('key')"
         />
       </n-form-item>
+
+      <n-form-item label="Quyền sử dụng hành động này">
+        <n-spin :show="permissionLoading">
+          <n-empty v-if="!allPermissions.length" description="Chưa có quyền nào" />
+          <n-checkbox-group v-else v-model:value="selectedPermissionIds">
+            <n-space vertical>
+              <n-checkbox
+                v-for="permission in allPermissions"
+                :key="permission.id"
+                :value="permission.id"
+              >
+                {{ permission.name }} <span class="option-key">({{ permission.key }})</span>
+              </n-checkbox>
+            </n-space>
+          </n-checkbox-group>
+        </n-spin>
+      </n-form-item>
     </n-form>
 
     <template #action>
@@ -158,3 +221,10 @@ watch(() => props.action, syncFormWithProps, { immediate: true })
     </template>
   </n-modal>
 </template>
+
+<style scoped>
+.option-key {
+  color: var(--n-text-color-disabled);
+  font-size: 12px;
+}
+</style>

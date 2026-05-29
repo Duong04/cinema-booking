@@ -7,6 +7,8 @@ import type { Seat, SeatRow } from '@/features/admin/types/seat.type'
 import type { Room } from '@/features/admin/types/room.type'
 import { seatTypeService } from '@/features/admin/services/seat-type.service'
 import { Pencil, Trash } from 'lucide-vue-next'
+import { useAdminPermission } from '@/features/admin/composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 interface SeatTypeOption {
   label: string
@@ -26,6 +28,7 @@ const props = defineProps<{
 const showModal = defineModel<boolean>('show')
 const message = useMessage()
 const dialog = useDialog()
+const { can } = useAdminPermission()
 
 const seatMap = ref<Record<string, Seat[]> | null>(null)
 const loadingSeats = ref(false)
@@ -41,6 +44,27 @@ const deletingLabel = ref<string | null>(null)
 
 const sortedRowLabels = computed(() => (seatMap.value ? Object.keys(seatMap.value).sort() : []))
 const hasSeats = computed(() => sortedRowLabels.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.SEATS, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.SEATS, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.SEATS, ADMIN_ACTIONS.DELETE))
+const seatTypeLegends = computed(() => {
+  const map = new Map<string, { id: string; name: string; className: string }>()
+
+  Object.values(seatMap.value ?? {})
+    .flat()
+    .forEach((seat) => {
+      if (!seat.seat_type_id || map.has(seat.seat_type_id)) return
+
+      const name = seat.seat_type?.name ?? 'Standard'
+      map.set(seat.seat_type_id, {
+        id: seat.seat_type_id,
+        name,
+        className: seatTypeClass(name),
+      })
+    })
+
+  return Array.from(map.values())
+})
 
 async function fetchSeats() {
   if (!props.room?.id) return
@@ -153,6 +177,18 @@ function resetNewRows() {
   newRows.splice(0, newRows.length, { label: '', seats_per_row: 10, seat_type_id: '' })
 }
 
+function seatTypeClass(name?: string) {
+  const normalized = name?.toLowerCase() ?? ''
+
+  if (normalized.includes('imax')) return 'imax'
+  if (normalized.includes('vip')) return 'vip'
+  if (normalized.includes('sweetbox') || normalized.includes('sweet box')) return 'sweetbox'
+  if (normalized.includes('couple') || normalized.includes('đôi')) return 'couple'
+  if (normalized.includes('premium')) return 'premium'
+
+  return 'standard'
+}
+
 watch(
   () => showModal.value,
   (val) => {
@@ -181,7 +217,7 @@ watch(
           <div v-if="!loadingSeats && !hasSeats" class="empty-state">
             <n-empty description="Phòng này chưa có ghế nào" size="large">
               <template #extra>
-                <n-button type="primary" @click="activeTab = 'create'">+ Tạo ghế ngay</n-button>
+                <n-button v-if="canCreate" type="primary" @click="activeTab = 'create'">+ Tạo ghế ngay</n-button>
               </template>
             </n-empty>
           </div>
@@ -239,7 +275,7 @@ watch(
                     placement="top"
                   >
                     <template #trigger>
-                      <div class="seat" :class="seat.seat_type?.name?.toLowerCase()">
+                      <div class="seat" :class="seatTypeClass(seat.seat_type?.name)">
                         {{ seat.seat_number }}
                       </div>
                     </template>
@@ -252,11 +288,12 @@ watch(
                 </div>
                 <span class="row-label">{{ rowLabel }}</span>
 
-                <div class="row-actions">
-                  <n-button size="tiny" quaternary type="primary" @click="startEdit(rowLabel)">
+                <div v-if="canUpdate || canDelete" class="row-actions">
+                  <n-button v-if="canUpdate" size="tiny" quaternary type="primary" @click="startEdit(rowLabel)">
                     <Pencil :size="16" :stroke-width="2" />
                   </n-button>
                   <n-button
+                    v-if="canDelete"
                     size="tiny"
                     quaternary
                     type="error"
@@ -270,30 +307,22 @@ watch(
             </div>
 
             <div class="legend">
-              <div class="legend-item">
-                <div class="seat standard" style="pointer-events: none" />
-                <span>Standard</span>
-              </div>
-              <div class="legend-item">
-                <div class="seat vip" style="pointer-events: none" />
-                <span>VIP</span>
-              </div>
-              <div class="legend-item">
-                <div class="seat imax" style="pointer-events: none" />
-                <span>IMAX</span>
+              <div v-for="type in seatTypeLegends" :key="type.id" class="legend-item">
+                <div class="seat" :class="type.className" style="pointer-events: none" />
+                <span>{{ type.name }}</span>
               </div>
             </div>
           </div>
         </n-spin>
       </n-tab-pane>
 
-      <n-tab-pane name="create" tab="Tạo hàng ghế mới">
+      <n-tab-pane v-if="canCreate" name="create" tab="Tạo hàng ghế mới">
         <div class="create-section">
           <div v-for="(row, index) in newRows" :key="index" class="row-form-item">
             <n-card size="small" :title="`Hàng ${index + 1}`">
               <template #header-extra>
                 <n-button
-                  v-if="newRows.length > 1"
+                  v-if="newRows.length > 1 && canCreate"
                   text
                   type="error"
                   size="small"
@@ -335,7 +364,7 @@ watch(
               </n-grid>
             </n-card>
           </div>
-          <n-button dashed block @click="addRow">+ Thêm hàng</n-button>
+          <n-button v-if="canCreate" dashed block @click="addRow">+ Thêm hàng</n-button>
         </div>
       </n-tab-pane>
     </n-tabs>
@@ -344,7 +373,7 @@ watch(
       <n-space justify="end">
         <n-button @click="showModal = false">Đóng</n-button>
         <n-button
-          v-if="activeTab === 'create'"
+          v-if="activeTab === 'create' && canCreate"
           type="primary"
           :loading="submitting"
           @click="handleSubmit"
@@ -456,6 +485,21 @@ watch(
   background: #f0fff0;
   color: #18a058;
   border-bottom-color: #18a058;
+}
+.seat.couple {
+  background: #fff0fb;
+  color: #c026d3;
+  border-bottom-color: #c026d3;
+}
+.seat.premium {
+  background: #fff7e6;
+  color: #f0a020;
+  border-bottom-color: #f0a020;
+}
+.seat.sweetbox {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border-bottom-color: #7e22ce;
 }
 
 .legend {

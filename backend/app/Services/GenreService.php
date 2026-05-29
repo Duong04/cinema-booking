@@ -4,10 +4,9 @@ namespace App\Services;
 use App\Repositories\Genre\GenreRepositoryInterface;
 
 class GenreService {
-    private $genreRepository;
-
-    public function __construct(GenreRepositoryInterface $genreRepository) {
-        $this->genreRepository = $genreRepository;
+    public function __construct(
+        private GenreRepositoryInterface $genreRepository
+    ) {
     }
 
     public function paginate($limit, $q) {

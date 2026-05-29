@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\UsesUuidV7;
-use Illuminate\Support\Str;
 
 class Booking extends Model
 {

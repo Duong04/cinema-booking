@@ -4,10 +4,9 @@ namespace App\Services;
 use App\Repositories\SeatType\SeatTypeRepositoryInterface;
 
 class SeatTypeService {
-    private $seatTypeRepository;
-
-    public function __construct(SeatTypeRepositoryInterface $seatTypeRepository) {
-        $this->seatTypeRepository = $seatTypeRepository;
+    public function __construct(
+        private SeatTypeRepositoryInterface $seatTypeRepository
+    ) {
     }
 
     public function paginate($limit, $q) {

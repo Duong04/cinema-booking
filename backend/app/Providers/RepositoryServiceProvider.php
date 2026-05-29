@@ -41,12 +41,24 @@ use App\Repositories\Booking\BookingRepository;
 use App\Repositories\Booking\BookingRepositoryInterface;
 use App\Repositories\BookingItem\BookingItemRepository;
 use App\Repositories\BookingItem\BookingItemRepositoryInterface;
+use App\Repositories\BookingCombo\BookingComboRepository;
+use App\Repositories\BookingCombo\BookingComboRepositoryInterface;
 use App\Repositories\Combo\ComboRepository;
 use App\Repositories\Combo\ComboRepositoryInterface;
+use App\Repositories\Promotion\PromotionRepository;
+use App\Repositories\Promotion\PromotionRepositoryInterface;
+use App\Repositories\PromotionUsage\PromotionUsageRepository;
+use App\Repositories\PromotionUsage\PromotionUsageRepositoryInterface;
 use App\Repositories\BookingStatusLog\BookingStatusLogRepository;
 use App\Repositories\BookingStatusLog\BookingStatusLogRepositoryInterface;
 use App\Repositories\SeatHold\SeatHoldRepository;
 use App\Repositories\SeatHold\SeatHoldRepositoryInterface;
+use App\Repositories\Payment\PaymentRepository;
+use App\Repositories\Payment\PaymentRepositoryInterface;
+use App\Repositories\PaymentAttempt\PaymentAttemptRepository;
+use App\Repositories\PaymentAttempt\PaymentAttemptRepositoryInterface;
+use App\Repositories\Membership\MembershipRepository;
+use App\Repositories\Membership\MembershipRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -74,9 +86,15 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ShowtimePriceRepositoryInterface::class, ShowtimePriceRepository::class);
         $this->app->bind(BookingRepositoryInterface::class, BookingRepository::class);
         $this->app->bind(BookingItemRepositoryInterface::class, BookingItemRepository::class);
+        $this->app->bind(BookingComboRepositoryInterface::class, BookingComboRepository::class);
         $this->app->bind(ComboRepositoryInterface::class, ComboRepository::class);
+        $this->app->bind(PromotionRepositoryInterface::class, PromotionRepository::class);
+        $this->app->bind(PromotionUsageRepositoryInterface::class, PromotionUsageRepository::class);
         $this->app->bind(BookingStatusLogRepositoryInterface::class, BookingStatusLogRepository::class);
         $this->app->bind(SeatHoldRepositoryInterface::class, SeatHoldRepository::class);
+        $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
+        $this->app->bind(PaymentAttemptRepositoryInterface::class, PaymentAttemptRepository::class);
+        $this->app->bind(MembershipRepositoryInterface::class, MembershipRepository::class);
     }
 
     /**

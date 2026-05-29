@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { type Movie } from '@/data/mockData'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import type { PublicMovie } from '@/features/client/types/movie.type'
 import { useLanguageStore } from '@/stores/language'
 import { Star, Play, Info, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const props = defineProps<{
-  movies: Movie[]
+  movies: PublicMovie[]
 }>()
 
 const languageStore = useLanguageStore()
@@ -14,7 +14,7 @@ const isTransitioning = ref(false)
 let autoPlayInterval: ReturnType<typeof setInterval> | null = null
 
 const nextSlide = () => {
-  if (isTransitioning.value) return
+  if (isTransitioning.value || props.movies.length === 0) return
   isTransitioning.value = true
   currentIndex.value = (currentIndex.value + 1) % props.movies.length
   setTimeout(() => {
@@ -23,7 +23,7 @@ const nextSlide = () => {
 }
 
 const prevSlide = () => {
-  if (isTransitioning.value) return
+  if (isTransitioning.value || props.movies.length === 0) return
   isTransitioning.value = true
   currentIndex.value = (currentIndex.value - 1 + props.movies.length) % props.movies.length
   setTimeout(() => {
@@ -32,11 +32,15 @@ const prevSlide = () => {
 }
 
 const startAutoPlay = () => {
+  if (props.movies.length === 0 || autoPlayInterval) return
   autoPlayInterval = setInterval(nextSlide, 8000)
 }
 
 const stopAutoPlay = () => {
-  if (autoPlayInterval) clearInterval(autoPlayInterval)
+  if (autoPlayInterval) {
+    clearInterval(autoPlayInterval)
+    autoPlayInterval = null
+  }
 }
 
 onMounted(() => {
@@ -46,6 +50,22 @@ onMounted(() => {
 onUnmounted(() => {
   stopAutoPlay()
 })
+
+watch(
+  () => props.movies.length,
+  (length) => {
+    if (length === 0) {
+      currentIndex.value = 0
+      stopAutoPlay()
+      return
+    }
+
+    if (currentIndex.value >= length) {
+      currentIndex.value = 0
+    }
+    startAutoPlay()
+  },
+)
 </script>
 
 <template>
@@ -62,26 +82,11 @@ onUnmounted(() => {
         <div class="absolute inset-0">
           <!-- Poster Image (Always present as fallback/loading state) -->
           <img
-            :src="movie.backdrop"
+            :src="movie.banner_url ?? movie.poster_url"
             :alt="movie.title"
             class="w-full h-full object-cover opacity-60 md:opacity-100"
             referrerpolicy="no-referrer"
           />
-
-          <!-- Video Overlay -->
-          <video
-            v-if="movie.videoUrl && index === currentIndex"
-            :key="movie.videoUrl"
-            autoplay
-            muted
-            loop
-            playsinline
-            class="absolute inset-0 w-full h-full object-cover opacity-60 md:opacity-100 transition-opacity duration-1000"
-            @loadeddata="(e: any) => (e.target.style.opacity = 1)"
-            style="opacity: 0"
-          >
-            <source :src="movie.videoUrl" type="video/mp4" />
-          </video>
 
           <div
             class="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10"
@@ -103,38 +108,30 @@ onUnmounted(() => {
           >
             <div class="flex items-center gap-3 mb-4">
               <span
-                v-if="movie.videoUrl"
-                class="px-3 py-1 bg-red-600 text-white text-[10px] font-black rounded uppercase tracking-widest flex items-center gap-1.5 shadow-lg shadow-red-600/20"
-              >
-                <div class="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                Live Trailer
-              </span>
-              <span
-                v-else
                 class="px-3 py-1 bg-white/10 backdrop-blur-md text-white text-[10px] font-black rounded uppercase tracking-widest border border-white/10"
               >
                 Featured
               </span>
               <div class="flex items-center gap-1 text-yellow-500 drop-shadow-md">
                 <Star class="w-4 h-4 fill-current" />
-                <span class="text-sm font-bold">{{ movie.rating }}</span>
+                <span class="text-sm font-bold">{{ movie.rating_score ?? '-' }}</span>
               </div>
             </div>
             <h1
               class="text-4xl md:text-7xl font-black text-white mb-4 tracking-tighter uppercase leading-none drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
             >
-              {{ languageStore.language === 'en' ? movie.title : movie.titleVi }}
+              {{ movie.title }}
             </h1>
             <p
               class="text-base md:text-lg text-gray-200 mb-8 line-clamp-3 font-medium leading-relaxed drop-shadow-lg"
             >
-              {{ languageStore.language === 'en' ? movie.description : movie.descriptionVi }}
+              {{ movie.description }}
             </p>
             <div class="flex flex-wrap gap-4">
               <router-link
                 :to="{
                   name: 'movie-detail',
-                  params: { id: movie.id }
+                  params: { id: movie.slug ?? movie.id }
                 }"
                 class="px-6 md:px-8 py-3 md:py-4 bg-red-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-red-700 transition-all transform hover:scale-105 shadow-xl shadow-red-600/20"
               >
@@ -144,7 +141,7 @@ onUnmounted(() => {
               <router-link
                 :to="{
                   name: 'movie-detail',
-                  params: { id: movie.id }
+                  params: { id: movie.slug ?? movie.id }
                 }"
                 class="px-6 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-2xl font-bold flex items-center gap-2 hover:bg-white/20 transition-all"
               >

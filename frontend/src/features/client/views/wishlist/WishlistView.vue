@@ -1,15 +1,25 @@
 <script setup lang="ts">
+import { computed, onMounted } from 'vue'
 import { useLanguageStore } from '@/stores/language'
 import { useBookingStore } from '@/stores/client/booking'
-import { MOVIES } from '@/data/mockData'
 import { Heart, Film } from 'lucide-vue-next'
 import MovieCard from '../../components/ui/MovieCard.vue'
+import { useMovie } from '@/features/client/composables/useMovie'
 
 const languageStore = useLanguageStore()
 const bookingStore = useBookingStore()
+const { nowPlayingMovies, comingSoonMovies, fetchNowPlayingMovies, fetchComingSoonMovies } = useMovie()
 
-const wishlistMovies = computed(() => MOVIES.filter((m) => bookingStore.wishlist.includes(m.id)))
-import { computed } from 'vue'
+const wishlistMovies = computed(() =>
+  [...nowPlayingMovies.value, ...comingSoonMovies.value].filter((movie) =>
+    bookingStore.wishlist.includes(movie.id),
+  ),
+)
+
+onMounted(() => {
+  fetchNowPlayingMovies()
+  fetchComingSoonMovies()
+})
 </script>
 
 <template>

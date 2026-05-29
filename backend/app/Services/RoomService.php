@@ -4,10 +4,9 @@ namespace App\Services;
 use App\Repositories\Room\RoomRepositoryInterface;
 
 class RoomService {
-    private $roomRepository;
-
-    public function __construct(RoomRepositoryInterface $roomRepository) {
-        $this->roomRepository = $roomRepository;
+    public function __construct(
+        private RoomRepositoryInterface $roomRepository
+    ) {
     }
 
     public function paginate($limit, $q) {

@@ -157,6 +157,8 @@ return new class extends Migration {
         Schema::create('cities', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->timestamps();
         });
 
@@ -518,7 +520,7 @@ return new class extends Migration {
             $table->integer('usage_limit')->nullable();
             $table->integer('per_user_limit')->nullable();
 
-            $table->string('applicable_to')->nullable();
+            $table->enum('applicable_to', ['booking', 'ticket', 'combo'])->default('combo');
             $table->enum('status', ['active', 'paused', 'expired'])->default('active');
             $table->timestamps();
         });

@@ -16,7 +16,7 @@ class PermissionResource extends JsonResource
     {
         $roleId = $this?->pivot?->role_id ?? null;
 
-        $filteredActions = $this?->actions->filter(function ($action) use ($roleId) {
+        $filteredActions = $this?->roleActions->filter(function ($action) use ($roleId) {
             return $action?->pivot?->role_id == $roleId;
         })->values();
 

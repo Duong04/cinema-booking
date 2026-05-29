@@ -9,7 +9,6 @@ import {
   Bell,
   User,
   Globe,
-  Calendar,
   MapPin,
   Menu,
   X,
@@ -25,15 +24,14 @@ const message = useMessage()
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const { isLoggedIn, isAdmin, user } = storeToRefs(authStore)
+const { isLoggedIn, isClient, user } = storeToRefs(authStore)
 const languageStore = useLanguageStore()
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
 const navItems = [
   { name: 'nav.home', namepath: 'home', icon: Film },
   { name: 'nav.movies', namepath: 'movies', icon: Film },
-  { name: 'nav.cinemas', namepath: 'cinemas', icon: MapPin },
-  { name: 'nav.schedule', namepath: 'schedule', icon: Calendar },
+  { name: 'nav.cinemas', namepath: 'cinemas', icon: MapPin }
 ]
 
 const handleScroll = () => {
@@ -46,7 +44,7 @@ const userMenuOptions = computed(() => [
     key: 'profile',
     icon: () => h(User, { class: 'w-4 h-4' }),
   },
-  ...(isAdmin.value ? [{
+  ...(!isClient.value ? [{
     label: () => languageStore.language === 'en' ? 'Admin Dashboard' : 'Quản trị',
     key: 'admin',
     icon: () => h(LayoutDashboard, { class: 'w-4 h-4' }),
@@ -321,7 +319,7 @@ onUnmounted(() => {
 
               <!-- Admin link -->
               <router-link
-                v-if="isAdmin"
+                v-if="!isClient"
                 to="/admin"
                 @click="isMobileMenuOpen = false"
                 class="w-full py-3 bg-white/5 border border-white/10 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3"

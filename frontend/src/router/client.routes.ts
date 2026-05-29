@@ -58,6 +58,65 @@ export const clientRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'profile',
+    name: 'profile',
+    component: () => import('@/features/shared/views/ProfileView.vue'),
+    meta: {
+      title: 'Cinema - Tài khoản',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: 'booking/showtime/:movieId',
+    name: 'booking-showtime',
+    component: () => import('@/features/client/views/booking/ShowtimeView.vue'),
+    meta: {
+      title: 'Cinema - Chọn suất chiếu',
+    },
+  },
+  {
+    path: 'booking/seats/:showtimeId',
+    name: 'booking-seats',
+    component: () => import('@/features/client/views/booking/SeatView.vue'),
+    meta: {
+      title: 'Cinema - Chọn ghế',
+    },
+  },
+  {
+    path: 'booking/combo',
+    name: 'booking-combo',
+    component: () => import('@/features/client/views/booking/ComboView.vue'),
+    meta: {
+      title: 'Cinema - Chọn combo',
+    },
+  },
+  {
+    path: 'booking/checkout',
+    name: 'booking-checkout',
+    component: () => import('@/features/client/views/booking/CheckoutView.vue'),
+    meta: {
+      title: 'Cinema - Thanh toán',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: 'booking/payment-result',
+    name: 'booking-payment-result',
+    component: () => import('@/features/client/views/booking/PaymentResultView.vue'),
+    meta: {
+      title: 'Cinema - Kết quả thanh toán',
+    },
+  },
+  {
+    path: 'booking/payment/:id',
+    name: 'booking-payment',
+    component: () => import('@/features/client/views/booking/PaymentView.vue'),
+    meta: {
+      title: 'Cinema - Thanh toán',
+      requiresAuth: true,
+    },
+  },
+  {
     path: 'login',
     name: 'login',
     component: () => import('@/features/shared/views/LoginView.vue'),

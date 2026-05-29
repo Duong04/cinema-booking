@@ -6,20 +6,29 @@ import { useShowtime } from '../../composables/useShowtime'
 import { useMovie } from '../../composables/useMovie'
 import { useRoom } from '../../composables/useRoom'
 import ShowtimeFormModal from './components/ShowtimeFormModal.vue'
+import ShowtimeSeatOverviewModal from './components/ShowtimeSeatOverviewModal.vue'
 import type { Showtime, Status } from '../../types/showtime.type'
 import { Search as SearchIcon } from '@vicons/ionicons5'
+import { useAdminPermission } from '../../composables/useAdminPermission'
+import { ADMIN_ACTIONS, ADMIN_PERMISSIONS } from '@/features/admin/configs/access-control.config'
 
 const { data, loading, filters, pagination, fetchShowtimes, deleteShowtime } = useShowtime()
 const { data: movieData, fetchMovies } = useMovie()
 const { data: roomData, fetchRooms } = useRoom()
+const { can } = useAdminPermission()
 
 const message = useMessage()
 const dialog = useDialog()
 const showModal = ref(false)
+const showSeatOverviewModal = ref(false)
 const selectedShowtime = ref<Showtime | null>(null)
+const selectedSeatOverviewShowtime = ref<Showtime | null>(null)
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 
 const hasChecked = computed(() => checkedRowKeysRef.value.length > 0)
+const canCreate = computed(() => can(ADMIN_PERMISSIONS.SHOWTIMES, ADMIN_ACTIONS.CREATE))
+const canUpdate = computed(() => can(ADMIN_PERMISSIONS.SHOWTIMES, ADMIN_ACTIONS.UPDATE))
+const canDelete = computed(() => can(ADMIN_PERMISSIONS.SHOWTIMES, ADMIN_ACTIONS.DELETE))
 
 const STATUS_MAP: Record<
   Status,
@@ -53,7 +62,7 @@ function createColumns(): DataTableColumns<Showtime> {
   return [
     { type: 'selection' },
     {
-      title: 'Phim',
+      title: 'Movie',
       key: 'movie',
       minWidth: 200,
       render: (row) =>
@@ -77,7 +86,7 @@ function createColumns(): DataTableColumns<Showtime> {
         ]),
     },
     {
-      title: 'Phòng chiếu',
+      title: 'Room',
       key: 'room',
       width: 130,
       render: (row) =>
@@ -87,25 +96,25 @@ function createColumns(): DataTableColumns<Showtime> {
         ]),
     },
     {
-      title: 'Ngày chiếu',
+      title: 'Show Date',
       key: 'show_date',
       width: 120,
       render: (row) => h('span', formatShowDate(row.show_date)),
     },
     {
-      title: 'Giờ chiếu',
+      title: 'Start Time',
       key: 'start_time',
       width: 140,
       render: (row) => h('span', `${formatTime(row.start_time)} → ${formatTime(row.end_time)}`),
     },
     {
-      title: 'Giá cơ bản',
+      title: 'Base Price',
       key: 'base_price',
       width: 130,
       render: (row) => h('span', formatVND(row.base_price)),
     },
     {
-      title: 'Loại ghế / Giá',
+      title: 'Seat Type / Price',
       key: 'prices',
       minWidth: 160,
       render: (row) =>
@@ -126,7 +135,7 @@ function createColumns(): DataTableColumns<Showtime> {
         ),
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       key: 'status',
       width: 130,
       render: (row) => {
@@ -135,9 +144,9 @@ function createColumns(): DataTableColumns<Showtime> {
       },
     },
     {
-      title: 'Thao tác',
+      title: 'Actions',
       key: 'actions',
-      width: 130,
+      width: 230,
       fixed: 'right',
       render: (row) =>
         h(
@@ -147,14 +156,27 @@ function createColumns(): DataTableColumns<Showtime> {
             default: () => [
               h(
                 NButton,
-                { size: 'small', type: 'primary', ghost: true, onClick: () => openEditModal(row) },
-                { default: () => 'Sửa' },
+                { size: 'small', type: 'info', secondary: true, onClick: () => openSeatOverview(row) },
+                { default: () => 'Seat' },
               ),
-              h(
-                NButton,
-                { size: 'small', type: 'error', ghost: true, onClick: () => handleDelete(row) },
-                { default: () => 'Xóa' },
-              ),
+              ...(canUpdate.value
+                ? [
+                    h(
+                      NButton,
+                      { size: 'small', type: 'primary', secondary: true, onClick: () => openEditModal(row) },
+                      { default: () => 'Edit' },
+                    ),
+                  ]
+                : []),
+              ...(canDelete.value
+                ? [
+                    h(
+                      NButton,
+                      { size: 'small', type: 'error', secondary: true, onClick: () => handleDelete(row) },
+                      { default: () => 'Delete' },
+                    ),
+                  ]
+                : []),
             ],
           },
         ),
@@ -172,6 +194,11 @@ function openCreateModal() {
 function openEditModal(row: Showtime) {
   selectedShowtime.value = row
   showModal.value = true
+}
+
+function openSeatOverview(row: Showtime) {
+  selectedSeatOverviewShowtime.value = row
+  showSeatOverviewModal.value = true
 }
 
 function handleDelete(row: Showtime) {
@@ -236,6 +263,7 @@ onMounted(() => {
         placeholder="Tìm theo phim"
         filterable
         clearable
+        style="width: 220px"
       />
       <n-select
         v-model:value="filters.room_id"
@@ -243,6 +271,7 @@ onMounted(() => {
         placeholder="Tìm theo phòng"
         filterable
         clearable
+        style="width: 180px"
       />
       <n-date-picker
         v-model:formatted-value="filters.show_date"
@@ -251,11 +280,23 @@ onMounted(() => {
         placeholder="Chọn ngày chiếu"
         clearable
       />
-      <n-button v-if="hasChecked" type="error" @click="handleDeleteMultiple">
+      <n-select
+        v-model:value="filters.status"
+        :options="[
+          { label: 'Sắp chiếu', value: 'scheduled' },
+          { label: 'Đang chiếu', value: 'ongoing' },
+          { label: 'Đã kết thúc', value: 'completed' },
+          { label: 'Đã hủy', value: 'cancelled' },
+        ]"
+        placeholder="Tìm theo trạng thái"
+        clearable
+        style="width: 180px"
+      />
+      <n-button v-if="hasChecked && canDelete" type="error" @click="handleDeleteMultiple">
         Xóa {{ checkedRowKeysRef.length }} mục đã chọn
       </n-button>
     </n-space>
-    <n-button type="primary" @click="openCreateModal">+ Tạo suất chiếu</n-button>
+    <n-button v-if="canCreate" type="primary" @click="openCreateModal">+ Tạo suất chiếu</n-button>
   </n-space>
 
   <n-data-table
@@ -264,7 +305,7 @@ onMounted(() => {
     :loading="loading"
     :pagination="pagination"
     :row-key="(row: Showtime) => row.id"
-    :scroll-x="1100"
+    :scroll-x="1350"
     remote
     @update:checked-row-keys="(keys: DataTableRowKey[]) => (checkedRowKeysRef = keys)"
   />
@@ -275,5 +316,10 @@ onMounted(() => {
     @success="fetchShowtimes"
     :movies="movieOptions"
     :rooms="roomOptions"
+  />
+
+  <ShowtimeSeatOverviewModal
+    v-model:show="showSeatOverviewModal"
+    :showtime="selectedSeatOverviewShowtime"
   />
 </template>
