@@ -4,17 +4,32 @@ namespace App\Http\Controllers\Apis\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PaymentRequest;
+use App\Http\Requests\QueryRequest;
 use App\Services\PaymentService;
-use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
+use App\Traits\PaginationTrait;
 use App\Traits\ResponseHelper;
 
 class PaymentController extends Controller
 {
-    use ResponseHelper;
+    use ResponseHelper, PaginationTrait;
+
     public function __construct(
         private PaymentService $paymentService
     ) {
+    }
+
+    public function paginate(QueryRequest $request)
+    {
+        $query = $request->validated();
+        $limit = $query['limit'] ?? 15;
+        $q = $query['q'] ?? null;
+        $status = $query['status'] ?? null;
+        $provider = $query['provider'] ?? null;
+
+        $payments = $this->paymentService->paginate($limit, $q, $status, $provider);
+
+        return $this->successList($payments->items(), $this->paginationMeta($payments));
     }
 
     #[OA\Post(

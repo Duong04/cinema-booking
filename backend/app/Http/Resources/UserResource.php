@@ -23,6 +23,8 @@ class UserResource extends JsonResource
             'date_of_birth' => $this->date_of_birth,
             'gender' => $this->gender,
             'is_active' => $this->is_active,
+            'membership' => $this->whenLoaded('membership'),
+            'tickets_purchased_count' => $this->whenCounted('confirmedBookingItems'),
             'role' => new RoleResource($this->role)
         ];
     }

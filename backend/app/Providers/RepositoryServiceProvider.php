@@ -57,6 +57,8 @@ use App\Repositories\Payment\PaymentRepository;
 use App\Repositories\Payment\PaymentRepositoryInterface;
 use App\Repositories\PaymentAttempt\PaymentAttemptRepository;
 use App\Repositories\PaymentAttempt\PaymentAttemptRepositoryInterface;
+use App\Repositories\Membership\MembershipRepository;
+use App\Repositories\Membership\MembershipRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -92,6 +94,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SeatHoldRepositoryInterface::class, SeatHoldRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
         $this->app->bind(PaymentAttemptRepositoryInterface::class, PaymentAttemptRepository::class);
+        $this->app->bind(MembershipRepositoryInterface::class, MembershipRepository::class);
     }
 
     /**

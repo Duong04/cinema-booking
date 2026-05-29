@@ -3,6 +3,8 @@ export interface User {
   name: string
   email: string
   role: UserRole
+  membership?: Membership | null
+  tickets_purchased_count?: number
   phone?: string | null
   avatar?: string | null
   date_of_birth?: string | null
@@ -19,6 +21,8 @@ export interface UserProfile {
     name: string,
     email: string,
     role: UserRole,
+    membership?: Membership | null,
+    tickets_purchased_count?: number,
     phone?: string | null,
     avatar?: string | null,
     date_of_birth?: string | null,
@@ -30,6 +34,13 @@ export interface UserProfile {
   },
   message?: string,
   success?: boolean
+}
+
+export interface Membership {
+  id: string
+  user_id: string
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum'
+  points: number
 }
 
 export interface UserRole {

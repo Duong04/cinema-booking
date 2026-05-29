@@ -124,6 +124,32 @@ export const adminRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: 'bookings',
+    name: 'admin-bookings',
+    component: () => import('@/features/admin/views/booking/BookingView.vue'),
+    meta: {
+      title: 'Cinema - Admin Bookings',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Đặt vé & thanh toán' },
+        { label: 'Booking' },
+      ],
+    },
+  },
+  {
+    path: 'payments',
+    name: 'admin-payments',
+    component: () => import('@/features/admin/views/payment/PaymentView.vue'),
+    meta: {
+      title: 'Cinema - Admin Payments',
+      breadcrumb: [
+        { label: 'Dashboard', name: 'dashboard' },
+        { label: 'Đặt vé & thanh toán' },
+        { label: 'Payment' },
+      ],
+    },
+  },
+  {
     path: 'movies',
     name: 'admin-movies',
     component: () => import('@/features/admin/views/movie/MovieView.vue'),

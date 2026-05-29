@@ -31,7 +31,8 @@ class BookingService
         private BookingComboRepositoryInterface $bookingComboRepository, 
         private ComboRepositoryInterface $comboRepository, 
         private PromotionRepositoryInterface $promotionRepository, 
-        private PromotionUsageRepositoryInterface $promotionUsageRepository
+        private PromotionUsageRepositoryInterface $promotionUsageRepository,
+        private MembershipService $membershipService
     ) {
     }
 
@@ -280,6 +281,10 @@ class BookingService
                     'new_status' => $payload['status'],
                     'changed_at' => now(),
                 ]);
+
+                if ($payload['status'] === 'confirmed') {
+                    $this->membershipService->addPointsForConfirmedBooking($booking->fresh());
+                }
             }
 
             DB::commit();

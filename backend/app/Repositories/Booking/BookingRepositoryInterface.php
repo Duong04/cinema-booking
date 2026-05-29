@@ -5,5 +5,5 @@ use App\Repositories\Base\BaseRepositoryInterface;
 
 interface BookingRepositoryInterface extends BaseRepositoryInterface
 {
-    public function paginate(int $limit, string $q, string $status);
+    public function paginate(int $limit, ?string $q, ?string $status);
 }

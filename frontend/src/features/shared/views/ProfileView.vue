@@ -11,6 +11,8 @@ import {
   Phone,
   Save,
   ShieldCheck,
+  Ticket,
+  Trophy,
   User,
 } from 'lucide-vue-next'
 import { useMessage } from 'naive-ui'
@@ -64,6 +66,19 @@ const initials = computed(() => {
 })
 const roleName = computed(() => user.value?.role?.name ?? 'customer')
 const hasAvatar = computed(() => Boolean(profileForm.avatar))
+const membership = computed(() => user.value?.membership ?? null)
+const membershipTierLabel = computed(() => {
+  const tier = membership.value?.tier ?? 'bronze'
+
+  return {
+    bronze: 'Bronze',
+    silver: 'Silver',
+    gold: 'Gold',
+    platinum: 'Platinum',
+  }[tier]
+})
+const membershipPoints = computed(() => membership.value?.points ?? 0)
+const ticketsPurchasedCount = computed(() => user.value?.tickets_purchased_count ?? 0)
 
 function syncProfileForm() {
   if (!user.value) return
@@ -192,6 +207,26 @@ onMounted(async () => {
           <div class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-black uppercase">
             <ShieldCheck class="w-4 h-4" />
             {{ roleName }}
+          </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div class="flex items-center gap-2 text-amber-300 text-xs font-black uppercase">
+              <Trophy class="w-4 h-4" />
+              Hạng
+            </div>
+            <p class="mt-2 text-xl font-black text-white">{{ membershipTierLabel }}</p>
+            <p class="text-xs text-gray-500">{{ membershipPoints.toLocaleString('vi-VN') }} điểm</p>
+          </div>
+
+          <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div class="flex items-center gap-2 text-sky-300 text-xs font-black uppercase">
+              <Ticket class="w-4 h-4" />
+              Vé
+            </div>
+            <p class="mt-2 text-xl font-black text-white">{{ ticketsPurchasedCount.toLocaleString('vi-VN') }}</p>
+            <p class="text-xs text-gray-500">đã mua</p>
           </div>
         </div>
 

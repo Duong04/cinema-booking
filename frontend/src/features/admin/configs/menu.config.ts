@@ -5,13 +5,11 @@ import {
   BookOutline as BookIcon,
   ShieldCheckmarkOutline as ShieldCheckmarkIcon,
   LocationOutline as LocationOutlineIcon,
-  ColorFilterOutline as ColorFilterOutlineIcon,
-  NuclearSharp as NuclearSharpIcon,
   TvOutline as TvOutlineIcon,
   PersonCircleSharp as UserIcon,
   PeopleOutline as PeopleIcon,
-  FastFoodOutline as ComboIcon,
   PricetagOutline as PromotionIcon,
+  ReceiptOutline as BookingPaymentIcon,
 } from '@vicons/ionicons5'
 import { NIcon } from 'naive-ui'
 import router from '@/router'
@@ -32,16 +30,26 @@ export const handleMenuSelect = (key: string) => {
 
 export const menuOptions: AdminMenuOption[] = [
   {
-    label: 'Dashboard',
+    label: 'Tổng quan',
     key: 'dashboard',
     icon: renderIcon(BookIcon),
     permissionKey: ADMIN_PERMISSIONS.DASHBOARD,
   },
   {
-    label: 'Rạp chiếu phim',
-    key: 'cinema-group',
-    icon: renderIcon(NuclearSharpIcon),
+    label: 'Vận hành rạp',
+    key: 'cinema-operation-group',
+    icon: renderIcon(LocationOutlineIcon),
     children: [
+      {
+        label: 'Thành phố',
+        key: 'admin-cities',
+        permissionKey: ADMIN_PERMISSIONS.CINEMAS,
+      },
+      {
+        label: 'Chuỗi rạp',
+        key: 'admin-cinema-chains',
+        permissionKey: ADMIN_PERMISSIONS.CINEMAS,
+      },
       {
         label: 'Danh sách rạp',
         key: 'admin-cinemas',
@@ -57,70 +65,74 @@ export const menuOptions: AdminMenuOption[] = [
         key: 'admin-seat-types',
         permissionKey: ADMIN_PERMISSIONS.SEATS,
       },
-      {
-        label: 'Lịch chiếu',
-        key: 'admin-showtimes',
-        permissionKey: ADMIN_PERMISSIONS.SHOWTIMES,
-      }
     ],
   },
   {
-    label: 'Phim',
-    key: 'movie-group',
+    label: 'Phim & lịch chiếu',
+    key: 'movie-showtime-group',
     icon: renderIcon(TvOutlineIcon),
     children: [
+      {
+        label: 'Danh sách phim',
+        key: 'admin-movies',
+        permissionKey: ADMIN_PERMISSIONS.MOVIES,
+      },
       {
         label: 'Thể loại phim',
         key: 'admin-genres',
         permissionKey: ADMIN_PERMISSIONS.GENRES,
       },
       {
-        label: 'Danh sách phim',
-        key: 'admin-movies',
-        permissionKey: ADMIN_PERMISSIONS.MOVIES,
-      }
-    ],
-  },
-  {
-    label: 'Chuỗi rạp',
-    key: 'admin-cinema-chains',
-    icon: renderIcon(ColorFilterOutlineIcon),
-    permissionKey: ADMIN_PERMISSIONS.CINEMAS,
-  },
-  {
-    label: 'Combo bắp nước',
-    key: 'admin-combos',
-    icon: renderIcon(ComboIcon),
-    permissionKey: ADMIN_PERMISSIONS.COMBOS,
-  },
-  {
-    label: 'Khuyến mãi',
-    key: 'admin-promotions',
-    icon: renderIcon(PromotionIcon),
-    permissionKey: ADMIN_PERMISSIONS.PROMOTIONS,
-  },
-  {
-    label: 'Khu vực',
-    key: 'location-group',
-    icon: renderIcon(LocationOutlineIcon),
-    children: [
-      {
-        label: 'Thành phố',
-        key: 'admin-cities',
-        permissionKey: ADMIN_PERMISSIONS.CINEMAS,
+        label: 'Lịch chiếu',
+        key: 'admin-showtimes',
+        permissionKey: ADMIN_PERMISSIONS.SHOWTIMES,
       },
     ],
   },
   {
-    label: 'Nhân sự',
-    key: 'admin-users',
-    icon: renderIcon(UserIcon),
-    permissionKey: ADMIN_PERMISSIONS.USERS,
+    label: 'Đặt vé & thanh toán',
+    key: 'booking-payment-group',
+    icon: renderIcon(BookingPaymentIcon),
+    children: [
+      {
+        label: 'Booking',
+        key: 'admin-bookings',
+        permissionKey: ADMIN_PERMISSIONS.BOOKINGS,
+      },
+      {
+        label: 'Payment',
+        key: 'admin-payments',
+        permissionKey: ADMIN_PERMISSIONS.PAYMENTS,
+      },
+    ],
+  },
+  {
+    label: 'Ưu đãi & combo',
+    key: 'sales-group',
+    icon: renderIcon(PromotionIcon),
+    children: [
+      {
+        label: 'Combo bắp nước',
+        key: 'admin-combos',
+        permissionKey: ADMIN_PERMISSIONS.COMBOS,
+      },
+      {
+        label: 'Khuyến mãi',
+        key: 'admin-promotions',
+        permissionKey: ADMIN_PERMISSIONS.PROMOTIONS,
+      },
+    ],
   },
   {
     label: 'Khách hàng',
     key: 'admin-customers',
     icon: renderIcon(PeopleIcon),
+    permissionKey: ADMIN_PERMISSIONS.USERS,
+  },
+  {
+    label: 'Nhân sự',
+    key: 'admin-users',
+    icon: renderIcon(UserIcon),
     permissionKey: ADMIN_PERMISSIONS.USERS,
   },
   {

@@ -24,6 +24,7 @@ use App\Models\SeatType;
 use App\Models\Showtime;
 use App\Models\ShowtimePrice;
 use App\Models\User;
+use App\Services\MembershipService;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -76,6 +77,7 @@ class DatabaseSeeder extends Seeder
         $this->seedCombos();
         $this->seedPromotions();
         $this->seedBookings();
+        $this->seedMemberships();
         $this->seedActivityLogs();
         $this->seedLoginData();
     }
@@ -130,10 +132,10 @@ class DatabaseSeeder extends Seeder
     private function seedAccessControl(): void
     {
         $roles = [
-            'super admin' => 'Toan quyen cau hinh he thong, phan quyen va du lieu van hanh.',
-            'manager' => 'Quan ly rap, lich chieu, gia ve va bao cao doanh thu.',
-            'staff' => 'Xu ly dat ve, soat ve, ho tro khach hang tai quay.',
-            'customer' => 'Khach hang dat ve, thanh toan va quan ly thanh vien.',
+            'super admin' => 'Toàn quyền cấu hình hệ thống, phân quyền và dữ liệu vận hành.',
+            'manager' => 'Quản lý rạp, lịch chiếu, giá vé và báo cáo doanh thu.',
+            'staff' => 'Xử lý đặt vé, soát vé, hỗ trợ khách hàng tại quầy.',
+            'customer' => 'Khách hàng đặt vé, thanh toán và quản lý thành viên.',
         ];
 
         foreach ($roles as $name => $description) {
@@ -141,20 +143,20 @@ class DatabaseSeeder extends Seeder
         }
 
         $permissions = [
-            'dashboard' => 'Bang dieu khien',
-            'users' => 'Nguoi dung',
-            'roles' => 'Vai tro',
-            'cinemas' => 'Rap chieu',
-            'rooms' => 'Phong chieu',
-            'seats' => 'Ghe ngoi',
+            'dashboard' => 'Bảng điều khiển',
+            'users' => 'Người dùng',
+            'roles' => 'Vai trò',
+            'cinemas' => 'Rạp chiếu',
+            'rooms' => 'Phòng chiếu',
+            'seats' => 'Ghế ngồi',
             'movies' => 'Phim',
-            'genres' => 'The loai',
-            'showtimes' => 'Suat chieu',
-            'bookings' => 'Dat ve',
-            'payments' => 'Thanh toan',
-            'combos' => 'Combo bap nuoc',
-            'promotions' => 'Khuyen mai',
-            'reports' => 'Bao cao',
+            'genres' => 'Thể loại',
+            'showtimes' => 'Suất chiếu',
+            'bookings' => 'Đặt vé',
+            'payments' => 'Thanh toán',
+            'combos' => 'Combo bắp nước',
+            'promotions' => 'Khuyến mãi',
+            'reports' => 'Báo cáo',
         ];
 
         foreach ($permissions as $key => $name) {
@@ -163,11 +165,11 @@ class DatabaseSeeder extends Seeder
 
         $actions = [
             'view' => 'Xem',
-            'create' => 'Them moi',
-            'update' => 'Cap nhat',
-            'delete' => 'Xoa',
-            'approve' => 'Duyet',
-            'export' => 'Xuat du lieu',
+            'create' => 'Thêm mới',
+            'update' => 'Cập nhật',
+            'delete' => 'Xóa',
+            'approve' => 'Duyệt',
+            'export' => 'Xuất dữ liệu',
         ];
 
         foreach ($actions as $key => $name) {
@@ -218,18 +220,18 @@ class DatabaseSeeder extends Seeder
     private function seedUsers(): void
     {
         $users = [
-            ['role' => 'super admin', 'name' => 'Nguyen Minh Quan', 'email' => 'quan.admin@cinemax.vn', 'phone' => '0901000001', 'gender' => 'male', 'date_of_birth' => '1988-02-17'],
-            ['role' => 'manager', 'name' => 'Tran Thu Ha', 'email' => 'ha.manager@cinemax.vn', 'phone' => '0901000002', 'gender' => 'female', 'date_of_birth' => '1990-09-12'],
-            ['role' => 'manager', 'name' => 'Le Hoang Nam', 'email' => 'nam.manager@cinemax.vn', 'phone' => '0901000003', 'gender' => 'male', 'date_of_birth' => '1986-11-21'],
-            ['role' => 'staff', 'name' => 'Pham Gia Bao', 'email' => 'bao.staff@cinemax.vn', 'phone' => '0901000004', 'gender' => 'male', 'date_of_birth' => '1998-03-08'],
-            ['role' => 'staff', 'name' => 'Do Minh Anh', 'email' => 'anh.staff@cinemax.vn', 'phone' => '0901000005', 'gender' => 'female', 'date_of_birth' => '1999-07-19'],
-            ['role' => 'customer', 'name' => 'Bui Khanh Linh', 'email' => 'linh.bui@example.com', 'phone' => '0912000001', 'gender' => 'female', 'date_of_birth' => '2001-04-11'],
-            ['role' => 'customer', 'name' => 'Vo Duc Huy', 'email' => 'huy.vo@example.com', 'phone' => '0912000002', 'gender' => 'male', 'date_of_birth' => '1997-12-29'],
-            ['role' => 'customer', 'name' => 'Dang Ngoc Tram', 'email' => 'tram.dang@example.com', 'phone' => '0912000003', 'gender' => 'female', 'date_of_birth' => '1995-05-23'],
-            ['role' => 'customer', 'name' => 'Hoang Viet Dung', 'email' => 'dung.hoang@example.com', 'phone' => '0912000004', 'gender' => 'male', 'date_of_birth' => '1993-08-14'],
-            ['role' => 'customer', 'name' => 'Mai Phuong Thao', 'email' => 'thao.mai@example.com', 'phone' => '0912000005', 'gender' => 'female', 'date_of_birth' => '2000-10-05'],
-            ['role' => 'customer', 'name' => 'Phan Nhat Minh', 'email' => 'minh.phan@example.com', 'phone' => '0912000006', 'gender' => 'male', 'date_of_birth' => '1996-01-30'],
-            ['role' => 'customer', 'name' => 'Vu Quynh Chi', 'email' => 'chi.vu@example.com', 'phone' => '0912000007', 'gender' => 'female', 'date_of_birth' => '1998-06-18'],
+            ['role' => 'super admin', 'name' => 'Nguyễn Minh Quân', 'email' => 'quan.admin@cinemax.vn', 'phone' => '0901000001', 'gender' => 'male', 'date_of_birth' => '1988-02-17'],
+            ['role' => 'manager', 'name' => 'Trần Thu Hà', 'email' => 'ha.manager@cinemax.vn', 'phone' => '0901000002', 'gender' => 'female', 'date_of_birth' => '1990-09-12'],
+            ['role' => 'manager', 'name' => 'Lê Hoàng Nam', 'email' => 'nam.manager@cinemax.vn', 'phone' => '0901000003', 'gender' => 'male', 'date_of_birth' => '1986-11-21'],
+            ['role' => 'staff', 'name' => 'Phạm Gia Bảo', 'email' => 'bao.staff@cinemax.vn', 'phone' => '0901000004', 'gender' => 'male', 'date_of_birth' => '1998-03-08'],
+            ['role' => 'staff', 'name' => 'Đỗ Minh Anh', 'email' => 'anh.staff@cinemax.vn', 'phone' => '0901000005', 'gender' => 'female', 'date_of_birth' => '1999-07-19'],
+            ['role' => 'customer', 'name' => 'Bùi Khánh Linh', 'email' => 'linh.bui@example.com', 'phone' => '0912000001', 'gender' => 'female', 'date_of_birth' => '2001-04-11'],
+            ['role' => 'customer', 'name' => 'Võ Đức Huy', 'email' => 'huy.vo@example.com', 'phone' => '0912000002', 'gender' => 'male', 'date_of_birth' => '1997-12-29'],
+            ['role' => 'customer', 'name' => 'Đặng Ngọc Trâm', 'email' => 'tram.dang@example.com', 'phone' => '0912000003', 'gender' => 'female', 'date_of_birth' => '1995-05-23'],
+            ['role' => 'customer', 'name' => 'Hoàng Việt Dũng', 'email' => 'dung.hoang@example.com', 'phone' => '0912000004', 'gender' => 'male', 'date_of_birth' => '1993-08-14'],
+            ['role' => 'customer', 'name' => 'Mai Phương Thảo', 'email' => 'thao.mai@example.com', 'phone' => '0912000005', 'gender' => 'female', 'date_of_birth' => '2000-10-05'],
+            ['role' => 'customer', 'name' => 'Phan Nhật Minh', 'email' => 'minh.phan@example.com', 'phone' => '0912000006', 'gender' => 'male', 'date_of_birth' => '1996-01-30'],
+            ['role' => 'customer', 'name' => 'Vũ Quỳnh Chi', 'email' => 'chi.vu@example.com', 'phone' => '0912000007', 'gender' => 'female', 'date_of_birth' => '1998-06-18'],
         ];
 
         foreach ($users as $index => $user) {
@@ -246,15 +248,15 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $lastNames = ['Nguyen', 'Tran', 'Le', 'Pham', 'Hoang', 'Phan', 'Vu', 'Vo', 'Dang', 'Bui', 'Do', 'Ngo'];
-        $middleNames = ['Minh', 'Gia', 'Thanh', 'Quoc', 'Bao', 'Ngoc', 'Phuong', 'Khanh', 'Nhat', 'Hoai'];
-        $givenNames = ['An', 'Anh', 'Binh', 'Chau', 'Dung', 'Giang', 'Hai', 'Han', 'Hieu', 'Khoa', 'Lam', 'Linh'];
+        $lastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Phan', 'Vũ', 'Võ', 'Đặng', 'Bùi', 'Đỗ', 'Ngô'];
+        $middleNames = ['Minh', 'Gia', 'Thanh', 'Quốc', 'Bảo', 'Ngọc', 'Phương', 'Khánh', 'Nhật', 'Hoài'];
+        $givenNames = ['An', 'Anh', 'Bình', 'Châu', 'Dũng', 'Giang', 'Hải', 'Hân', 'Hiếu', 'Khoa', 'Lâm', 'Linh'];
 
         for ($index = 1; $index <= 120; $index++) {
             $lastName = $lastNames[($index - 1) % count($lastNames)];
             $middleName = $middleNames[(int) floor(($index - 1) / count($lastNames)) % count($middleNames)];
             $givenName = $givenNames[(($index - 1) * 5 + (int) floor(($index - 1) / count($lastNames))) % count($givenNames)];
-            $gender = in_array($givenName, ['Anh', 'Chau', 'Giang', 'Han', 'Linh'], true) ? 'female' : 'male';
+            $gender = in_array($givenName, ['Anh', 'Châu', 'Giang', 'Hân', 'Linh'], true) ? 'female' : 'male';
 
             $this->users[] = User::factory()->create([
                 'role_id' => $this->roles['customer']->id,
@@ -269,12 +271,25 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $tiers = ['bronze', 'silver', 'gold', 'platinum'];
-        foreach (array_slice($this->users, 5) as $index => $user) {
+    }
+
+    private function seedMemberships(): void
+    {
+        $membershipService = app(MembershipService::class);
+        $customers = array_values(array_filter($this->users, fn (User $user) => $user->role_id === $this->roles['customer']->id));
+
+        foreach ($customers as $user) {
+            $confirmedAmount = Booking::query()
+                ->where('user_id', $user->id)
+                ->where('status', 'confirmed')
+                ->sum('total_amount');
+
+            $points = $membershipService->calculatePoints($confirmedAmount);
+
             Membership::factory()->create([
                 'user_id' => $user->id,
-                'tier' => $tiers[$index % count($tiers)],
-                'points' => 180 + ($index * 470),
+                'tier' => $membershipService->tierForPoints($points),
+                'points' => $points,
             ]);
         }
     }
@@ -282,11 +297,11 @@ class DatabaseSeeder extends Seeder
     private function seedLocations(): void
     {
         $cities = [
-            ['name' => 'TP. Ho Chi Minh', 'latitude' => 10.7769, 'longitude' => 106.7009],
-            ['name' => 'Ha Noi', 'latitude' => 21.0278, 'longitude' => 105.8342],
-            ['name' => 'Da Nang', 'latitude' => 16.0544, 'longitude' => 108.2022],
-            ['name' => 'Can Tho', 'latitude' => 10.0452, 'longitude' => 105.7469],
-            ['name' => 'Hai Phong', 'latitude' => 20.8449, 'longitude' => 106.6881],
+            ['name' => 'TP. Hồ Chí Minh', 'latitude' => 10.7769, 'longitude' => 106.7009],
+            ['name' => 'Hà Nội', 'latitude' => 21.0278, 'longitude' => 105.8342],
+            ['name' => 'Đà Nẵng', 'latitude' => 16.0544, 'longitude' => 108.2022],
+            ['name' => 'Cần Thơ', 'latitude' => 10.0452, 'longitude' => 105.7469],
+            ['name' => 'Hải Phòng', 'latitude' => 20.8449, 'longitude' => 106.6881],
         ];
 
         foreach ($cities as $city) {
@@ -304,12 +319,12 @@ class DatabaseSeeder extends Seeder
         }
 
         $cinemas = [
-            ['city' => 'TP. Ho Chi Minh', 'chain' => 'Galaxy Cinema', 'name' => 'Galaxy Nguyen Du', 'address' => '116 Nguyen Du, Phuong Ben Thanh, Quan 1'],
-            ['city' => 'TP. Ho Chi Minh', 'chain' => 'BHD Star Cineplex', 'name' => 'BHD Star Thao Dien', 'address' => 'Tang 5, Vincom Mega Mall Thao Dien, TP Thu Duc'],
-            ['city' => 'Ha Noi', 'chain' => 'Galaxy Cinema', 'name' => 'Galaxy Mipec Long Bien', 'address' => 'Tang 5, Mipec Long Bien, 2 Long Bien 2'],
-            ['city' => 'Ha Noi', 'chain' => 'Cinestar', 'name' => 'Cinestar Hai Ba Trung', 'address' => '135 Hai Ba Trung, Quan Hoan Kiem'],
-            ['city' => 'Da Nang', 'chain' => 'BHD Star Cineplex', 'name' => 'BHD Star Le Duan', 'address' => '255 Le Duan, Quan Thanh Khe'],
-            ['city' => 'Can Tho', 'chain' => 'Cinestar', 'name' => 'Cinestar Ninh Kieu', 'address' => '68 Tran Phu, Quan Ninh Kieu'],
+            ['city' => 'TP. Hồ Chí Minh', 'chain' => 'Galaxy Cinema', 'name' => 'Galaxy Nguyễn Du', 'address' => '116 Nguyễn Du, Phường Bến Thành, Quận 1'],
+            ['city' => 'TP. Hồ Chí Minh', 'chain' => 'BHD Star Cineplex', 'name' => 'BHD Star Thảo Điền', 'address' => 'Tầng 5, Vincom Mega Mall Thảo Điền, TP. Thủ Đức'],
+            ['city' => 'Hà Nội', 'chain' => 'Galaxy Cinema', 'name' => 'Galaxy Mipec Long Biên', 'address' => 'Tầng 5, Mipec Long Biên, 2 Long Biên 2'],
+            ['city' => 'Hà Nội', 'chain' => 'Cinestar', 'name' => 'Cinestar Hai Bà Trưng', 'address' => '135 Hai Bà Trưng, Quận Hoàn Kiếm'],
+            ['city' => 'Đà Nẵng', 'chain' => 'BHD Star Cineplex', 'name' => 'BHD Star Lê Duẩn', 'address' => '255 Lê Duẩn, Quận Thanh Khê'],
+            ['city' => 'Cần Thơ', 'chain' => 'Cinestar', 'name' => 'Cinestar Ninh Kiều', 'address' => '68 Trần Phú, Quận Ninh Kiều'],
         ];
 
         foreach ($cinemas as $cinema) {
@@ -340,7 +355,7 @@ class DatabaseSeeder extends Seeder
             for ($number = 1; $number <= 3; $number++) {
                 $room = Room::factory()->create([
                     'cinema_id' => $cinema->id,
-                    'name' => 'Phong ' . $number . ' - ' . $cinema->name,
+                    'name' => 'Phòng ' . $number . ' - ' . $cinema->name,
                     'type' => $roomTypes[($cinemaIndex + $number - 1) % count($roomTypes)],
                 ]);
 
@@ -370,7 +385,7 @@ class DatabaseSeeder extends Seeder
 
     private function seedMovies(): void
     {
-        foreach (['Hanh dong', 'Phieu luu', 'Hoat hinh', 'Tam ly', 'Hai', 'Kinh di', 'Khoa hoc vien tuong', 'Gia dinh', 'Lang man'] as $name) {
+        foreach (['Hành động', 'Phiêu lưu', 'Hoạt hình', 'Tâm lý', 'Hài', 'Kinh dị', 'Khoa học viễn tưởng', 'Gia đình', 'Lãng mạn'] as $name) {
             $this->genres[$name] = Genre::factory()->create(['name' => $name]);
         }
 
@@ -381,13 +396,13 @@ class DatabaseSeeder extends Seeder
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg',
                 'banner_url' => 'https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=Way9Dexny3w',
-                'description' => 'Paul Atreides hop luc cung nguoi Fremen de doi dau the luc da huy hoai gia toc minh.',
-                'content' => 'Mot chuyen phieu luu khoa hoc vien tuong quy mo lon ve long trung thanh, quyen luc va cai gia cua so menh.',
+                'description' => 'Paul Atreides hợp lực cùng người Fremen để đối đầu thế lực đã hủy hoại gia tộc mình.',
+                'content' => 'Một chuyến phiêu lưu khoa học viễn tưởng quy mô lớn về lòng trung thành, quyền lực và cái giá của số mệnh.',
                 'release_date' => '2024-03-01',
                 'rating' => 'T13',
                 'language' => 'English',
                 'status' => 'ended',
-                'genres' => ['Khoa hoc vien tuong', 'Phieu luu', 'Hanh dong'],
+                'genres' => ['Khoa học viễn tưởng', 'Phiêu lưu', 'Hành động'],
             ],
             [
                 'title' => 'Inside Out 2',
@@ -395,13 +410,13 @@ class DatabaseSeeder extends Seeder
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg',
                 'banner_url' => 'https://image.tmdb.org/t/p/w1280/stKGOm8UyhuLPR9sZLjs5AkmncA.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=LEjhY15eCx0',
-                'description' => 'Riley buoc vao tuoi teen voi nhung cam xuc moi xuat hien day bat ngo.',
-                'content' => 'Bo phim hoat hinh am ap ve truong thanh, gia dinh va cach ta hoc cach song chung voi nhung cam xuc phuc tap.',
+                'description' => 'Riley bước vào tuổi teen với những cảm xúc mới xuất hiện đầy bất ngờ.',
+                'content' => 'Bộ phim hoạt hình ấm áp về trưởng thành, gia đình và cách ta học cách sống chung với những cảm xúc phức tạp.',
                 'release_date' => '2024-06-14',
                 'rating' => 'P',
                 'language' => 'English',
                 'status' => 'now_showing',
-                'genres' => ['Hoat hinh', 'Gia dinh', 'Hai'],
+                'genres' => ['Hoạt hình', 'Gia đình', 'Hài'],
             ],
             [
                 'title' => 'Oppenheimer',
@@ -409,27 +424,27 @@ class DatabaseSeeder extends Seeder
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
                 'banner_url' => 'https://image.tmdb.org/t/p/w1280/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=uYPbbksJxIg',
-                'description' => 'Chan dung J. Robert Oppenheimer va nhung quyet dinh lam thay doi lich su nhan loai.',
-                'content' => 'Tac pham tam ly lich su cang thang, tap trung vao tham vong khoa hoc va ganh nang dao duc.',
+                'description' => 'Chân dung J. Robert Oppenheimer và những quyết định làm thay đổi lịch sử nhân loại.',
+                'content' => 'Tác phẩm tâm lý lịch sử căng thẳng, tập trung vào tham vọng khoa học và gánh nặng đạo đức.',
                 'release_date' => '2023-07-21',
                 'rating' => 'T16',
                 'language' => 'English',
                 'status' => 'ended',
-                'genres' => ['Tam ly'],
+                'genres' => ['Tâm lý'],
             ],
             [
                 'title' => 'Mai',
                 'duration_minutes' => 131,
-                'poster_url' => 'https://image.tmdb.org/t/p/w500/9t7YTHp0ZbEl1BNgAu5Y9Hhvu0j.jpg',
-                'banner_url' => 'https://image.tmdb.org/t/p/w1280/6uKobmMZa0E47l5YUYJZfK87Ilh.jpg',
-                'trailer_url' => 'https://www.youtube.com/watch?v=EX6clvId19s',
-                'description' => 'Mot nguoi phu nu tung trai tim thay hy vong moi giua nhung dinh kien doi thuong.',
-                'content' => 'Cau chuyen tinh cam Viet Nam ve tinh yeu, gia dinh va noi dau can duoc lang nghe.',
+                'poster_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6wWRww77F5NnGo4H13v4ewS5fwEVxxGhWyw&s',
+                'banner_url' => 'https://media-cdn-v2.laodong.vn/storage/newsportal/2024/1/10/1291012/Phim-Mai-8.jpg',
+                'trailer_url' => 'https://youtu.be/HXWRTGbhb4U?si=wAUigSSIy7kcJyCS',
+                'description' => 'Một người phụ nữ từng trải tìm thấy hy vọng mới giữa những định kiến đời thường.',
+                'content' => 'Câu chuyện tình cảm Việt Nam về tình yêu, gia đình và nỗi đau cần được lắng nghe.',
                 'release_date' => '2024-02-10',
                 'rating' => 'T18',
                 'language' => 'Vietnamese',
                 'status' => 'now_showing',
-                'genres' => ['Tam ly', 'Lang man'],
+                'genres' => ['Tâm lý', 'Lãng mạn'],
             ],
             [
                 'title' => 'Godzilla x Kong: The New Empire',
@@ -437,13 +452,13 @@ class DatabaseSeeder extends Seeder
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/z1p34vh7dEOnLDmyCrlUVLuoDzd.jpg',
                 'banner_url' => 'https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=lV1OOlGwExM',
-                'description' => 'Hai bieu tuong khong lo hop suc truoc moi de doa tu the gioi rong lon ben duoi Trai Dat.',
-                'content' => 'Phim giai tri toc do cao voi chien truong quai vat, hinh anh hoanh trang va nhieu canh hanh dong.',
+                'description' => 'Hai biểu tượng khổng lồ hợp sức trước mối đe dọa từ thế giới rộng lớn bên dưới Trái Đất.',
+                'content' => 'Phim giải trí tốc độ cao với chiến trường quái vật, hình ảnh hoành tráng và nhiều cảnh hành động.',
                 'release_date' => '2024-03-29',
                 'rating' => 'T13',
                 'language' => 'English',
                 'status' => 'now_showing',
-                'genres' => ['Hanh dong', 'Phieu luu', 'Khoa hoc vien tuong'],
+                'genres' => ['Hành động', 'Phiêu lưu', 'Khoa học viễn tưởng'],
             ],
             [
                 'title' => 'Kung Fu Panda 4',
@@ -451,13 +466,13 @@ class DatabaseSeeder extends Seeder
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg',
                 'banner_url' => 'https://image.tmdb.org/t/p/w1280/kYgQzzjNis5jJalYtIHgrom0gOx.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=_inKs4eeHiI',
-                'description' => 'Po tim nguoi ke nhiem Dragon Warrior va doi dau mot ke thu co kha nang bien hinh.',
-                'content' => 'Chuyen phieu luu hai huoc, sang mau, phu hop gia dinh va khan gia nho tuoi.',
+                'description' => 'Po tìm người kế nhiệm Dragon Warrior và đối đầu một kẻ thù có khả năng biến hình.',
+                'content' => 'Chuyến phiêu lưu hài hước, sáng màu, phù hợp gia đình và khán giả nhỏ tuổi.',
                 'release_date' => '2024-03-08',
                 'rating' => 'P',
                 'language' => 'English',
                 'status' => 'now_showing',
-                'genres' => ['Hoat hinh', 'Gia dinh', 'Hai'],
+                'genres' => ['Hoạt hình', 'Gia đình', 'Hài'],
             ],
             [
                 'title' => 'A Quiet Place: Day One',
@@ -465,13 +480,13 @@ class DatabaseSeeder extends Seeder
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/yrpPYKijwdMHyTGIOd1iK1h0Xno.jpg',
                 'banner_url' => 'https://image.tmdb.org/t/p/w1280/4yrOyO3N55XazHQXXYoqiiPQd40.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=YPY7J-flzE8',
-                'description' => 'Ngay dau tien cua tham hoa, khi im lang tro thanh cach duy nhat de song sot.',
-                'content' => 'Bo phim kinh di cang thang voi khong khi do thi hon loan va nhung khoang lang day ap luc.',
+                'description' => 'Ngày đầu tiên của thảm họa, khi im lặng trở thành cách duy nhất để sống sót.',
+                'content' => 'Bộ phim kinh dị căng thẳng với không khí đô thị hỗn loạn và những khoảng lặng đầy áp lực.',
                 'release_date' => '2024-06-28',
                 'rating' => 'T16',
                 'language' => 'English',
                 'status' => 'coming_soon',
-                'genres' => ['Kinh di', 'Khoa hoc vien tuong'],
+                'genres' => ['Kinh dị', 'Khoa học viễn tưởng'],
             ],
             [
                 'title' => 'Deadpool & Wolverine',
@@ -479,13 +494,13 @@ class DatabaseSeeder extends Seeder
                 'poster_url' => 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
                 'banner_url' => 'https://image.tmdb.org/t/p/w1280/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg',
                 'trailer_url' => 'https://www.youtube.com/watch?v=73_1biulkYk',
-                'description' => 'Deadpool keo Wolverine vao mot nhiem vu hon loan, vua bao luc vua day mau sac hai huoc.',
-                'content' => 'Phim sieu anh hung co tiet tau nhanh, nhieu tinh huong tu trao va cac man doi dap sac canh.',
+                'description' => 'Deadpool kéo Wolverine vào một nhiệm vụ hỗn loạn, vừa bạo lực vừa đầy màu sắc hài hước.',
+                'content' => 'Phim siêu anh hùng có tiết tấu nhanh, nhiều tình huống tự trào và các màn đối đáp sắc cạnh.',
                 'release_date' => '2024-07-26',
                 'rating' => 'T18',
                 'language' => 'English',
                 'status' => 'coming_soon',
-                'genres' => ['Hanh dong', 'Hai', 'Khoa hoc vien tuong'],
+                'genres' => ['Hành động', 'Hài', 'Khoa học viễn tưởng'],
             ],
         ];
 
@@ -513,14 +528,14 @@ class DatabaseSeeder extends Seeder
     {
         $customers = array_values(array_filter($this->users, fn (User $user) => $user->role_id === $this->roles['customer']->id));
         $comments = [
-            'Phim co nhip ke chuyen cuon, hinh anh dep va am thanh rat da.',
-            'Noi dung on, trai nghiem ngoai rap tot hon mong doi.',
-            'Dien vien dien tron vai, mot vai phan hoi dai nhung van dang xem.',
-            'Minh thich cach phim xay dung cam xuc va cao trao.',
-            'Phu hop xem cuoi tuan, giai tri tot va de theo doi.',
-            'Canh hanh dong an tuong, phan am nhac nang tam trai nghiem.',
-            'Phim khong qua moi nhung van lam minh hai long.',
-            'Tiet tau gon, hinh anh sang va co nhieu khoanh khac dang nho.',
+            'Phim có nhịp kể chuyện cuốn, hình ảnh đẹp và âm thanh rất đã.',
+            'Nội dung ổn, trải nghiệm ngoài rạp tốt hơn mong đợi.',
+            'Diễn viên diễn tròn vai, một vài phần hơi dài nhưng vẫn đáng xem.',
+            'Mình thích cách phim xây dựng cảm xúc và cao trào.',
+            'Phù hợp xem cuối tuần, giải trí tốt và dễ theo dõi.',
+            'Cảnh hành động ấn tượng, phần âm nhạc nâng tầm trải nghiệm.',
+            'Phim không quá mới nhưng vẫn làm mình hài lòng.',
+            'Tiết tấu gọn, hình ảnh sáng và có nhiều khoảnh khắc đáng nhớ.',
         ];
 
         foreach ($this->movies as $movieIndex => $movie) {
@@ -595,10 +610,10 @@ class DatabaseSeeder extends Seeder
     private function seedCombos(): void
     {
         $comboTemplates = [
-            ['name' => 'Classic Popcorn Set', 'description' => '1 bap lon vi bo, 2 nuoc ngot size M.', 'price' => 89000, 'image_query' => 'popcorn,soda'],
-            ['name' => 'Couple Nachos Set', 'description' => '1 nachos pho mai, 1 bap vua, 2 tra dao.', 'price' => 129000, 'image_query' => 'nachos,cinema-snack'],
-            ['name' => 'Family Movie Feast', 'description' => '2 bap lon, 4 nuoc ngot, 2 hotdog.', 'price' => 219000, 'image_query' => 'hotdog,popcorn'],
-            ['name' => 'Premium Snack Box', 'description' => 'Bap caramel, ga vien, khoai tay va soda chanh.', 'price' => 159000, 'image_query' => 'popcorn,snack-box'],
+            ['name' => 'Combo Bắp Nước Cổ Điển', 'description' => '1 bắp lớn vị bơ, 2 nước ngọt size M.', 'price' => 89000, 'image_query' => 'popcorn,soda'],
+            ['name' => 'Combo Nachos Cặp Đôi', 'description' => '1 nachos phô mai, 1 bắp vừa, 2 trà đào.', 'price' => 129000, 'image_query' => 'nachos,cinema-snack'],
+            ['name' => 'Tiệc Phim Gia Đình', 'description' => '2 bắp lớn, 4 nước ngọt, 2 hotdog.', 'price' => 219000, 'image_query' => 'hotdog,popcorn'],
+            ['name' => 'Hộp Snack Cao Cấp', 'description' => 'Bắp caramel, gà viên, khoai tây và soda chanh.', 'price' => 159000, 'image_query' => 'popcorn,snack-box'],
         ];
 
         foreach (array_values($this->cinemas) as $cinemaIndex => $cinema) {
@@ -623,10 +638,10 @@ class DatabaseSeeder extends Seeder
     private function seedPromotions(): void
     {
         $promotions = [
-            ['code' => 'WELCOME50K', 'description' => 'Giam 50.000 VND cho khach hang moi.', 'discount_type' => 'fixed_amount', 'discount_value' => 50000, 'applicable_to' => 'booking'],
-            ['code' => 'WEEKDAY15', 'description' => 'Giam 15% cho suat chieu thu 2 den thu 5.', 'discount_type' => 'percentage', 'discount_value' => 15, 'applicable_to' => 'ticket'],
-            ['code' => 'COMBO20', 'description' => 'Giam 20% khi mua combo bap nuoc.', 'discount_type' => 'percentage', 'discount_value' => 20, 'applicable_to' => 'combo'],
-            ['code' => 'FAMILYDAY', 'description' => 'Uu dai gia dinh cuoi tuan.', 'discount_type' => 'fixed_amount', 'discount_value' => 80000, 'applicable_to' => 'booking'],
+            ['code' => 'WELCOME50K', 'description' => 'Giảm 50.000 VND cho khách hàng mới.', 'discount_type' => 'fixed_amount', 'discount_value' => 50000, 'applicable_to' => 'booking'],
+            ['code' => 'WEEKDAY15', 'description' => 'Giảm 15% cho suất chiếu thứ 2 đến thứ 5.', 'discount_type' => 'percentage', 'discount_value' => 15, 'applicable_to' => 'ticket'],
+            ['code' => 'COMBO20', 'description' => 'Giảm 20% khi mua combo bắp nước.', 'discount_type' => 'percentage', 'discount_value' => 20, 'applicable_to' => 'combo'],
+            ['code' => 'FAMILYDAY', 'description' => 'Ưu đãi gia đình cuối tuần.', 'discount_type' => 'fixed_amount', 'discount_value' => 80000, 'applicable_to' => 'booking'],
         ];
 
         foreach ($promotions as $index => $promotion) {
@@ -667,7 +682,7 @@ class DatabaseSeeder extends Seeder
                 'booking_code' => 'BK' . now()->format('ymd') . str_pad((string) ($index + 1), 5, '0', STR_PAD_LEFT),
                 'total_amount' => 0,
                 'status' => $status,
-                'cancellation_reason' => $status === 'cancelled' ? 'Khach hang doi lich xem phim.' : null,
+                'cancellation_reason' => $status === 'cancelled' ? 'Khách hàng đổi lịch xem phim.' : null,
                 'cancelled_at' => $status === 'cancelled' ? now()->subDays(1) : null,
                 'expired_at' => $status === 'expired' ? now()->subHours(8) : now()->addMinutes(15),
                 'confirmed_at' => $status === 'confirmed' ? now()->subDays(3)->addHours($index) : null,
@@ -854,8 +869,8 @@ class DatabaseSeeder extends Seeder
                     'entity_id' => $item->id,
                     'metadata' => json_encode([
                         'ip' => '113.161.72.' . (40 + $index),
-                        'note' => 'Du lieu mau duoc tao boi database seeder.',
-                    ]),
+                        'note' => 'Dữ liệu mẫu được tạo bởi database seeder.',
+                    ], JSON_UNESCAPED_UNICODE),
                     'created_at' => now()->subHours(30 - $index),
                     'updated_at' => now()->subHours(30 - $index),
                 ]);
@@ -867,9 +882,9 @@ class DatabaseSeeder extends Seeder
     {
         $ipIds = [];
         foreach ([
-            ['ip' => '113.161.72.41', 'city' => 'Ho Chi Minh City', 'region' => 'Ho Chi Minh', 'country' => 'VN', 'loc' => '10.8231,106.6297', 'org' => 'VNPT Corp', 'timezone' => 'Asia/Ho_Chi_Minh'],
-            ['ip' => '14.177.81.22', 'city' => 'Ha Noi', 'region' => 'Ha Noi', 'country' => 'VN', 'loc' => '21.0278,105.8342', 'org' => 'Viettel Group', 'timezone' => 'Asia/Ho_Chi_Minh'],
-            ['ip' => '42.116.98.73', 'city' => 'Da Nang', 'region' => 'Da Nang', 'country' => 'VN', 'loc' => '16.0471,108.2068', 'org' => 'FPT Telecom', 'timezone' => 'Asia/Ho_Chi_Minh'],
+            ['ip' => '113.161.72.41', 'city' => 'TP. Hồ Chí Minh', 'region' => 'Hồ Chí Minh', 'country' => 'VN', 'loc' => '10.8231,106.6297', 'org' => 'VNPT Corp', 'timezone' => 'Asia/Ho_Chi_Minh'],
+            ['ip' => '14.177.81.22', 'city' => 'Hà Nội', 'region' => 'Hà Nội', 'country' => 'VN', 'loc' => '21.0278,105.8342', 'org' => 'Viettel Group', 'timezone' => 'Asia/Ho_Chi_Minh'],
+            ['ip' => '42.116.98.73', 'city' => 'Đà Nẵng', 'region' => 'Đà Nẵng', 'country' => 'VN', 'loc' => '16.0471,108.2068', 'org' => 'FPT Telecom', 'timezone' => 'Asia/Ho_Chi_Minh'],
         ] as $ip) {
             $id = (string) Str::uuid7();
             $ipIds[] = $id;

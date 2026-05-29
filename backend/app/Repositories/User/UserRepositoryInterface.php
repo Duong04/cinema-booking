@@ -8,4 +8,6 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
     public function getByToken(string $token,  array $columns = ['*']);
 
     public function getByEmail(string $email,  array $columns = ['*']);
+
+    public function findWithMembershipStats(string $id);
 }

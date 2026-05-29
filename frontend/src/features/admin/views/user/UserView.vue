@@ -4,6 +4,7 @@ import { computed, h, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { NAvatar, NButton, NEllipsis, NIcon, NSpace, NTag, useMessage } from 'naive-ui'
 import { CallOutline, MailOutline, PersonCircleOutline, Search as SearchIcon } from '@vicons/ionicons5'
+import { Ticket } from 'lucide-vue-next'
 import { useUser } from '../../composables/useUser'
 import { useRole } from '../../composables/useRole'
 import UserFormModal from './components/UserFormModal.vue'
@@ -32,6 +33,38 @@ const createButtonLabel = computed(() => (isCustomerScope.value ? '+ Tạo khác
 const canCreate = computed(() => can(ADMIN_PERMISSIONS.USERS, ADMIN_ACTIONS.CREATE))
 const canUpdate = computed(() => can(ADMIN_PERMISSIONS.USERS, ADMIN_ACTIONS.UPDATE))
 
+function getMembershipMeta(tier?: NonNullable<User['membership']>['tier']) {
+  if (tier === 'platinum') {
+    return {
+      label: 'Platinum',
+      badge: 'background:#ecfeff;color:#0e7490;border:1px solid #67e8f9',
+      dot: '#06b6d4',
+    }
+  }
+
+  if (tier === 'gold') {
+    return {
+      label: 'Gold',
+      badge: 'background:#fffbeb;color:#b45309;border:1px solid #fcd34d',
+      dot: '#f59e0b',
+    }
+  }
+
+  if (tier === 'silver') {
+    return {
+      label: 'Silver',
+      badge: 'background:#f8fafc;color:#475569;border:1px solid #cbd5e1',
+      dot: '#94a3b8',
+    }
+  }
+
+  return {
+    label: 'Bronze',
+    badge: 'background:#fff7ed;color:#c2410c;border:1px solid #fdba74',
+    dot: '#f97316',
+  }
+}
+
 function getGenderMeta(gender?: User['gender']) {
   if (gender === 'male') return { label: 'Nam', type: 'info' as const }
   if (gender === 'female') return { label: 'Nữ', type: 'error' as const }
@@ -39,7 +72,7 @@ function getGenderMeta(gender?: User['gender']) {
 }
 
 function createColumns(): DataTableColumns<User> {
-  return [
+  const columns: DataTableColumns<User> = [
     { type: 'selection', width: 48 },
     {
       title: 'Người dùng',
@@ -110,6 +143,59 @@ function createColumns(): DataTableColumns<User> {
           ),
         ]),
     },
+    ...(isCustomerScope.value
+      ? [
+          {
+            title: 'Membership',
+            key: 'membership',
+            width: 180,
+            render: (row: User) => {
+              const membership = row.membership
+              const tier = getMembershipMeta(membership?.tier)
+
+              return h('div', { style: 'display:flex;align-items:center;gap:8px;min-width:0' }, [
+                h(
+                  'span',
+                  {
+                    style:
+                      'display:inline-flex;align-items:center;gap:6px;width:max-content;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;line-height:1;' +
+                      tier.badge,
+                  },
+                  [
+                    h('span', {
+                      style: `width:7px;height:7px;border-radius:999px;background:${tier.dot};box-shadow:0 0 0 3px rgb(255 255 255 / 0.7)`,
+                    }),
+                    tier.label,
+                  ],
+                ),
+                h(
+                  'span',
+                  { style: 'color:#6b7280;font-size:12px;white-space:nowrap' },
+                  `${(membership?.points ?? 0).toLocaleString('vi-VN')} điểm`,
+                ),
+              ])
+            },
+          },
+          {
+            title: 'Số vé mua',
+            key: 'tickets_purchased_count',
+            width: 120,
+            align: 'center' as const,
+            render: (row: User) =>
+              h(
+                'span',
+                {
+                  style:
+                    'display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:5px 10px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:12px;font-weight:800;line-height:1;min-width:58px',
+                },
+                [
+                  h(Ticket, { size: 14, strokeWidth: 2.4 }),
+                  (row.tickets_purchased_count ?? 0).toLocaleString('vi-VN'),
+                ],
+              ),
+          },
+        ]
+      : []),
     {
       title: 'Vai trò',
       key: 'role',
@@ -198,9 +284,11 @@ function createColumns(): DataTableColumns<User> {
         ]),
     },
   ]
+
+  return columns
 }
 
-const columns = createColumns()
+const columns = computed(() => createColumns())
 
 const roleOptions = computed(() => {
   const customerRoleId = customerRole.value?.id
@@ -309,7 +397,7 @@ onMounted(fetchRoles)
     :loading="loading"
     :pagination="pagination"
     :row-key="(row: User) => row.id"
-    :scroll-x="1470"
+    :scroll-x="isCustomerScope ? 1770 : 1470"
     remote
     @update:checked-row-keys="handleCheckedRowKeys"
   />

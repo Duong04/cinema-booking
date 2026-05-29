@@ -62,4 +62,20 @@ class User extends Authenticatable
     public function role() {
         return $this->belongsTo(Role::class, 'role_id');
     }
+
+    public function membership()
+    {
+        return $this->hasOne(Membership::class);
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function confirmedBookingItems()
+    {
+        return $this->hasManyThrough(BookingItem::class, Booking::class)
+            ->where('bookings.status', 'confirmed');
+    }
 }

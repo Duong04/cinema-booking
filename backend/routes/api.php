@@ -174,6 +174,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('payments')->controller(PaymentController::class)->middleware('auth:sanctum')->group(function () {
+        Route::get('/', 'paginate');
         Route::post('/', 'create');
         Route::get('/{id}', 'show');
         Route::post('/{id}/confirm', 'confirm');

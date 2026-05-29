@@ -81,7 +81,10 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return $this->success(new UserResource($user), 'Người dùng đã đăng nhập thành công!');
+        return $this->success(
+            new UserResource($user->load('membership')->loadCount('confirmedBookingItems')),
+            'Người dùng đã đăng nhập thành công!'
+        );
     }
 
     #[OA\Get(
@@ -166,7 +169,9 @@ class AuthController extends Controller
     )]
     public function profile(Request $request)
     {
-        return $this->success(new UserResource($request->user()->load('role.permissions.actions')));
+        return $this->success(
+            new UserResource($request->user()->load('role.permissions.actions', 'membership')->loadCount('confirmedBookingItems'))
+        );
     }
 
     #[OA\Put(
@@ -219,7 +224,10 @@ class AuthController extends Controller
 
         $user->update($data);
 
-        return $this->success(new UserResource($user->fresh()->load('role.permissions.actions')), 'Cập nhật hồ sơ thành công!');
+        return $this->success(
+            new UserResource($user->fresh()->load('role.permissions.actions', 'membership')->loadCount('confirmedBookingItems')),
+            'Cập nhật hồ sơ thành công!'
+        );
     }
 
     #[OA\Put(

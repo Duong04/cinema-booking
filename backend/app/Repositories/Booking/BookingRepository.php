@@ -12,7 +12,7 @@ class BookingRepository extends BaseRepository implements BookingRepositoryInter
         $this->model = $model;
     }
 
-    public function paginate(int $limit, string $q, string $status)
+    public function paginate(int $limit, ?string $q, ?string $status)
     {
         $bookings = $this->model
             ->with([

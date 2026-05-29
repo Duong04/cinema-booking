@@ -5,6 +5,7 @@ use App\Repositories\Booking\BookingRepositoryInterface;
 use App\Repositories\BookingStatusLog\BookingStatusLogRepositoryInterface;
 use App\Repositories\Payment\PaymentRepositoryInterface;
 use App\Repositories\PaymentAttempt\PaymentAttemptRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -17,8 +18,14 @@ class PaymentService
         private BookingRepositoryInterface $bookingRepository,
         private BookingStatusLogRepositoryInterface $bookingStatusLogRepository,
         private PaymentRepositoryInterface $paymentRepository,
-        private PaymentAttemptRepositoryInterface $paymentAttemptRepository
+        private PaymentAttemptRepositoryInterface $paymentAttemptRepository,
+        private MembershipService $membershipService
     ) {
+    }
+
+    public function paginate(int $limit, ?string $q, ?string $status, ?string $provider): LengthAwarePaginator
+    {
+        return $this->paymentRepository->paginate($limit, $q, $status, $provider);
     }
 
     public function create(array $data, string $userId)
@@ -146,6 +153,8 @@ class PaymentService
                 'response_payload' => json_encode(['status' => 'paid']),
                 'status' => 'success',
             ]);
+
+            $this->membershipService->addPointsForConfirmedBooking($booking->fresh());
 
             DB::commit();
 
