@@ -78,4 +78,34 @@ class User extends Authenticatable
         return $this->hasManyThrough(BookingItem::class, Booking::class)
             ->where('bookings.status', 'confirmed');
     }
+
+    public function permissions()
+    {
+        return $this->role()->with('permissions')->get()->pluck('permissions')->flatten()->unique('id');
+    }
+
+    public function actions()
+    {
+        return $this->role->actions();
+    }
+
+    public function hasPermission($permissionKey)
+    {
+        return $this->permissions()->contains('key', $permissionKey);
+    }
+
+    public function hasAction($permissionKey, $actionKey, $role_id)
+    {
+        $permission = $this->permissions()->where('key', $permissionKey)->first();
+
+        if (!$permission) {
+            return false; 
+        }
+
+        $filteredActions = $permission->roleActions->filter(function ($action) use ($role_id, $permission) {
+            return $action->pivot->role_id == $role_id && $action->pivot->permission_id == $permission->id;
+        })->values();
+
+        return $filteredActions->contains('key', $actionKey);
+    }
 }

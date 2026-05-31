@@ -39,38 +39,38 @@ Route::prefix('v1')->group(function () {
         Route::put('/password', 'changePassword')->middleware('auth:sanctum');
     });
 
-    Route::prefix('users')->controller(UserController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
+    Route::prefix('users')->controller(UserController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:users,view');
+        Route::post('/', 'create')->middleware('permission.action:users,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:users,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:users,update');
     });
 
-    Route::prefix('roles')->controller(RoleController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('roles')->controller(RoleController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:roles,view');
+        Route::post('/', 'create')->middleware('permission.action:roles,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:roles,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:roles,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:roles,delete');
     });
 
-    Route::prefix('actions')->controller(ActionController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('actions')->controller(ActionController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:actions,view');
+        Route::post('/', 'create')->middleware('permission.action:actions,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:actions,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:actions,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:actions,delete');
     });
 
-    Route::prefix('permissions')->controller(PermissionController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('permissions')->controller(PermissionController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:permissions,view');
+        Route::post('/', 'create')->middleware('permission.action:permissions,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:permissions,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:permissions,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:permissions,delete');
     });
 
-    Route::prefix('upload')->controller(UploadController::class)->middleware('auth:sanctum')->group(function () {
+    Route::prefix('upload')->controller(UploadController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
         Route::post('/image', 'uploadImage');
         Route::post('/file', 'uploadFile');
         Route::post('/multiple', 'uploadMultiple');
@@ -78,114 +78,114 @@ Route::prefix('v1')->group(function () {
         Route::delete('/multiple', 'deleteMultiple');
     });
 
-    Route::prefix('cities')->controller(CityController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('cities')->controller(CityController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:cities,view');
+        Route::post('/', 'create')->middleware('permission.action:cities,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:cities,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:cities,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:cities,delete');
     });
 
-    Route::prefix('cinemas')->controller(CinemaController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('cinemas')->controller(CinemaController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:cinemas,view');
+        Route::post('/', 'create')->middleware('permission.action:cinemas,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:cinemas,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:cinemas,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:cinemas,delete');
     });
 
-    Route::prefix('cinema-chains')->controller(CinemaChainController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('cinema-chains')->controller(CinemaChainController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:cinema-chains,view');
+        Route::post('/', 'create')->middleware('permission.action:cinema-chains,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:cinema-chains,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:cinema-chains,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:cinema-chains,delete');
     });
 
-    Route::prefix('rooms')->controller(RoomController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('rooms')->controller(RoomController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:rooms,view');
+        Route::post('/', 'create')->middleware('permission.action:rooms,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:rooms,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:rooms,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:rooms,delete');
     });
 
-    Route::prefix('seat-types')->controller(SeatTypeController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('seat-types')->controller(SeatTypeController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:seat-types,view');
+        Route::post('/', 'create')->middleware('permission.action:seat-types,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:seat-types,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:seat-types,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:seat-types,delete');
     });
 
-    Route::prefix('rooms')->controller(SeatController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/{id}/seats', 'getSeatByRoom');
-        Route::post('/{id}/seats', 'create');
-        Route::put('/{id}/seats/{rowLabel}', 'updateRow');
-        Route::delete('/{id}/seats/{rowLabel}', 'deleteRow');
+    Route::prefix('rooms')->controller(SeatController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/{id}/seats', 'getSeatByRoom')->middleware('permission.action:rooms,view');
+        Route::post('/{id}/seats', 'create')->middleware('permission.action:rooms,create');
+        Route::put('/{id}/seats/{rowLabel}', 'updateRow')->middleware('permission.action:rooms,update');
+        Route::delete('/{id}/seats/{rowLabel}', 'deleteRow')->middleware('permission.action:rooms,delete');
     });
 
-    Route::prefix('movies')->controller(MovieController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('movies')->controller(MovieController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:movies,view');
+        Route::post('/', 'create')->middleware('permission.action:movies,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:movies,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:movies,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:movies,delete');
     });
 
-    Route::prefix('genres')->controller(GenreController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('genres')->controller(GenreController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:genres,view');
+        Route::post('/', 'create')->middleware('permission.action:genres,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:genres,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:genres,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:genres,delete');
     });
 
-    Route::prefix('showtimes')->controller(ShowtimeController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}/seat-overview', 'seatOverview');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('showtimes')->controller(ShowtimeController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:showtimes,view');
+        Route::post('/', 'create')->middleware('permission.action:showtimes,create');
+        Route::get('/{id}/seat-overview', 'seatOverview')->middleware('permission.action:showtimes,view');
+        Route::get('/{id}', 'show')->middleware('permission.action:showtimes,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:showtimes,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:showtimes,delete');
     });
 
-    Route::prefix('seat-holds')->controller(SeatHoldController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/showtimes/{showtimeId}', 'getListShowtime');
-        Route::post('/hold', 'hold');
-        Route::post('/release', 'release');
+    Route::prefix('seat-holds')->controller(SeatHoldController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/showtimes/{showtimeId}', 'getListShowtime')->middleware('permission.action:seat-holds,view');
+        Route::post('/hold', 'hold')->middleware('permission.action:seat-holds,create');
+        Route::post('/release', 'release')->middleware('permission.action:seat-holds,delete');
     });
 
-    Route::prefix('bookings')->controller(BookingController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::put('/{id}/cancel', 'cancel');
+    Route::prefix('bookings')->controller(BookingController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:bookings,view');
+        Route::post('/', 'create')->middleware('permission.action:bookings,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:bookings,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:bookings,update');
+        Route::put('/{id}/cancel', 'cancel')->middleware('permission.action:bookings,update');
     });
 
-    Route::prefix('promotions')->controller(PromotionController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::post('/check', 'check');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('promotions')->controller(PromotionController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:promotions,view');
+        Route::post('/', 'create')->middleware('permission.action:promotions,create');
+        Route::post('/check', 'check')->middleware('permission.action:promotions,view');
+        Route::get('/{id}', 'show')->middleware('permission.action:promotions,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:promotions,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:promotions,delete');
     });
 
-    Route::prefix('payments')->controller(PaymentController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::post('/{id}/confirm', 'confirm');
+    Route::prefix('payments')->controller(PaymentController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:payments,view');
+        Route::post('/', 'create')->middleware('permission.action:payments,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:payments,view');
+        Route::post('/{id}/confirm', 'confirm')->middleware('permission.action:payments,update');
     });
 
-    Route::prefix('combos')->controller(ComboController::class)->middleware('auth:sanctum')->group(function () {
-        Route::get('/', 'paginate');
-        Route::post('/', 'create');
-        Route::get('/{id}', 'show');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'delete');
+    Route::prefix('combos')->controller(ComboController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/', 'paginate')->middleware('permission.action:combos,view');
+        Route::post('/', 'create')->middleware('permission.action:combos,create');
+        Route::get('/{id}', 'show')->middleware('permission.action:combos,view');
+        Route::put('/{id}', 'update')->middleware('permission.action:combos,update');
+        Route::delete('/{id}', 'delete')->middleware('permission.action:combos,delete');
     });
 
     Route::prefix('/public')->group(function () {

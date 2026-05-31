@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Illuminate\Session\Middleware\StartSession;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Http\Middleware\CheckPermissionAction;
+use App\Http\Middleware\CheckActive;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
         $middleware->append(StartSession::class);
+        $middleware->alias([
+            'permission.action' => CheckPermissionAction::class,
+            'check.active' => CheckActive::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Validation error

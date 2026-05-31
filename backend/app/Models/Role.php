@@ -28,4 +28,10 @@ class Role extends Model
             ->with('roleActions');
     }
 
+    public function actions()
+    {
+        return $this->belongsToMany(Action::class, 'role_permissions')
+        ->withPivot('role_id', 'permission_id');
+    }
+
 }
