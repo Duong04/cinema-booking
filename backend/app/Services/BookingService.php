@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Events\SeatStatusChanged;
 use App\Repositories\Booking\BookingRepositoryInterface;
 use App\Repositories\BookingStatusLog\BookingStatusLogRepositoryInterface;
 use App\Repositories\SeatHold\SeatHoldRepositoryInterface;
@@ -239,6 +240,8 @@ class BookingService
             ]);
  
             DB::commit();
+
+            event(new SeatStatusChanged($showtimeId, $seatIds, 'booked', $user->id));
  
             return $booking->load($this->detailRelations());
  

@@ -5,7 +5,7 @@ import { Film, Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucid
 import { useAuthStore } from '../stores/auth.store'
 import { useLanguageStore } from '@/stores/language'
 import { loginSchema } from '../validators/auth.validation'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { STORAGE_KEYS } from '@/shared/constants/storage'
 
 const authStore = useAuthStore()
@@ -13,6 +13,7 @@ const languageStore = useLanguageStore()
 
 const showPassword = ref(false)
 const router = useRouter()
+const route = useRoute()
 
 onUnmounted(() => {
   authStore.resetError()
@@ -36,7 +37,7 @@ const onSubmit = handleSubmit(async (values) => {
   if (success) {
     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true')
 
-    await router.push({ name: 'home' })
+    await router.push(typeof route.query.redirect === 'string' ? route.query.redirect : { name: 'home' })
   }
 })
 

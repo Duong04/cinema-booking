@@ -53,6 +53,22 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
                 ->delete();
     }
 
+    public function getActiveByUser(string $showtimeId, string $userId)
+    {
+        return $this->model->where('showtime_id', $showtimeId)
+            ->where('user_id', $userId)
+            ->where('expired_at', '>', now())
+            ->get();
+    }
+
+    public function getExpired(?string $showtimeId = null)
+    {
+        return $this->model
+            ->when($showtimeId, fn($query) => $query->where('showtime_id', $showtimeId))
+            ->where('expired_at', '<=', now())
+            ->get();
+    }
+
     public function deleteExpired(?string $showtimeId = null)
     {
         return $this->model

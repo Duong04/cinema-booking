@@ -10,6 +10,8 @@ interface SeatHoldRepositoryInterface extends BaseRepositoryInterface {
     public function deleteByMixCol(array $seatIds, string $showtimeId, string $userId);
     public function deleteByUser(string $showtimeId, string $userId);
     public function deleteExpired(?string $showtimeId = null);
+    public function getActiveByUser(string $showtimeId, string $userId);
+    public function getExpired(?string $showtimeId = null);
     public function getBookedSeatIds(array $seatIds, string $showtimeId);
     public function getActiveHoldsByShowtime(string $showtimeId);
 }

@@ -9,6 +9,7 @@
         "cloudinary-labs/cloudinary-laravel": "^3.0",
         "darkaonline/l5-swagger": "^10.1",
         "laravel/framework": "^11.0",
+        "laravel/reverb": "^1.5",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "predis/predis": "^3.4"

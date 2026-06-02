@@ -3,8 +3,13 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChevronLeft, Clock, Loader2 } from 'lucide-vue-next'
 import { useLanguageStore } from '@/stores/language'
+import { useAuthStore } from '@/features/shared/stores/auth.store'
 import { showtimeService } from '@/features/client/services/showtime.service'
 import { seatHoldService } from '@/features/client/services/seat-hold.service'
+import {
+  seatRealtimeService,
+  type SeatStatusChangedEvent,
+} from '@/features/client/services/seat-realtime.service'
 import { useBookingFlow, type BookingSeat } from '@/features/client/composables/useBookingFlow'
 import type { PublicShowtime, PublicShowtimeSeat } from '@/features/client/types/showtime.type'
 import BookingStepper from './components/BookingStepper.vue'
@@ -12,6 +17,7 @@ import BookingStepper from './components/BookingStepper.vue'
 const route = useRoute()
 const router = useRouter()
 const languageStore = useLanguageStore()
+const authStore = useAuthStore()
 const { draft, setShowtime, setSeats, formatVND } = useBookingFlow()
 
 const timeLeft = ref(600)
@@ -22,6 +28,7 @@ const loading = ref(false)
 const holding = ref(false)
 const holdError = ref('')
 let timer: ReturnType<typeof setInterval> | null = null
+let seatChannelName: string | null = null
 
 const movie = computed(() => showtime.value?.movie)
 const priceBySeatType = computed(() => {
@@ -150,6 +157,12 @@ function toggleSeat(seat: PublicShowtimeSeat) {
 async function confirmSeats() {
   if (selectedSeats.value.length === 0 || !showtime.value || holding.value) return
 
+  if (!authStore.isLoggedIn) {
+    setSeats(selectedSeats.value)
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+
   holding.value = true
   holdError.value = ''
 
@@ -171,6 +184,26 @@ async function confirmSeats() {
   }
 }
 
+function applySeatStatusChange(event: SeatStatusChangedEvent) {
+  if (event.showtime_id !== String(route.params.showtimeId)) return
+
+  const changedSeatIds = new Set(event.seat_ids)
+
+  seats.value = seats.value.map((seat) => {
+    if (!changedSeatIds.has(seat.id)) return seat
+
+    return {
+      ...seat,
+      status: event.status,
+    }
+  })
+
+  if (event.status !== 'available') {
+    selectedSeats.value = selectedSeats.value.filter((seat) => !changedSeatIds.has(seat.id))
+    setSeats(selectedSeats.value)
+  }
+}
+
 async function fetchSeatOverview() {
   const showtimeId = String(route.params.showtimeId)
   loading.value = true
@@ -188,7 +221,11 @@ async function fetchSeatOverview() {
 }
 
 onMounted(() => {
+  const showtimeId = String(route.params.showtimeId)
+
   fetchSeatOverview()
+  seatChannelName = seatRealtimeService.subscribe(showtimeId, applySeatStatusChange)
+
   timer = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
@@ -200,6 +237,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (timer) clearInterval(timer)
+  if (seatChannelName) seatRealtimeService.leave(seatChannelName)
 })
 </script>
 
