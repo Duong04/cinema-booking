@@ -7,7 +7,6 @@ import type {
 export function paymentProviderLabel(provider?: ClientPayment['provider']) {
   if (provider === 'momo') return 'MoMo'
   if (provider === 'zalopay') return 'ZaloPay'
-  if (provider === 'cashier') return 'Cashier'
   return 'VNPay'
 }
 

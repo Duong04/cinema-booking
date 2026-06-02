@@ -4,7 +4,7 @@ import type {
   BookingSeat,
 } from '@/features/client/composables/useBookingFlow'
 
-export type PaymentProvider = 'vnpay' | 'momo' | 'zalopay' | 'cashier'
+export type PaymentProvider = 'vnpay' | 'momo' | 'zalopay'
 
 export interface ClientBookingItem {
   id?: string

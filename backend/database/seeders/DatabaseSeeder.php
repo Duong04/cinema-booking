@@ -820,7 +820,7 @@ class DatabaseSeeder extends Seeder
 
     private function createPaymentRecords(Booking $booking, string $bookingStatus, int $index): void
     {
-        $provider = ['vnpay', 'momo', 'zalopay', 'cashier'][$index % 4];
+        $provider = ['vnpay', 'momo', 'zalopay'][$index % 3];
         $paymentStatus = match ($bookingStatus) {
             'confirmed' => 'paid',
             'cancelled' => 'refunded',

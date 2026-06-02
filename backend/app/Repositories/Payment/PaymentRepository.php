@@ -11,7 +11,7 @@ class PaymentRepository extends BaseRepository implements PaymentRepositoryInter
         $this->model = $model;
     }
 
-    public function paginate(int $limit, ?string $q, ?string $status, ?string $provider)
+    public function paginate(int $limit, ?string $q, ?string $status, ?string $provider, ?string $fromDate, ?string $toDate)
     {
         $payments = $this->model
             ->with([
@@ -36,7 +36,9 @@ class PaymentRepository extends BaseRepository implements PaymentRepositoryInter
                 )
             )
             ->when($status, fn ($query) => $query->where('status', $status))
-            ->when($provider, fn ($query) => $query->where('provider', $provider));
+            ->when($provider, fn ($query) => $query->where('provider', $provider))
+            ->when($fromDate, fn ($query) => $query->whereDate('created_at', '>=', $fromDate))
+            ->when($toDate, fn ($query) => $query->whereDate('created_at', '<=', $toDate));
 
         return $payments
             ->orderByDesc('created_at')

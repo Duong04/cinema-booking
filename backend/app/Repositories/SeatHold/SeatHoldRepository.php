@@ -14,6 +14,8 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
 
     public function getListShowtime(string $showtimeId)
     {
+        $this->deleteExpired($showtimeId);
+
         return $this->model->with(['seat', 'user:id,name,email,avatar'])
             ->where('showtime_id', $showtimeId)
             ->where('expired_at', '>', now())
@@ -26,6 +28,8 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
 
     public function checkHoldTransaction(array $seatIds, string $showtimeId, string $userId = null)
     {
+        $this->deleteExpired($showtimeId);
+
         return $this->model->whereIn('seat_id', $seatIds)
             ->where('showtime_id', $showtimeId)
             ->when($userId, function ($query) use ($userId) {
@@ -49,6 +53,14 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
                 ->delete();
     }
 
+    public function deleteExpired(?string $showtimeId = null)
+    {
+        return $this->model
+            ->when($showtimeId, fn($query) => $query->where('showtime_id', $showtimeId))
+            ->where('expired_at', '<=', now())
+            ->delete();
+    }
+
     public function getBookedSeatIds(array $seatIds, string $showtimeId)
     {
         return BookingItem::query()
@@ -64,6 +76,8 @@ class SeatHoldRepository extends BaseRepository implements SeatHoldRepositoryInt
 
     public function getActiveHoldsByShowtime(string $showtimeId)
     {
+        $this->deleteExpired($showtimeId);
+
         return $this->model->with('user:id,name,email')
             ->where('showtime_id', $showtimeId)
             ->where('expired_at', '>', now())

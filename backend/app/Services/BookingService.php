@@ -36,9 +36,9 @@ class BookingService
     ) {
     }
 
-    public function paginate(int $limit, ?string $q, ?string $status): LengthAwarePaginator
+    public function paginate(int $limit, ?string $q, ?string $status, ?string $fromDate, ?string $toDate): LengthAwarePaginator
     {
-        return $this->bookingRepository->paginate($limit, $q, $status);
+        return $this->bookingRepository->paginate($limit, $q, $status, $fromDate, $toDate);
     }
 
     public function find($id) {

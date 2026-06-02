@@ -1,64 +1,202 @@
 <script setup lang="ts">
-import type { DataTableColumns } from 'naive-ui'
+import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import { NTag } from 'naive-ui'
-import { h, onMounted } from 'vue'
+import { computed, h, onMounted, ref } from 'vue'
 import {
+  AlertCircleOutline,
   CardOutline,
-  CashOutline,
-  FilmOutline,
+  CheckmarkDoneCircleOutline,
+  ReceiptOutline,
   SearchOutline,
   SwapHorizontalOutline,
+  TimeOutline,
   WalletOutline,
 } from '@vicons/ionicons5'
 import { usePayment } from '@/features/admin/composables/usePayment'
-import type { Payment } from '@/features/admin/types/payment.type'
-import type { PaymentStatus } from '@/features/admin/types/booking.type'
+import type { Payment, PaymentProvider } from '@/features/admin/types/payment.type'
+import type { BookingStatus, PaymentStatus } from '@/features/admin/types/booking.type'
 import { formatDateTime } from '@/shared/utils/formatDate'
 
 const { data, loading, filters, pagination, fetchPayments } = usePayment()
+const expandedRowKeys = ref<DataTableRowKey[]>([])
 
-const statusOptions = [
+const statusOptions: Array<{ label: string; value: PaymentStatus | null }> = [
+  { label: 'Tất cả trạng thái', value: null },
   { label: 'Đang chờ', value: 'pending' },
   { label: 'Đã thanh toán', value: 'paid' },
   { label: 'Thất bại', value: 'failed' },
   { label: 'Hoàn tiền', value: 'refunded' },
 ]
 
-const providerOptions = [
+const providerOptions: Array<{ label: string; value: PaymentProvider | null }> = [
+  { label: 'Tất cả kênh', value: null },
   { label: 'VNPay', value: 'vnpay' },
   { label: 'MoMo', value: 'momo' },
   { label: 'ZaloPay', value: 'zalopay' },
-  { label: 'Thu ngân', value: 'cashier' },
 ]
 
+const visibleSummary = computed(() => {
+  const total = pagination.itemCount || data.value.length
+  return `${data.value.length}/${total} giao dịch`
+})
+
+const paymentMetrics = computed(() => {
+  const rows = data.value
+  const paidRows = rows.filter((row) => row.status === 'paid')
+  const pendingRows = rows.filter((row) => row.status === 'pending')
+  const failedRows = rows.filter((row) => row.status === 'failed')
+  const paidAmount = paidRows.reduce((sum, row) => sum + toNumber(row.amount), 0)
+
+  return [
+    {
+      label: 'Đã ghi nhận',
+      value: money(paidAmount),
+      caption: `${paidRows.length} giao dịch thành công`,
+      icon: WalletOutline,
+      className: 'metric-revenue',
+    },
+    {
+      label: 'Đang chờ',
+      value: pendingRows.length.toString(),
+      caption: 'Cần đối soát hoặc callback',
+      icon: TimeOutline,
+      className: 'metric-pending',
+    },
+    {
+      label: 'Thanh toán lỗi',
+      value: failedRows.length.toString(),
+      caption: 'Cần kiểm tra lại cổng thanh toán',
+      icon: AlertCircleOutline,
+      className: 'metric-failed',
+    },
+  ]
+})
+
+function toNumber(value?: number | string | null) {
+  return Number(value ?? 0)
+}
+
 function money(value?: number | string | null) {
-  return Number(value ?? 0).toLocaleString('vi-VN') + ' đ'
+  return toNumber(value).toLocaleString('vi-VN') + ' đ'
 }
 
 function statusMeta(status: PaymentStatus) {
-  if (status === 'paid') return { label: 'Paid', type: 'success' as const, className: 'status-confirmed' }
-  if (status === 'pending') return { label: 'Waiting', type: 'warning' as const, className: 'status-pending' }
-  if (status === 'refunded') return { label: 'Refunded', type: 'info' as const, className: 'status-refunded' }
-  return { label: 'Failed', type: 'error' as const, className: 'status-cancelled' }
+  if (status === 'paid') return { label: 'Đã thanh toán', type: 'success' as const, className: 'status-confirmed' }
+  if (status === 'pending') return { label: 'Đang chờ', type: 'warning' as const, className: 'status-pending' }
+  if (status === 'refunded') return { label: 'Đã hoàn tiền', type: 'info' as const, className: 'status-refunded' }
+  return { label: 'Thất bại', type: 'error' as const, className: 'status-cancelled' }
 }
 
-function providerLabel(provider: string) {
-  return providerOptions.find((option) => option.value === provider)?.label ?? provider.toUpperCase()
+function bookingStatusMeta(status?: BookingStatus) {
+  if (status === 'confirmed') return 'Đã xác nhận'
+  if (status === 'pending') return 'Chờ thanh toán'
+  if (status === 'refunded') return 'Đã hoàn tiền'
+  if (status === 'expired') return 'Hết hạn'
+  if (status === 'cancelled') return 'Đã hủy'
+  return '-'
 }
 
-function providerClass(provider: string) {
+function providerLabel(provider?: string | null) {
+  return providerOptions.find((option) => option.value === provider)?.label ?? provider?.toUpperCase() ?? '-'
+}
+
+function providerClass(provider?: string | null) {
   if (provider === 'momo') return 'provider-momo'
   if (provider === 'zalopay') return 'provider-zalopay'
-  if (provider === 'cashier') return 'provider-cashier'
   return 'provider-vnpay'
+}
+
+function bookingCode(row: Payment) {
+  return row.booking?.booking_code ?? '-'
+}
+
+function customerName(row: Payment) {
+  return row.booking?.user?.name ?? 'Khách hàng'
+}
+
+function movieTitle(row: Payment) {
+  return row.booking?.showtime?.movie?.title ?? '-'
+}
+
+function cinemaLabel(row: Payment) {
+  return row.booking?.showtime?.room?.cinema?.name ?? '-'
+}
+
+function roomLabel(row: Payment) {
+  return row.booking?.showtime?.room?.name ?? '-'
+}
+
+function showtimeLabel(row: Payment) {
+  return formatDateTime(row.booking?.showtime?.start_time ?? row.booking?.showtime?.show_date)
+}
+
+function renderStatusTag(status: PaymentStatus) {
+  const meta = statusMeta(status)
+  return h(NTag, { round: true, bordered: false, class: meta.className, type: meta.type }, { default: () => meta.label })
+}
+
+function renderIcon(icon: unknown, className = 'inline-icon') {
+  return h('span', { class: className }, [h(icon as never)])
+}
+
+function renderExpand(row: Payment) {
+  return h('div', { class: 'payment-detail' }, [
+    h('section', { class: 'detail-block' }, [
+      h('div', { class: 'detail-heading' }, [renderIcon(ReceiptOutline), h('h4', 'Thông tin giao dịch')]),
+      h('dl', [
+        h('div', [h('dt', 'Mã giao dịch'), h('dd', row.transaction_code ?? 'Chưa có mã')]),
+        h('div', [h('dt', 'Kênh'), h('dd', [h('span', { class: `provider-pill ${providerClass(row.provider)}` }, providerLabel(row.provider))])]),
+        h('div', [h('dt', 'Trạng thái'), h('dd', [renderStatusTag(row.status)])]),
+        h('div', [h('dt', 'Số tiền'), h('dd', money(row.amount))]),
+      ]),
+    ]),
+    h('section', { class: 'detail-block' }, [
+      h('div', { class: 'detail-heading' }, [renderIcon(CardOutline), h('h4', 'Booking liên quan')]),
+      h('dl', [
+        h('div', [h('dt', 'Mã booking'), h('dd', bookingCode(row))]),
+        h('div', [h('dt', 'Trạng thái booking'), h('dd', bookingStatusMeta(row.booking?.status))]),
+        h('div', [h('dt', 'Khách hàng'), h('dd', customerName(row))]),
+        h('div', [h('dt', 'Email'), h('dd', row.booking?.user?.email ?? '-')]),
+      ]),
+    ]),
+    h('section', { class: 'detail-block' }, [
+      h('div', { class: 'detail-heading' }, [renderIcon(TimeOutline), h('h4', 'Suất chiếu')]),
+      h('dl', [
+        h('div', [h('dt', 'Phim'), h('dd', movieTitle(row))]),
+        h('div', [h('dt', 'Thời gian'), h('dd', showtimeLabel(row))]),
+        h('div', [h('dt', 'Rạp'), h('dd', cinemaLabel(row))]),
+        h('div', [h('dt', 'Phòng'), h('dd', roomLabel(row))]),
+      ]),
+    ]),
+    h('section', { class: 'detail-block' }, [
+      h('div', { class: 'detail-heading' }, [renderIcon(SwapHorizontalOutline), h('h4', 'Dòng tiền')]),
+      h('dl', [
+        h('div', [h('dt', 'Tạo lúc'), h('dd', formatDateTime(row.created_at))]),
+        h('div', [h('dt', 'Ghi nhận lúc'), h('dd', formatDateTime(row.paid_at ?? undefined))]),
+        h('div', [h('dt', 'Số tiền hoàn'), h('dd', money(row.refunded_amount))]),
+        h('div', [h('dt', 'Trạng thái hoàn'), h('dd', row.refund_status ?? '-')]),
+      ]),
+    ]),
+  ])
+}
+
+function rowClassName(row: Payment) {
+  return expandedRowKeys.value.includes(row.id) ? 'is-expanded-row' : ''
 }
 
 function createColumns(): DataTableColumns<Payment> {
   return [
     {
+      type: 'expand',
+      width: 48,
+      fixed: 'left',
+      renderExpand,
+    },
+    {
       title: 'Mã giao dịch',
       key: 'payment',
       width: 230,
+      fixed: 'left',
       render: (row) =>
         h('div', { class: 'payment-code-cell' }, [
           h('strong', row.transaction_code ?? 'Chưa có mã'),
@@ -68,33 +206,33 @@ function createColumns(): DataTableColumns<Payment> {
     {
       title: 'Booking',
       key: 'booking',
-      width: 170,
+      width: 190,
       render: (row) =>
         h('div', { class: 'primary-cell' }, [
-          h('strong', `#${row.booking?.booking_code?.replace(/^BK-?/, '') ?? '-'}`),
-          h('span', row.booking?.status ?? '-'),
+          h('strong', bookingCode(row)),
+          h('span', bookingStatusMeta(row.booking?.status)),
         ]),
     },
     {
       title: 'Khách hàng',
       key: 'customer',
-      width: 210,
+      width: 230,
       render: (row) =>
         h('div', { class: 'primary-cell' }, [
-          h('strong', row.booking?.user?.name ?? 'Khách hàng'),
+          h('strong', customerName(row)),
           h('span', row.booking?.user?.email ?? '-'),
         ]),
     },
     {
       title: 'Nội dung thanh toán',
       key: 'content',
-      minWidth: 260,
+      minWidth: 330,
       render: (row) =>
         h('div', { class: 'movie-cell' }, [
-          h('strong', row.booking?.showtime?.movie?.title ?? '-'),
+          h('strong', movieTitle(row)),
           h('div', [
-            h('span', { class: 'provider-pill ' + providerClass(row.provider) }, providerLabel(row.provider)),
-            h('span', row.booking?.showtime?.room?.cinema?.name ?? '-'),
+            h('span', { class: `provider-pill ${providerClass(row.provider)}` }, providerLabel(row.provider)),
+            h('span', `${cinemaLabel(row)} - ${roomLabel(row)}`),
           ]),
         ]),
     },
@@ -103,22 +241,22 @@ function createColumns(): DataTableColumns<Payment> {
       key: 'amount',
       width: 150,
       align: 'right',
-      render: (row) => h('strong', { class: 'amount-text' }, money(row.amount)),
+      render: (row) =>
+        h('div', { class: 'amount-cell' }, [
+          h('strong', money(row.amount)),
+          h('span', showtimeLabel(row)),
+        ]),
     },
     {
       title: 'Trạng thái',
       key: 'status',
-      width: 145,
-      render: (row) => {
-        const status = statusMeta(row.status)
-
-        return h(NTag, { round: true, bordered: false, class: status.className, type: status.type }, { default: () => status.label })
-      },
+      width: 150,
+      render: (row) => renderStatusTag(row.status),
     },
     {
       title: 'Dòng tiền',
       key: 'cashflow',
-      width: 170,
+      width: 180,
       render: (row) =>
         h('div', { class: 'primary-cell' }, [
           h('strong', row.paid_at ? 'Đã ghi nhận' : 'Chưa ghi nhận'),
@@ -134,255 +272,314 @@ onMounted(fetchPayments)
 </script>
 
 <template>
-  <section class="cinema-panel">
-    <header class="panel-header">
-      <div>
-        <h2>
-          <WalletOutline />
-          Đối soát thanh toán
-        </h2>
-        <p>Theo dõi giao dịch, kênh thanh toán và trạng thái dòng tiền theo từng booking.</p>
-      </div>
-      <div class="display-count">
-        <span>Đang hiển thị</span>
-        <strong>{{ data.length }}/{{ pagination.itemCount || data.length }} giao dịch</strong>
-      </div>
-    </header>
+  <n-space vertical :size="16" class="payment-page">
+    <n-card :bordered="false" class="page-card">
+      <template #header>
+        <n-space align="center" :size="10">
+          <n-icon size="22" color="#2563eb">
+            <WalletOutline />
+          </n-icon>
+          <span>Đối soát thanh toán</span>
+        </n-space>
+      </template>
 
-    <div class="toolbar-grid">
-      <n-input
-        v-model:value="filters.search"
-        placeholder="Tìm mã giao dịch, booking, khách hàng..."
-        clearable
-        size="large"
-      >
-        <template #prefix>
-          <n-icon><SearchOutline /></n-icon>
-        </template>
-      </n-input>
+      <template #header-extra>
+        <n-tag round type="info" :bordered="false">
+          {{ visibleSummary }}
+        </n-tag>
+      </template>
 
-      <n-select
-        v-model:value="filters.provider"
-        :options="providerOptions"
-        placeholder="--- Tất cả kênh ---"
-        clearable
-        size="large"
-      >
-        <template #prefix>
-          <n-icon><CardOutline /></n-icon>
-        </template>
-      </n-select>
+      <n-space vertical :size="16">
+        <div class="metric-grid">
+          <article v-for="metric in paymentMetrics" :key="metric.label" class="metric-card" :class="metric.className">
+            <span class="metric-icon">
+              <component :is="metric.icon" />
+            </span>
+            <div>
+              <p>{{ metric.label }}</p>
+              <strong>{{ metric.value }}</strong>
+              <small>{{ metric.caption }}</small>
+            </div>
+          </article>
+        </div>
 
-      <n-select
-        v-model:value="filters.status"
-        :options="statusOptions"
-        placeholder="--- Tất cả trạng thái ---"
-        clearable
-        size="large"
-      >
-        <template #prefix>
-          <n-icon><SwapHorizontalOutline /></n-icon>
-        </template>
-      </n-select>
-    </div>
+        <div class="payment-toolbar">
+          <n-input
+            v-model:value="filters.search"
+            class="toolbar-search"
+            placeholder="Tìm mã giao dịch, booking hoặc khách hàng..."
+            clearable
+          >
+            <template #prefix>
+              <n-icon><SearchOutline /></n-icon>
+            </template>
+          </n-input>
 
-    <div class="status-tabs">
-      <button type="button" :class="{ active: filters.status === null }" @click="filters.status = null">Tất cả</button>
-      <button type="button" class="filter-paid" :class="{ active: filters.status === 'paid' }" @click="filters.status = 'paid'">Đã thanh toán</button>
-      <button type="button" class="filter-pending" :class="{ active: filters.status === 'pending' }" @click="filters.status = 'pending'">Đang chờ</button>
-      <button type="button" class="filter-cancelled" :class="{ active: filters.status === 'failed' }" @click="filters.status = 'failed'">Thất bại</button>
-    </div>
+          <n-select
+            v-model:value="filters.provider"
+            class="toolbar-provider"
+            :options="providerOptions"
+            label-field="label"
+            value-field="value"
+            placeholder="Tất cả kênh"
+            clearable
+          />
 
-    <n-data-table
-      :columns="columns"
-      :data="data"
-      :loading="loading"
-      :pagination="pagination"
-      :row-key="(row: Payment) => row.id"
-      :scroll-x="1340"
-      remote
-    />
-  </section>
+          <n-select
+            v-model:value="filters.status"
+            class="toolbar-status"
+            :options="statusOptions"
+            label-field="label"
+            value-field="value"
+            placeholder="Tất cả trạng thái"
+            clearable
+          />
+
+          <n-date-picker
+            v-model:value="filters.dateRange"
+            class="toolbar-date"
+            type="daterange"
+            clearable
+            format="dd/MM/yyyy"
+            start-placeholder="Từ ngày"
+            end-placeholder="Đến ngày"
+          />
+
+          <div class="toolbar-count">
+            <n-icon><CheckmarkDoneCircleOutline /></n-icon>
+            <span>{{ visibleSummary }}</span>
+          </div>
+        </div>
+
+        <n-button-group>
+          <n-button
+            v-for="item in statusOptions"
+            :key="item.label"
+            :type="filters.status === item.value ? 'primary' : 'default'"
+            secondary
+            @click="filters.status = item.value"
+          >
+            {{ item.value === null ? 'Tất cả' : item.label }}
+          </n-button>
+        </n-button-group>
+      </n-space>
+    </n-card>
+
+    <n-card :bordered="false" content-style="padding: 0" class="table-card">
+      <n-data-table
+        :columns="columns"
+        :data="data"
+        :expanded-row-keys="expandedRowKeys"
+        :loading="loading"
+        :pagination="pagination"
+        :row-class-name="rowClassName"
+        :row-key="(row: Payment) => row.id"
+        :scroll-x="1500"
+        remote
+        @update:expanded-row-keys="(keys: DataTableRowKey[]) => (expandedRowKeys = keys)"
+      />
+    </n-card>
+  </n-space>
 </template>
 
 <style scoped>
-.cinema-panel {
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgb(15 23 42 / 0.04);
+.payment-page {
   color: #1f2937;
 }
 
-.panel-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 28px 24px 18px;
+.page-card,
+.table-card {
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
 }
 
-.panel-header h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  color: #111827;
+:deep(.page-card .n-card-header__main) {
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
-.panel-header h2 svg {
-  width: 18px;
-  color: #6366f1;
-}
-
-.panel-header p {
-  margin: 8px 0 0;
-  color: #64748b;
-  font-size: 13px;
-}
-
-.display-count {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  color: #64748b;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.display-count strong {
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #4f46e5;
-  padding: 6px 12px;
-}
-
-.toolbar-grid {
+.metric-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 1.25fr) minmax(200px, 0.8fr) minmax(220px, 0.9fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  padding: 0 24px 20px;
 }
 
-.status-tabs {
+.metric-card {
   display: flex;
-  flex-wrap: wrap;
-  gap: 28px;
-  border-top: 1px solid #e5e7eb;
-  padding: 14px 24px 22px;
-}
-
-.status-tabs button {
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: #64748b;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 800;
-  padding: 7px 12px;
-  text-transform: uppercase;
-}
-
-.status-tabs button.active,
-.status-tabs button:hover {
-  background: #f3f4f6;
-  color: #111827;
-}
-
-:deep(.n-data-table) {
-  --n-td-color: #fff !important;
-  --n-td-color-hover: #f8fafc !important;
-  --n-th-color: #f9fafb !important;
-  --n-border-color: #e5e7eb !important;
-  --n-th-text-color: #64748b !important;
-  --n-td-text-color: #1f2937 !important;
-}
-
-:deep(.n-data-table-th) {
-  font-size: 10px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-:deep(.n-data-table-td) {
-  padding: 18px 24px !important;
-}
-
-.payment-code-cell,
-.primary-cell,
-.movie-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.payment-code-cell strong {
-  width: max-content;
-  border-radius: 4px;
-  background: #f3f4f6;
-  color: #111827;
-  font-size: 12px;
-  padding: 6px 9px;
-}
-
-.payment-code-cell span,
-.primary-cell span,
-.movie-cell span {
-  color: #64748b;
-  font-size: 12px;
-}
-
-.primary-cell strong,
-.movie-cell strong {
-  color: #111827;
-  font-weight: 900;
-}
-
-.movie-cell > div {
-  display: flex;
+  min-height: 104px;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
 }
 
-.provider-pill {
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 900;
-  padding: 4px 8px;
+.metric-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
 }
 
-.provider-vnpay {
-  background: #dbeafe;
-  color: #1d4ed8;
+:deep(.metric-icon svg) {
+  width: 22px;
+  height: 22px;
 }
 
-.provider-momo {
-  background: #fce7f3;
-  color: #be185d;
+.metric-card p,
+.metric-card small {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
 }
 
-.provider-zalopay {
-  background: #e0f2fe;
-  color: #0369a1;
+.metric-card strong {
+  display: block;
+  margin: 3px 0;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
 }
 
-.provider-cashier {
+.metric-revenue .metric-icon {
   background: #dcfce7;
   color: #15803d;
 }
 
-.amount-text {
+.metric-pending .metric-icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.metric-failed .metric-icon {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.payment-toolbar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(140px, 180px) minmax(170px, 220px) minmax(250px, 310px) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.toolbar-search,
+.toolbar-provider,
+.toolbar-status,
+.toolbar-date {
+  min-width: 0;
+}
+
+.toolbar-count {
+  display: inline-flex;
+  min-width: 132px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.toolbar-count svg {
+  width: 15px;
+  height: 15px;
+}
+
+:deep(.n-data-table-th) {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+:deep(.n-data-table-td) {
+  vertical-align: top;
+}
+
+:deep(.is-expanded-row td) {
+  background: #fcfcfd !important;
+}
+
+:deep(.payment-code-cell),
+:deep(.primary-cell),
+:deep(.movie-cell),
+:deep(.amount-cell) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+:deep(.payment-code-cell strong),
+:deep(.primary-cell strong),
+:deep(.movie-cell strong),
+:deep(.amount-cell strong) {
+  display: block;
   color: #111827;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+:deep(.payment-code-cell span),
+:deep(.primary-cell span),
+:deep(.movie-cell span),
+:deep(.amount-cell span) {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+:deep(.movie-cell > div) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+:deep(.amount-cell) {
+  align-items: flex-end;
+}
+
+:deep(.amount-cell strong) {
   font-size: 14px;
-  font-weight: 900;
+}
+
+:deep(.provider-pill) {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+}
+
+:deep(.provider-vnpay) {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+:deep(.provider-momo) {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+:deep(.provider-zalopay) {
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
 :deep(.status-confirmed) {
@@ -403,5 +600,89 @@ onMounted(fetchPayments)
 :deep(.status-refunded) {
   background: #dbeafe !important;
   color: #1d4ed8 !important;
+}
+
+:deep(.payment-detail) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  background: #f8fafc;
+  padding: 16px 24px 20px;
+}
+
+:deep(.detail-block) {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
+}
+
+:deep(.detail-heading) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+:deep(.detail-heading h4) {
+  margin: 0;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+:deep(.detail-block dl) {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+:deep(.detail-block dl div) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+:deep(.detail-block dt) {
+  color: #64748b;
+  font-size: 12px;
+}
+
+:deep(.detail-block dd) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+
+:deep(.inline-icon svg) {
+  width: 14px;
+  height: 14px;
+  color: #2563eb;
+}
+
+@media (max-width: 1200px) {
+  .payment-toolbar,
+  :deep(.payment-detail) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .metric-grid,
+  .payment-toolbar,
+  :deep(.payment-detail) {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar-count {
+    justify-content: flex-start;
+  }
 }
 </style>

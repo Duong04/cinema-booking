@@ -15,7 +15,7 @@ class PaymentRequest extends FormRequest
     {
         return [
             'booking_id' => ['required', 'uuid', 'exists:bookings,id'],
-            'provider' => ['required', 'string', 'in:vnpay,momo,zalopay,cashier'],
+            'provider' => ['required', 'string', 'in:vnpay,momo,zalopay'],
         ];
     }
 }

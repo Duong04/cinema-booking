@@ -8,6 +8,8 @@ export const bookingService = {
     limit?: number
     q?: string
     status?: BookingStatus
+    from_date?: string
+    to_date?: string
   }) => api.get<PaginatedResponse<Booking[]>>('/bookings', { params }),
 
   getBookingById: (id: string) => api.get<ApiResponse<Booking>>(`/bookings/${id}`),

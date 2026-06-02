@@ -5,6 +5,18 @@ import type { PaymentProvider } from '@/features/admin/types/payment.type'
 import type { Payment } from '@/features/admin/types/payment.type'
 import type { PaymentStatus } from '@/features/admin/types/booking.type'
 
+type DateRangeValue = [number, number] | null
+
+function formatDateParam(value?: number) {
+  if (!value) return undefined
+  const date = new Date(value)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 export function usePayment() {
   const data = ref<Payment[]>([])
   const loading = ref(false)
@@ -12,6 +24,7 @@ export function usePayment() {
     search: '',
     status: null as PaymentStatus | null,
     provider: null as PaymentProvider | null,
+    dateRange: null as DateRangeValue,
   })
 
   const pagination = reactive({
@@ -40,6 +53,8 @@ export function usePayment() {
         q: filters.search || undefined,
         status: filters.status || undefined,
         provider: filters.provider || undefined,
+        from_date: formatDateParam(filters.dateRange?.[0]),
+        to_date: formatDateParam(filters.dateRange?.[1]),
       })
 
       data.value = res.data
@@ -55,7 +70,7 @@ export function usePayment() {
   }, 500)
 
   watch(() => filters.search, debouncedSearch)
-  watch(() => [filters.status, filters.provider], () => {
+  watch(() => [filters.status, filters.provider, filters.dateRange], () => {
     pagination.page = 1
     fetchPayments()
   })

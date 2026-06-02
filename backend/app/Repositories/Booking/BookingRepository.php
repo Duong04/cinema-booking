@@ -12,7 +12,7 @@ class BookingRepository extends BaseRepository implements BookingRepositoryInter
         $this->model = $model;
     }
 
-    public function paginate(int $limit, ?string $q, ?string $status)
+    public function paginate(int $limit, ?string $q, ?string $status, ?string $fromDate, ?string $toDate)
     {
         $bookings = $this->model
             ->with([
@@ -42,7 +42,9 @@ class BookingRepository extends BaseRepository implements BookingRepositoryInter
             ->when(
                 $status,
                 fn($query) => $query->where('status', $status)
-            );
+            )
+            ->when($fromDate, fn($query) => $query->whereDate('created_at', '>=', $fromDate))
+            ->when($toDate, fn($query) => $query->whereDate('created_at', '<=', $toDate));
 
         return $bookings
             ->orderByDesc('created_at')

@@ -1,6 +1,6 @@
 import type { Booking, PaymentStatus } from './booking.type'
 
-export type PaymentProvider = 'vnpay' | 'momo' | 'zalopay' | 'cashier'
+export type PaymentProvider = 'vnpay' | 'momo' | 'zalopay'
 
 export interface Payment {
   id: string

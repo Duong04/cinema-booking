@@ -13,7 +13,7 @@ class PaymentFactory extends Factory
 {
     public function definition(): array
     {
-        $provider = fake()->randomElement(['vnpay', 'momo', 'zalopay', 'cashier']);
+        $provider = fake()->randomElement(['vnpay', 'momo', 'zalopay']);
 
         return [
             'booking_id' => Booking::factory(),

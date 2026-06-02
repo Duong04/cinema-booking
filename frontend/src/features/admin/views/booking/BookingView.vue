@@ -5,61 +5,106 @@ import { computed, h, onMounted, ref } from 'vue'
 import {
   CalendarOutline,
   CardOutline,
+  CheckmarkDoneCircleOutline,
   ChevronDownOutline,
   ChevronUpOutline,
-  EyeOutline,
   FilmOutline,
+  HourglassOutline,
+  PeopleOutline,
+  PricetagOutline,
+  ReceiptOutline,
   SearchOutline,
   TicketOutline,
   TimeOutline,
-  TrashOutline,
+  WalletOutline,
 } from '@vicons/ionicons5'
 import { useBooking } from '@/features/admin/composables/useBooking'
-import type { Booking, BookingStatus, PaymentStatus } from '@/features/admin/types/booking.type'
+import type {
+  Booking,
+  BookingCombo,
+  BookingPromotion,
+  BookingStatus,
+  PaymentStatus,
+} from '@/features/admin/types/booking.type'
 import { formatDateTime } from '@/shared/utils/formatDate'
 
 const { data, loading, filters, pagination, fetchBookings } = useBooking()
 const expandedRowKeys = ref<DataTableRowKey[]>([])
 
-const statusFilters: Array<{ label: string; value: BookingStatus | null; className: string }> = [
-  { label: 'Tất cả', value: null, className: 'filter-all' },
-  { label: 'Đã thanh toán', value: 'confirmed', className: 'filter-paid' },
-  { label: 'Chờ thanh toán', value: 'pending', className: 'filter-pending' },
-  { label: 'Đã hủy', value: 'cancelled', className: 'filter-cancelled' },
+const statusFilters: Array<{ label: string; value: BookingStatus | null }> = [
+  { label: 'Tất cả', value: null },
+  { label: 'Chờ thanh toán', value: 'pending' },
+  { label: 'Đã xác nhận', value: 'confirmed' },
+  { label: 'Đã hủy', value: 'cancelled' },
+  { label: 'Hoàn tiền', value: 'refunded' },
+  { label: 'Hết hạn', value: 'expired' },
 ]
+
+const bookingMetrics = computed(() => {
+  const rows = data.value
+  const paidBookings = rows.filter((row) => row.status === 'confirmed' || row.payment?.status === 'paid')
+  const pendingBookings = rows.filter((row) => row.status === 'pending')
+  const ticketCount = rows.reduce((sum, row) => sum + (row.items?.length ?? 0), 0)
+  const paidAmount = paidBookings.reduce((sum, row) => sum + toNumber(row.total_amount), 0)
+
+  return [
+    {
+      label: 'Doanh thu đã ghi nhận',
+      value: money(paidAmount),
+      caption: `${paidBookings.length} booking đã thanh toán`,
+      icon: WalletOutline,
+      className: 'metric-revenue',
+    },
+    {
+      label: 'Đang chờ xử lý',
+      value: pendingBookings.length.toString(),
+      caption: 'Cần thanh toán/xác nhận',
+      icon: HourglassOutline,
+      className: 'metric-pending',
+    },
+    {
+      label: 'Vé đã đặt',
+      value: ticketCount.toString(),
+      caption: `${data.value.length}/${pagination.itemCount || data.value.length} booking đang hiển thị`,
+      icon: TicketOutline,
+      className: 'metric-ticket',
+    },
+  ]
+})
 
 const visibleSummary = computed(() => {
   const total = pagination.itemCount || data.value.length
-  const visible = data.value.length
-
-  return `${visible}/${total} đơn đặt vé`
+  return `${data.value.length}/${total} booking`
 })
 
+function toNumber(value?: number | string | null) {
+  return Number(value ?? 0)
+}
+
 function money(value?: number | string | null) {
-  return Number(value ?? 0).toLocaleString('vi-VN') + ' đ'
+  return toNumber(value).toLocaleString('vi-VN') + ' đ'
 }
 
 function bookingStatusMeta(status: BookingStatus) {
-  if (status === 'confirmed') return { label: 'Confirmed', type: 'success' as const, className: 'status-confirmed' }
-  if (status === 'pending') return { label: 'Pending', type: 'warning' as const, className: 'status-pending' }
-  if (status === 'refunded') return { label: 'Refunded', type: 'info' as const, className: 'status-refunded' }
-  if (status === 'expired') return { label: 'Expired', type: 'default' as const, className: 'status-muted' }
-  return { label: 'Cancelled', type: 'error' as const, className: 'status-cancelled' }
+  if (status === 'confirmed') return { label: 'Đã xác nhận', type: 'success' as const, className: 'status-confirmed' }
+  if (status === 'pending') return { label: 'Chờ thanh toán', type: 'warning' as const, className: 'status-pending' }
+  if (status === 'refunded') return { label: 'Đã hoàn tiền', type: 'info' as const, className: 'status-refunded' }
+  if (status === 'expired') return { label: 'Hết hạn', type: 'default' as const, className: 'status-muted' }
+  return { label: 'Đã hủy', type: 'error' as const, className: 'status-cancelled' }
 }
 
 function paymentStatusMeta(status?: PaymentStatus) {
-  if (status === 'paid') return { label: 'Đã thanh toán', className: 'filter-paid' }
-  if (status === 'pending') return { label: 'Chờ thanh toán', className: 'filter-pending' }
-  if (status === 'refunded') return { label: 'Đã hoàn tiền', className: 'filter-paid' }
-  if (status === 'failed') return { label: 'Thất bại', className: 'filter-cancelled' }
-  return { label: 'Chưa tạo thanh toán', className: 'filter-cancelled' }
+  if (status === 'paid') return { label: 'Đã thanh toán', type: 'success' as const, className: 'status-confirmed' }
+  if (status === 'pending') return { label: 'Chờ thanh toán', type: 'warning' as const, className: 'status-pending' }
+  if (status === 'refunded') return { label: 'Đã hoàn tiền', type: 'info' as const, className: 'status-refunded' }
+  if (status === 'failed') return { label: 'Thất bại', type: 'error' as const, className: 'status-cancelled' }
+  return { label: 'Chưa tạo thanh toán', type: 'default' as const, className: 'status-muted' }
 }
 
 function providerLabel(provider?: string | null) {
   if (provider === 'vnpay') return 'VNPay'
   if (provider === 'momo') return 'MoMo'
   if (provider === 'zalopay') return 'ZaloPay'
-  if (provider === 'cashier') return 'Thu ngân'
   return 'Chưa có kênh'
 }
 
@@ -67,8 +112,48 @@ function seatLabels(row: Booking) {
   return row.items?.map((item) => item.seat_label).filter(Boolean) ?? []
 }
 
-function ageRating(row: Booking) {
-  return row.items?.[0]?.seat_type_name ?? 'C13'
+function ticketTotal(row: Booking) {
+  return row.items?.reduce((sum, item) => sum + toNumber(item.price), 0) ?? 0
+}
+
+function comboName(combo: BookingCombo) {
+  return combo.pivot?.combo_name ?? combo.combo_name ?? combo.name ?? 'Combo'
+}
+
+function comboQuantity(combo: BookingCombo) {
+  return combo.pivot?.quantity ?? combo.quantity ?? 1
+}
+
+function comboTotal(row: Booking) {
+  return row.combos?.reduce((sum, combo) => sum + toNumber(combo.pivot?.total_price ?? combo.total_price), 0) ?? 0
+}
+
+function promotionDiscount(promotion: BookingPromotion) {
+  return toNumber(promotion.pivot?.discount_amount)
+}
+
+function discountTotal(row: Booking) {
+  return row.promotions?.reduce((sum, promotion) => sum + promotionDiscount(promotion), 0) ?? 0
+}
+
+function statusLogs(row: Booking) {
+  return row.status_logs ?? row.statusLogs ?? []
+}
+
+function showtimeLabel(row: Booking) {
+  return formatDateTime(row.showtime?.start_time ?? row.showtime?.show_date)
+}
+
+function cinemaLabel(row: Booking) {
+  return row.showtime?.room?.cinema?.name ?? '-'
+}
+
+function roomLabel(row: Booking) {
+  return row.showtime?.room?.name ?? row.items?.[0]?.room_name ?? '-'
+}
+
+function movieTitle(row: Booking) {
+  return row.showtime?.movie?.title ?? row.items?.[0]?.movie_title ?? '-'
 }
 
 function setStatusFilter(status: BookingStatus | null) {
@@ -83,35 +168,109 @@ function renderIcon(icon: unknown, className = 'inline-icon') {
   return h('span', { class: className }, [h(icon as never)])
 }
 
-function renderExpand(row: Booking) {
-  const ticketTotal = row.items?.reduce((sum, item) => sum + Number(item.price ?? 0), 0) ?? 0
-  const comboTotal = Math.max(Number(row.total_amount ?? 0) - ticketTotal, 0)
+function renderStatusTag(status: BookingStatus) {
+  const meta = bookingStatusMeta(status)
+
+  return h(NTag, { round: true, bordered: false, class: meta.className, type: meta.type }, { default: () => meta.label })
+}
+
+function renderPaymentTag(status?: PaymentStatus) {
+  const meta = paymentStatusMeta(status)
+
+  return h(NTag, { round: true, bordered: false, class: meta.className, type: meta.type }, { default: () => meta.label })
+}
+
+function renderEmptyText(text = 'Chưa có dữ liệu') {
+  return h('span', { class: 'muted-text' }, text)
+}
+
+function renderSeatChips(row: Booking, limit = 5) {
   const labels = seatLabels(row)
+  const visible = labels.slice(0, limit).map((label) => h('span', { class: 'seat-chip' }, label))
+
+  if (labels.length > limit) {
+    visible.push(h('span', { class: 'seat-chip more' }, `+${labels.length - limit}`))
+  }
+
+  return visible.length ? visible : [renderEmptyText('-')]
+}
+
+function renderExpand(row: Booking) {
+  const subtotal = ticketTotal(row) + comboTotal(row)
+  const discount = discountTotal(row)
+  const logs = statusLogs(row)
 
   return h('div', { class: 'booking-detail' }, [
     h('section', { class: 'detail-block' }, [
-      h('h4', 'Chi tiết suất chiếu'),
+      h('div', { class: 'detail-heading' }, [renderIcon(FilmOutline), h('h4', 'Suất chiếu')]),
       h('dl', [
-        h('div', [h('dt', 'Ngày chiếu'), h('dd', [renderIcon(CalendarOutline), formatDateTime(row.showtime?.start_time)])]),
-        h('div', [h('dt', 'Phòng'), h('dd', row.showtime?.room?.name ?? '-')]),
-        h('div', [h('dt', 'Rạp'), h('dd', row.showtime?.room?.cinema?.name ?? '-')]),
-        h('div', [h('dt', 'Ghế'), h('dd', labels.length ? labels.join(', ') : '-')]),
+        h('div', [h('dt', 'Phim'), h('dd', movieTitle(row))]),
+        h('div', [h('dt', 'Thời gian'), h('dd', [renderIcon(CalendarOutline), showtimeLabel(row)])]),
+        h('div', [h('dt', 'Rạp'), h('dd', cinemaLabel(row))]),
+        h('div', [h('dt', 'Phòng'), h('dd', roomLabel(row))]),
       ]),
     ]),
     h('section', { class: 'detail-block' }, [
-      h('h4', 'Thanh toán'),
+      h('div', { class: 'detail-heading' }, [renderIcon(PeopleOutline), h('h4', 'Khách & vé')]),
       h('dl', [
+        h('div', [h('dt', 'Khách hàng'), h('dd', row.user?.name ?? 'Khách hàng')]),
+        h('div', [h('dt', 'Email'), h('dd', row.user?.email ?? '-')]),
+        h('div', [h('dt', 'Số vé'), h('dd', `${row.items?.length ?? 0} vé`)]),
+        h('div', [h('dt', 'Ghế'), h('dd', { class: 'detail-seat-list' }, renderSeatChips(row, 12))]),
+      ]),
+    ]),
+    h('section', { class: 'detail-block' }, [
+      h('div', { class: 'detail-heading' }, [renderIcon(CardOutline), h('h4', 'Thanh toán')]),
+      h('dl', [
+        h('div', [h('dt', 'Trạng thái'), h('dd', [renderPaymentTag(row.payment?.status)])]),
         h('div', [h('dt', 'Kênh'), h('dd', providerLabel(row.payment?.provider))]),
         h('div', [h('dt', 'Mã giao dịch'), h('dd', row.payment?.transaction_code ?? '-')]),
-        h('div', [h('dt', 'Paid at'), h('dd', formatDateTime(row.payment?.paid_at ?? undefined))]),
+        h('div', [h('dt', 'Ghi nhận lúc'), h('dd', formatDateTime(row.payment?.paid_at ?? undefined))]),
       ]),
     ]),
     h('section', { class: 'invoice-card' }, [
-      h('h4', 'Chi tiết hóa đơn'),
-      h('div', [h('span', 'Giá vé'), h('strong', money(ticketTotal))]),
-      h('div', [h('span', 'Đồ ăn & nước'), h('strong', money(comboTotal))]),
+      h('div', { class: 'detail-heading' }, [renderIcon(ReceiptOutline), h('h4', 'Hóa đơn')]),
+      h('div', [h('span', `Vé (${row.items?.length ?? 0})`), h('strong', money(ticketTotal(row)))]),
+      h('div', [h('span', 'Combo'), h('strong', money(comboTotal(row)))]),
+      h('div', [h('span', 'Tạm tính'), h('strong', money(subtotal))]),
+      h('div', { class: discount > 0 ? 'discount-line' : '' }, [h('span', 'Khuyến mãi'), h('strong', discount > 0 ? `-${money(discount)}` : money(0))]),
       h('footer', [h('span', 'Thành tiền'), h('strong', money(row.total_amount))]),
-      h('small', `Khách hàng: ${row.user?.email ?? '-'}`),
+    ]),
+    h('section', { class: 'wide-detail' }, [
+      h('div', { class: 'detail-heading' }, [renderIcon(PricetagOutline), h('h4', 'Combo & khuyến mãi')]),
+      h('div', { class: 'compact-list' }, [
+        ...(row.combos?.length
+          ? row.combos.map((combo) =>
+              h('div', [
+                h('span', `${comboName(combo)} x${comboQuantity(combo)}`),
+                h('strong', money(combo.pivot?.total_price ?? combo.total_price)),
+              ]),
+            )
+          : [h('div', [h('span', 'Combo'), renderEmptyText('Không sử dụng')])]),
+        ...(row.promotions?.length
+          ? row.promotions.map((promotion) =>
+              h('div', [
+                h('span', promotion.code ?? promotion.name ?? 'Khuyến mãi'),
+                h('strong', `-${money(promotionDiscount(promotion))}`),
+              ]),
+            )
+          : [h('div', [h('span', 'Khuyến mãi'), renderEmptyText('Không áp dụng')])]),
+      ]),
+    ]),
+    h('section', { class: 'wide-detail' }, [
+      h('div', { class: 'detail-heading' }, [renderIcon(TimeOutline), h('h4', 'Vòng đời booking')]),
+      h('div', { class: 'timeline-list' }, [
+        h('div', [h('span', 'Tạo đơn'), h('strong', formatDateTime(row.created_at))]),
+        row.confirmed_at ? h('div', [h('span', 'Xác nhận'), h('strong', formatDateTime(row.confirmed_at))]) : null,
+        row.expired_at ? h('div', [h('span', 'Hết hạn giữ đơn'), h('strong', formatDateTime(row.expired_at))]) : null,
+        row.cancelled_at ? h('div', [h('span', 'Hủy/hoàn'), h('strong', formatDateTime(row.cancelled_at))]) : null,
+        ...logs.slice(0, 3).map((log) =>
+          h('div', [
+            h('span', bookingStatusMeta(log.new_status ?? row.status).label),
+            h('strong', formatDateTime(log.changed_at)),
+          ]),
+        ),
+      ].filter(Boolean)),
     ]),
   ])
 }
@@ -119,19 +278,26 @@ function renderExpand(row: Booking) {
 function createColumns(): DataTableColumns<Booking> {
   return [
     {
+      type: 'expand',
+      width: 48,
+      fixed: 'left',
+      renderExpand,
+    },
+    {
       title: 'Mã booking',
       key: 'booking',
-      width: 140,
+      width: 170,
+      fixed: 'left',
       render: (row) =>
         h('div', { class: 'booking-code-cell' }, [
-          h('strong', `#${row.booking_code.replace(/^BK-?/, '')}`),
+          h('strong', row.booking_code),
           h('span', formatDateTime(row.created_at)),
         ]),
     },
     {
       title: 'Khách hàng',
       key: 'customer',
-      width: 190,
+      width: 220,
       render: (row) =>
         h('div', { class: 'primary-cell' }, [
           h('strong', row.user?.name ?? 'Khách hàng'),
@@ -139,59 +305,69 @@ function createColumns(): DataTableColumns<Booking> {
         ]),
     },
     {
-      title: 'Phim / phòng chiếu',
+      title: 'Phim / suất chiếu',
       key: 'showtime',
-      minWidth: 270,
+      minWidth: 320,
       render: (row) =>
         h('div', { class: 'movie-cell' }, [
-          h('strong', row.showtime?.movie?.title ?? '-'),
+          h('strong', movieTitle(row)),
           h('div', [
-            h('span', { class: 'age-pill' }, ageRating(row)),
-            h('span', row.showtime?.room?.name ?? '-'),
+            h('span', { class: 'showtime-pill' }, showtimeLabel(row)),
+            h('span', `${cinemaLabel(row)} - ${roomLabel(row)}`),
           ]),
         ]),
     },
     {
-      title: 'Ghế đặt',
+      title: 'Ghế',
       key: 'seats',
-      width: 150,
-      render: (row) => {
-        const labels = seatLabels(row)
-
-        return h('div', { class: 'seat-list' }, labels.slice(0, 4).map((label) => h('span', label)))
-      },
+      width: 180,
+      render: (row) => h('div', { class: 'seat-list' }, renderSeatChips(row)),
+    },
+    {
+      title: 'Thanh toán',
+      key: 'payment',
+      width: 190,
+      render: (row) =>
+        h('div', { class: 'payment-cell' }, [
+          renderPaymentTag(row.payment?.status),
+          h('span', providerLabel(row.payment?.provider)),
+        ]),
     },
     {
       title: 'Tổng tiền',
       key: 'amount',
-      width: 140,
+      width: 150,
       align: 'right',
-      render: (row) => h('strong', { class: 'amount-text' }, money(row.total_amount)),
+      render: (row) =>
+        h('div', { class: 'amount-cell' }, [
+          h('strong', money(row.total_amount)),
+          h('span', `${row.items?.length ?? 0} vé`),
+        ]),
     },
     {
       title: 'Trạng thái',
       key: 'status',
-      width: 155,
-      render: (row) => {
-        const status = bookingStatusMeta(row.status)
-
-        return h(NTag, { round: true, bordered: false, class: status.className, type: status.type }, { default: () => status.label })
-      },
+      width: 150,
+      render: (row) => renderStatusTag(row.status),
     },
     {
-      title: 'Hành động',
+      title: 'Thao tác',
       key: 'actions',
-      width: 180,
+      width: 120,
       align: 'right',
+      fixed: 'right',
       render: (row) => {
         const expanded = expandedRowKeys.value.includes(row.id)
 
         return h('div', { class: 'action-cell' }, [
-          row.payment?.status === 'pending'
-            ? h(NButton, { size: 'small', type: 'warning', strong: true }, { icon: () => h(CardOutline), default: () => 'Trả ngay' })
-            : h(NButton, { size: 'small', secondary: true }, { icon: () => h(EyeOutline), default: () => 'Chi tiết vé' }),
-          h(NButton, { size: 'tiny', text: true }, { icon: () => h(TrashOutline) }),
-          h(NButton, { size: 'tiny', text: true, onClick: () => toggleExpand(row.id) }, { icon: () => h(expanded ? ChevronUpOutline : ChevronDownOutline) }),
+          h(
+            NButton,
+            { size: 'small', secondary: true, onClick: () => toggleExpand(row.id) },
+            {
+              icon: () => h(expanded ? ChevronUpOutline : ChevronDownOutline),
+              default: () => (expanded ? 'Thu gọn' : 'Chi tiết'),
+            },
+          ),
         ])
       },
     },
@@ -208,244 +384,316 @@ onMounted(fetchBookings)
 </script>
 
 <template>
-  <section class="cinema-panel">
-    <header class="panel-header">
-      <div>
-        <h2>
-          <TicketOutline />
-          Lịch sử đặt vé xem phim
-        </h2>
-        <p>Tìm kiếm, lọc danh sách đơn đặt vé và quản lý thanh toán trực quan.</p>
-      </div>
-      <div class="display-count">
-        <span>Đang hiển thị</span>
-        <strong>{{ visibleSummary }}</strong>
-      </div>
-    </header>
+  <n-space vertical :size="16" class="booking-page">
+    <n-card :bordered="false" class="page-card">
+      <template #header>
+        <n-space align="center" :size="10">
+          <n-icon size="22" color="#2563eb">
+            <TicketOutline />
+          </n-icon>
+          <span>Quản lý booking vé phim</span>
+        </n-space>
+      </template>
 
-    <div class="toolbar-grid">
-      <n-input
-        v-model:value="filters.search"
-        placeholder="Tìm theo mã đặt vé, tên khách hàng, SĐT..."
-        clearable
-        size="large"
-      >
-        <template #prefix>
-          <n-icon><SearchOutline /></n-icon>
-        </template>
-      </n-input>
+      <template #header-extra>
+        <n-tag round type="info" :bordered="false">
+          {{ visibleSummary }}
+        </n-tag>
+      </template>
 
-      <n-select size="large" placeholder="--- Tất cả phim ---" disabled>
-        <template #prefix>
-          <n-icon><FilmOutline /></n-icon>
-        </template>
-      </n-select>
+      <n-space vertical :size="16">
+        <div class="metric-grid">
+          <article v-for="metric in bookingMetrics" :key="metric.label" class="metric-card" :class="metric.className">
+            <span class="metric-icon">
+              <component :is="metric.icon" />
+            </span>
+            <div>
+              <p>{{ metric.label }}</p>
+              <strong>{{ metric.value }}</strong>
+              <small>{{ metric.caption }}</small>
+            </div>
+          </article>
+        </div>
 
-      <n-select size="large" placeholder="Mới nhất trước" disabled />
-    </div>
+        <div class="booking-toolbar">
+          <n-input
+            v-model:value="filters.search"
+            class="toolbar-search"
+            placeholder="Tìm mã booking, khách hàng hoặc tên phim..."
+            clearable
+          >
+            <template #prefix>
+              <n-icon><SearchOutline /></n-icon>
+            </template>
+          </n-input>
 
-    <div class="status-tabs">
-      <button
-        v-for="item in statusFilters"
-        :key="item.label"
-        type="button"
-        :class="[{ active: filters.status === item.value }, item.className]"
-        @click="setStatusFilter(item.value)"
-      >
-        {{ item.label }}
-      </button>
-    </div>
+          <n-select
+            v-model:value="filters.status"
+            class="toolbar-status"
+            :options="statusFilters"
+            label-field="label"
+            value-field="value"
+            placeholder="Tất cả trạng thái"
+            clearable
+          />
 
-    <n-data-table
-      :columns="columns"
-      :data="data"
-      :expanded-row-keys="expandedRowKeys"
-      :loading="loading"
-      :pagination="pagination"
-      :render-expand="renderExpand"
-      :row-class-name="rowClassName"
-      :row-key="(row: Booking) => row.id"
-      :scroll-x="1220"
-      remote
-      @update:expanded-row-keys="(keys: DataTableRowKey[]) => (expandedRowKeys = keys)"
-    />
-  </section>
+          <n-date-picker
+            v-model:value="filters.dateRange"
+            class="toolbar-date"
+            type="daterange"
+            clearable
+            format="dd/MM/yyyy"
+            start-placeholder="Từ ngày"
+            end-placeholder="Đến ngày"
+          />
+
+          <div class="toolbar-count">
+            <n-icon><CheckmarkDoneCircleOutline /></n-icon>
+            <span>{{ visibleSummary }}</span>
+          </div>
+        </div>
+
+        <n-button-group>
+          <n-button
+            v-for="item in statusFilters"
+            :key="item.label"
+            :type="filters.status === item.value ? 'primary' : 'default'"
+            secondary
+            @click="setStatusFilter(item.value)"
+          >
+            {{ item.label }}
+          </n-button>
+        </n-button-group>
+      </n-space>
+    </n-card>
+
+    <n-card :bordered="false" content-style="padding: 0" class="table-card">
+      <n-data-table
+        :columns="columns"
+        :data="data"
+        :expanded-row-keys="expandedRowKeys"
+        :loading="loading"
+        :pagination="pagination"
+        :row-class-name="rowClassName"
+        :row-key="(row: Booking) => row.id"
+        :scroll-x="1500"
+        remote
+        @update:expanded-row-keys="(keys: DataTableRowKey[]) => (expandedRowKeys = keys)"
+      />
+    </n-card>
+  </n-space>
 </template>
 
 <style scoped>
-.cinema-panel {
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgb(15 23 42 / 0.04);
+.booking-page {
   color: #1f2937;
 }
 
-.panel-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 28px 24px 18px;
+.page-card,
+.table-card {
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
 }
 
-.panel-header h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  color: #111827;
+:deep(.page-card .n-card-header__main) {
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
-.panel-header h2 svg {
-  width: 18px;
-  color: #6366f1;
-}
-
-.panel-header p {
-  margin: 8px 0 0;
-  color: #64748b;
-  font-size: 13px;
-}
-
-.display-count {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  color: #64748b;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.display-count strong {
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #4f46e5;
-  padding: 6px 12px;
-}
-
-.toolbar-grid {
+.metric-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 1.25fr) minmax(220px, 1fr) minmax(200px, 0.75fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  padding: 0 24px 20px;
 }
 
-.status-tabs {
+.metric-card {
   display: flex;
-  flex-wrap: wrap;
-  gap: 28px;
-  border-top: 1px solid #e5e7eb;
-  padding: 14px 24px 22px;
+  min-height: 104px;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
 }
 
-.status-tabs button {
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
+.metric-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+}
+
+:deep(.metric-icon svg) {
+  width: 22px;
+  height: 22px;
+}
+
+.metric-card p,
+.metric-card small {
+  margin: 0;
   color: #64748b;
-  cursor: pointer;
   font-size: 12px;
-  font-weight: 800;
-  padding: 7px 12px;
-  text-transform: uppercase;
 }
 
-.status-tabs button.active,
-.status-tabs button:hover {
-  background: #f3f4f6;
+.metric-card strong {
+  display: block;
+  margin: 3px 0;
   color: #111827;
+  font-size: 22px;
+  font-weight: 800;
 }
 
-:deep(.n-data-table) {
-  --n-td-color: #fff !important;
-  --n-td-color-hover: #f8fafc !important;
-  --n-th-color: #f9fafb !important;
-  --n-border-color: #e5e7eb !important;
-  --n-th-text-color: #64748b !important;
-  --n-td-text-color: #1f2937 !important;
+.metric-revenue .metric-icon {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.metric-pending .metric-icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.metric-ticket .metric-icon {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.booking-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(170px, 220px) minmax(260px, 320px) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.toolbar-search,
+.toolbar-status,
+.toolbar-date {
+  min-width: 0;
+}
+
+.toolbar-count {
+  display: inline-flex;
+  min-width: 132px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.toolbar-count svg {
+  width: 15px;
+  height: 15px;
 }
 
 :deep(.n-data-table-th) {
-  font-size: 10px !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
 }
 
 :deep(.n-data-table-td) {
-  padding: 18px 24px !important;
+  vertical-align: top;
 }
 
-.booking-code-cell,
-.primary-cell,
-.movie-cell {
+:deep(.is-expanded-row td) {
+  background: #fcfcfd !important;
+}
+
+:deep(.booking-code-cell),
+:deep(.primary-cell),
+:deep(.movie-cell),
+:deep(.payment-cell),
+:deep(.amount-cell) {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
+  min-width: 0;
+  line-height: 1.35;
 }
 
-.booking-code-cell strong {
-  width: max-content;
-  border-radius: 4px;
-  background: #f3f4f6;
+:deep(.booking-code-cell strong),
+:deep(.primary-cell strong),
+:deep(.movie-cell strong),
+:deep(.amount-cell strong) {
+  display: block;
   color: #111827;
-  font-size: 12px;
-  padding: 6px 9px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
-.booking-code-cell span,
-.primary-cell span,
-.movie-cell span {
+:deep(.booking-code-cell span),
+:deep(.primary-cell span),
+:deep(.movie-cell span),
+:deep(.payment-cell span),
+:deep(.amount-cell span),
+:deep(.muted-text) {
+  display: block;
   color: #64748b;
   font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
-.primary-cell strong,
-.movie-cell strong {
-  color: #111827;
-  font-weight: 900;
-}
-
-.movie-cell > div {
+:deep(.movie-cell > div) {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
-.age-pill,
-.seat-list span {
-  border-radius: 4px;
+:deep(.showtime-pill),
+:deep(.seat-chip) {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border-radius: 6px;
   background: #f1f5f9;
   color: #475569;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 4px 7px;
 }
 
-.seat-list {
+:deep(.seat-list),
+:deep(.detail-seat-list) {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.amount-text {
-  color: #111827;
-  font-size: 14px;
-  font-weight: 900;
+:deep(.seat-chip.more) {
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
-.action-cell {
+:deep(.payment-cell) {
+  align-items: flex-start;
+}
+
+:deep(.amount-cell) {
+  align-items: flex-end;
+}
+
+:deep(.amount-cell strong) {
+  font-size: 14px;
+}
+
+:deep(.action-cell) {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 :deep(.status-confirmed) {
@@ -468,84 +716,140 @@ onMounted(fetchBookings)
   color: #1d4ed8 !important;
 }
 
-.booking-detail {
+:deep(.status-muted) {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+}
+
+:deep(.booking-detail) {
   display: grid;
-  grid-template-columns: 1fr 1fr minmax(280px, 0.9fr);
-  gap: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
   background: #f8fafc;
-  padding: 22px 24px 26px;
+  padding: 16px 24px 20px;
 }
 
-.detail-block h4,
-.invoice-card h4 {
-  margin: 0 0 14px;
-  color: #4f46e5;
+:deep(.detail-block),
+:deep(.wide-detail),
+:deep(.invoice-card) {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
+}
+
+:deep(.wide-detail) {
+  grid-column: span 2;
+}
+
+:deep(.detail-heading) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+:deep(.detail-heading h4) {
+  margin: 0;
+  color: #1f2937;
   font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 800;
 }
 
-.detail-block dl {
+:deep(.detail-block dl) {
   display: grid;
   gap: 10px;
   margin: 0;
 }
 
-.detail-block dl div,
-.invoice-card div,
-.invoice-card footer {
+:deep(.detail-block dl div),
+:deep(.invoice-card div),
+:deep(.invoice-card footer),
+:deep(.compact-list div),
+:deep(.timeline-list div) {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
-.detail-block dt,
-.invoice-card span {
+:deep(.detail-block dt),
+:deep(.invoice-card span),
+:deep(.compact-list span),
+:deep(.timeline-list span) {
   color: #64748b;
   font-size: 12px;
 }
 
-.detail-block dd,
-.invoice-card strong {
+:deep(.detail-block dd),
+:deep(.invoice-card strong),
+:deep(.compact-list strong),
+:deep(.timeline-list strong) {
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
   margin: 0;
   color: #111827;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
+  text-align: right;
 }
 
-.invoice-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 14px 40px rgb(15 23 42 / 0.08);
-  padding: 20px;
-}
-
-.invoice-card footer {
+:deep(.invoice-card footer) {
   border-top: 1px solid #e5e7eb;
-  margin-top: 14px;
-  padding-top: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
 }
 
-.invoice-card footer strong {
+:deep(.invoice-card footer strong) {
   color: #dc2626;
   font-size: 20px;
 }
 
-.invoice-card small {
-  display: block;
-  margin-top: 18px;
-  color: #94a3b8;
-  font-size: 11px;
+:deep(.discount-line strong),
+:deep(.compact-list strong) {
+  color: #15803d;
 }
 
-.inline-icon svg {
-  width: 13px;
-  color: #6366f1;
+:deep(.compact-list),
+:deep(.timeline-list) {
+  display: grid;
+  gap: 10px;
+}
+
+:deep(.inline-icon svg) {
+  width: 14px;
+  height: 14px;
+  color: #2563eb;
+}
+
+@media (max-width: 1200px) {
+  .booking-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :deep(.booking-detail) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .metric-grid,
+  :deep(.booking-detail) {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar-count {
+    justify-content: flex-start;
+  }
+
+  :deep(.wide-detail) {
+    grid-column: auto;
+  }
 }
 </style>

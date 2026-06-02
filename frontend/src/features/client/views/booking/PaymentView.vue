@@ -36,8 +36,6 @@ const amount = computed(() => Number(payment.value?.amount ?? bookingSummary.val
 const providerLabel = computed(() => paymentProviderLabel(payment.value?.provider))
 const discountAmount = computed(() => Number(bookingSummary.value?.discountAmount ?? 0))
 
-const isCashier = computed(() => payment.value?.provider === 'cashier')
-
 function getErrorMessage(err: unknown, fallback: string) {
   return err instanceof Error ? err.message : fallback
 }
@@ -119,7 +117,7 @@ onMounted(loadPayment)
       <section class="bg-zinc-900 border border-white/5 rounded-3xl p-6 sm:p-8">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-12 h-12 rounded-2xl bg-red-600/20 flex items-center justify-center text-red-500">
-            <QrCode v-if="payment?.provider === 'vnpay' || payment?.provider === 'cashier'" class="w-6 h-6" />
+            <QrCode v-if="payment?.provider === 'vnpay'" class="w-6 h-6" />
             <CreditCard v-else class="w-6 h-6" />
           </div>
           <div>
@@ -134,7 +132,7 @@ onMounted(loadPayment)
         </div>
 
         <p class="text-center text-gray-500 text-sm mt-6">
-          {{ isCashier ? 'Đưa mã này cho thu ngân để xác nhận thanh toán.' : 'Bấm xác nhận để mô phỏng callback thanh toán thành công.' }}
+          Bấm xác nhận để mô phỏng callback thanh toán thành công.
         </p>
       </section>
 
@@ -171,7 +169,7 @@ onMounted(loadPayment)
         >
           <Loader2 v-if="processing" class="w-5 h-5 animate-spin" />
           <CheckCircle2 v-else class="w-5 h-5" />
-          {{ processing ? 'Đang xử lý...' : isCashier ? 'Xác nhận thu ngân đã thanh toán' : 'Xác nhận thanh toán thành công' }}
+          {{ processing ? 'Đang xử lý...' : 'Xác nhận thanh toán thành công' }}
         </button>
       </aside>
     </div>

@@ -3,12 +3,25 @@ import { useDebounceFn } from '@vueuse/core'
 import { bookingService } from '@/features/admin/services/booking.service'
 import type { Booking, BookingStatus } from '@/features/admin/types/booking.type'
 
+type DateRangeValue = [number, number] | null
+
+function formatDateParam(value?: number) {
+  if (!value) return undefined
+  const date = new Date(value)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 export function useBooking() {
   const data = ref<Booking[]>([])
   const loading = ref(false)
   const filters = reactive({
     search: '',
     status: null as BookingStatus | null,
+    dateRange: null as DateRangeValue,
   })
 
   const pagination = reactive({
@@ -36,6 +49,8 @@ export function useBooking() {
         limit: pagination.pageSize,
         q: filters.search || undefined,
         status: filters.status || undefined,
+        from_date: formatDateParam(filters.dateRange?.[0]),
+        to_date: formatDateParam(filters.dateRange?.[1]),
       })
 
       data.value = res.data
@@ -51,7 +66,7 @@ export function useBooking() {
   }, 500)
 
   watch(() => filters.search, debouncedSearch)
-  watch(() => filters.status, () => {
+  watch(() => [filters.status, filters.dateRange], () => {
     pagination.page = 1
     fetchBookings()
   })

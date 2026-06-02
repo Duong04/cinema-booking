@@ -19,6 +19,47 @@ export interface BookingPayment {
   refund_status?: string | null
 }
 
+export interface BookingItem {
+  id: string
+  seat_label?: string
+  seat_type_name?: string
+  movie_title?: string
+  room_name?: string
+  price?: number | string
+}
+
+export interface BookingCombo {
+  id?: string
+  name?: string
+  combo_name?: string
+  quantity?: number
+  unit_price?: number | string
+  total_price?: number | string
+  pivot?: {
+    combo_name?: string
+    quantity?: number
+    unit_price?: number | string
+    total_price?: number | string
+  }
+}
+
+export interface BookingPromotion {
+  id?: string
+  code?: string
+  name?: string
+  pivot?: {
+    discount_amount?: number | string
+    used_at?: string | null
+  }
+}
+
+export interface BookingStatusLog {
+  id?: string
+  old_status?: BookingStatus | null
+  new_status?: BookingStatus
+  changed_at?: string
+}
+
 export interface Booking {
   id: string
   user_id: string
@@ -50,12 +91,10 @@ export interface Booking {
       } | null
     } | null
   } | null
-  items?: Array<{
-    id: string
-    seat_label?: string
-    seat_type_name?: string
-    price?: number | string
-  }>
-  combos?: Array<unknown>
+  items?: BookingItem[]
+  combos?: BookingCombo[]
+  promotions?: BookingPromotion[]
+  status_logs?: BookingStatusLog[]
+  statusLogs?: BookingStatusLog[]
   payment?: BookingPayment | null
 }

@@ -26,8 +26,10 @@ class PaymentController extends Controller
         $q = $query['q'] ?? null;
         $status = $query['status'] ?? null;
         $provider = $query['provider'] ?? null;
+        $fromDate = $query['from_date'] ?? null;
+        $toDate = $query['to_date'] ?? null;
 
-        $payments = $this->paymentService->paginate($limit, $q, $status, $provider);
+        $payments = $this->paymentService->paginate($limit, $q, $status, $provider, $fromDate, $toDate);
 
         return $this->successList($payments->items(), $this->paginationMeta($payments));
     }
@@ -43,7 +45,7 @@ class PaymentController extends Controller
                 required: ["booking_id", "provider"],
                 properties: [
                     new OA\Property(property: "booking_id", type: "string", format: "uuid"),
-                    new OA\Property(property: "provider", type: "string", enum: ["vnpay", "momo", "zalopay", "cashier"]),
+                    new OA\Property(property: "provider", type: "string", enum: ["vnpay", "momo", "zalopay"]),
                 ]
             )
         ),

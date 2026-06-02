@@ -139,8 +139,10 @@ class BookingController extends Controller
         $limit = $query['limit'] ?? 15;
         $q = $query['q'] ?? null;
         $status = $query['status'] ?? null;
+        $fromDate = $query['from_date'] ?? null;
+        $toDate = $query['to_date'] ?? null;
 
-        $bookings = $this->bookingService->paginate($limit, $q, $status);
+        $bookings = $this->bookingService->paginate($limit, $q, $status, $fromDate, $toDate);
 
         return $this->successList($bookings->items(), $this->paginationMeta($bookings));
     }

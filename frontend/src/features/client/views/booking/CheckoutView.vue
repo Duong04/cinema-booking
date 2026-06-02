@@ -36,7 +36,6 @@ const paymentMethods: Array<{ id: PaymentProvider; label: string; description: s
   { id: 'vnpay', label: 'VNPay', description: 'Thanh toán qua cổng VNPay' },
   { id: 'momo', label: 'MoMo', description: 'Thanh toán bằng ví MoMo' },
   { id: 'zalopay', label: 'ZaloPay', description: 'Thanh toán bằng ví ZaloPay' },
-  { id: 'cashier', label: 'Cashier', description: 'Thanh toán tại quầy' },
 ]
 
 function timeLabel(value?: string) {

@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PaymentService
 {
-    private const FAKE_PROVIDERS = ['vnpay', 'momo', 'zalopay', 'cashier'];
+    private const FAKE_PROVIDERS = ['vnpay', 'momo', 'zalopay'];
 
     public function __construct(
         private BookingRepositoryInterface $bookingRepository,
@@ -23,9 +23,9 @@ class PaymentService
     ) {
     }
 
-    public function paginate(int $limit, ?string $q, ?string $status, ?string $provider): LengthAwarePaginator
+    public function paginate(int $limit, ?string $q, ?string $status, ?string $provider, ?string $fromDate, ?string $toDate): LengthAwarePaginator
     {
-        return $this->paymentRepository->paginate($limit, $q, $status, $provider);
+        return $this->paymentRepository->paginate($limit, $q, $status, $provider, $fromDate, $toDate);
     }
 
     public function create(array $data, string $userId)
@@ -167,4 +167,5 @@ class PaymentService
             throw $e;
         }
     }
+
 }

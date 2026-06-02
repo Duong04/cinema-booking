@@ -10,5 +10,7 @@ export const paymentService = {
     q?: string
     status?: PaymentStatus
     provider?: PaymentProvider
+    from_date?: string
+    to_date?: string
   }) => api.get<PaginatedResponse<Payment[]>>('/payments', { params }),
 }

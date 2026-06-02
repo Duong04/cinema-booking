@@ -16,7 +16,14 @@ class SeatHoldService
 
     public function getListShowtime(string $showtimeId)
     {
+        $this->seatHoldRepository->deleteExpired($showtimeId);
+
         return $this->seatHoldRepository->getListShowtime($showtimeId);
+    }
+
+    public function deleteExpired(?string $showtimeId = null)
+    {
+        return $this->seatHoldRepository->deleteExpired($showtimeId);
     }
 
     public function hold($data)
@@ -28,6 +35,8 @@ class SeatHoldService
  
         try {
             DB::beginTransaction();
+
+            $this->seatHoldRepository->deleteExpired($showtimeId);
  
             $existing = $this->seatHoldRepository->checkHoldTransaction($seatIds, $showtimeId);
  
