@@ -19,6 +19,7 @@ import {
   WalletOutline,
 } from '@vicons/ionicons5'
 import { useBooking } from '@/features/admin/composables/useBooking'
+import { useThemeStore } from '@/stores/theme'
 import type {
   Booking,
   BookingCombo,
@@ -28,6 +29,7 @@ import type {
 } from '@/features/admin/types/booking.type'
 import { formatDateTime } from '@/shared/utils/formatDate'
 
+const themeStore = useThemeStore()
 const { data, loading, filters, pagination, fetchBookings } = useBooking()
 const expandedRowKeys = ref<DataTableRowKey[]>([])
 
@@ -384,7 +386,7 @@ onMounted(fetchBookings)
 </script>
 
 <template>
-  <n-space vertical :size="16" class="booking-page">
+  <n-space vertical :size="16" class="booking-page" :class="{ 'is-dark': themeStore.isDark }">
     <n-card :bordered="false" class="page-card">
       <template #header>
         <n-space align="center" :size="10">
@@ -486,14 +488,40 @@ onMounted(fetchBookings)
 
 <style scoped>
 .booking-page {
-  color: #1f2937;
+  --view-surface: #ffffff;
+  --view-surface-soft: #f8fafc;
+  --view-surface-muted: #f1f5f9;
+  --view-border: #e5e7eb;
+  --view-border-soft: #eef2f7;
+  --view-text: #111827;
+  --view-body: #1f2937;
+  --view-muted: #64748b;
+  --view-table-head: #f8fafc;
+  --view-expanded: #fcfcfd;
+  --view-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+
+  color: var(--view-body);
+}
+
+.booking-page.is-dark {
+  --view-surface: #18181c;
+  --view-surface-soft: #222228;
+  --view-surface-muted: #2a2a31;
+  --view-border: rgba(255, 255, 255, 0.1);
+  --view-border-soft: rgba(255, 255, 255, 0.08);
+  --view-text: #f4f4f5;
+  --view-body: #d4d4d8;
+  --view-muted: #a1a1aa;
+  --view-table-head: #202027;
+  --view-expanded: #1f1f25;
+  --view-shadow: 0 1px 2px rgb(0 0 0 / 0.22);
 }
 
 .page-card,
 .table-card {
-  border: 1px solid #eef2f7;
+  border: 1px solid var(--view-border-soft);
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  box-shadow: var(--view-shadow);
 }
 
 :deep(.page-card .n-card-header__main) {
@@ -512,9 +540,9 @@ onMounted(fetchBookings)
   min-height: 104px;
   align-items: center;
   gap: 14px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--view-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--view-surface);
   padding: 16px;
 }
 
@@ -535,14 +563,14 @@ onMounted(fetchBookings)
 .metric-card p,
 .metric-card small {
   margin: 0;
-  color: #64748b;
+  color: var(--view-muted);
   font-size: 12px;
 }
 
 .metric-card strong {
   display: block;
   margin: 3px 0;
-  color: #111827;
+  color: var(--view-text);
   font-size: 22px;
   font-weight: 800;
 }
@@ -560,6 +588,21 @@ onMounted(fetchBookings)
 .metric-ticket .metric-icon {
   background: #dbeafe;
   color: #1d4ed8;
+}
+
+.booking-page.is-dark .metric-revenue .metric-icon {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.booking-page.is-dark .metric-pending .metric-icon {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+}
+
+.booking-page.is-dark .metric-ticket .metric-icon {
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
 }
 
 .booking-toolbar {
@@ -592,14 +635,20 @@ onMounted(fetchBookings)
   white-space: nowrap;
 }
 
+.booking-page.is-dark .toolbar-count {
+  border-color: rgba(59, 130, 246, 0.28);
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+}
+
 .toolbar-count svg {
   width: 15px;
   height: 15px;
 }
 
 :deep(.n-data-table-th) {
-  background: #f8fafc !important;
-  color: #475569 !important;
+  background: var(--view-table-head) !important;
+  color: var(--view-muted) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
 }
@@ -609,7 +658,7 @@ onMounted(fetchBookings)
 }
 
 :deep(.is-expanded-row td) {
-  background: #fcfcfd !important;
+  background: var(--view-expanded) !important;
 }
 
 :deep(.booking-code-cell),
@@ -629,7 +678,7 @@ onMounted(fetchBookings)
 :deep(.movie-cell strong),
 :deep(.amount-cell strong) {
   display: block;
-  color: #111827;
+  color: var(--view-text);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
@@ -641,7 +690,7 @@ onMounted(fetchBookings)
 :deep(.amount-cell span),
 :deep(.muted-text) {
   display: block;
-  color: #64748b;
+  color: var(--view-muted);
   font-size: 12px;
   overflow-wrap: anywhere;
 }
@@ -659,8 +708,8 @@ onMounted(fetchBookings)
   width: fit-content;
   align-items: center;
   border-radius: 6px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--view-surface-muted);
+  color: var(--view-body);
   font-size: 11px;
   font-weight: 700;
   padding: 4px 7px;
@@ -676,6 +725,11 @@ onMounted(fetchBookings)
 :deep(.seat-chip.more) {
   background: #e0f2fe;
   color: #0369a1;
+}
+
+.booking-page.is-dark :deep(.seat-chip.more) {
+  background: rgba(14, 165, 233, 0.18);
+  color: #7dd3fc;
 }
 
 :deep(.payment-cell) {
@@ -716,25 +770,45 @@ onMounted(fetchBookings)
   color: #1d4ed8 !important;
 }
 
+.booking-page.is-dark :deep(.status-confirmed) {
+  background: rgba(34, 197, 94, 0.16) !important;
+  color: #86efac !important;
+}
+
+.booking-page.is-dark :deep(.status-pending) {
+  background: rgba(245, 158, 11, 0.16) !important;
+  color: #fcd34d !important;
+}
+
+.booking-page.is-dark :deep(.status-cancelled) {
+  background: rgba(239, 68, 68, 0.16) !important;
+  color: #fca5a5 !important;
+}
+
+.booking-page.is-dark :deep(.status-refunded) {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: #93c5fd !important;
+}
+
 :deep(.status-muted) {
-  background: #f1f5f9 !important;
-  color: #64748b !important;
+  background: var(--view-surface-muted) !important;
+  color: var(--view-muted) !important;
 }
 
 :deep(.booking-detail) {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
-  background: #f8fafc;
+  background: var(--view-surface-soft);
   padding: 16px 24px 20px;
 }
 
 :deep(.detail-block),
 :deep(.wide-detail),
 :deep(.invoice-card) {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--view-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--view-surface);
   padding: 16px;
 }
 
@@ -751,7 +825,7 @@ onMounted(fetchBookings)
 
 :deep(.detail-heading h4) {
   margin: 0;
-  color: #1f2937;
+  color: var(--view-body);
   font-size: 13px;
   font-weight: 800;
 }
@@ -777,7 +851,7 @@ onMounted(fetchBookings)
 :deep(.invoice-card span),
 :deep(.compact-list span),
 :deep(.timeline-list span) {
-  color: #64748b;
+  color: var(--view-muted);
   font-size: 12px;
 }
 
@@ -790,14 +864,14 @@ onMounted(fetchBookings)
   gap: 6px;
   min-width: 0;
   margin: 0;
-  color: #111827;
+  color: var(--view-text);
   font-size: 12px;
   font-weight: 700;
   text-align: right;
 }
 
 :deep(.invoice-card footer) {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--view-border);
   margin-top: 12px;
   padding-top: 12px;
 }
@@ -807,9 +881,18 @@ onMounted(fetchBookings)
   font-size: 20px;
 }
 
+.booking-page.is-dark :deep(.invoice-card footer strong) {
+  color: #f87171;
+}
+
 :deep(.discount-line strong),
 :deep(.compact-list strong) {
   color: #15803d;
+}
+
+.booking-page.is-dark :deep(.discount-line strong),
+.booking-page.is-dark :deep(.compact-list strong) {
+  color: #86efac;
 }
 
 :deep(.compact-list),
@@ -822,6 +905,10 @@ onMounted(fetchBookings)
   width: 14px;
   height: 14px;
   color: #2563eb;
+}
+
+.booking-page.is-dark :deep(.inline-icon svg) {
+  color: #93c5fd;
 }
 
 @media (max-width: 1200px) {

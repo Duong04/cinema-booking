@@ -13,10 +13,12 @@ import {
   WalletOutline,
 } from '@vicons/ionicons5'
 import { usePayment } from '@/features/admin/composables/usePayment'
+import { useThemeStore } from '@/stores/theme'
 import type { Payment, PaymentProvider } from '@/features/admin/types/payment.type'
 import type { BookingStatus, PaymentStatus } from '@/features/admin/types/booking.type'
 import { formatDateTime } from '@/shared/utils/formatDate'
 
+const themeStore = useThemeStore()
 const { data, loading, filters, pagination, fetchPayments } = usePayment()
 const expandedRowKeys = ref<DataTableRowKey[]>([])
 
@@ -272,7 +274,7 @@ onMounted(fetchPayments)
 </script>
 
 <template>
-  <n-space vertical :size="16" class="payment-page">
+  <n-space vertical :size="16" class="payment-page" :class="{ 'is-dark': themeStore.isDark }">
     <n-card :bordered="false" class="page-card">
       <template #header>
         <n-space align="center" :size="10">
@@ -384,14 +386,40 @@ onMounted(fetchPayments)
 
 <style scoped>
 .payment-page {
-  color: #1f2937;
+  --view-surface: #ffffff;
+  --view-surface-soft: #f8fafc;
+  --view-surface-muted: #f1f5f9;
+  --view-border: #e5e7eb;
+  --view-border-soft: #eef2f7;
+  --view-text: #111827;
+  --view-body: #1f2937;
+  --view-muted: #64748b;
+  --view-table-head: #f8fafc;
+  --view-expanded: #fcfcfd;
+  --view-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+
+  color: var(--view-body);
+}
+
+.payment-page.is-dark {
+  --view-surface: #18181c;
+  --view-surface-soft: #222228;
+  --view-surface-muted: #2a2a31;
+  --view-border: rgba(255, 255, 255, 0.1);
+  --view-border-soft: rgba(255, 255, 255, 0.08);
+  --view-text: #f4f4f5;
+  --view-body: #d4d4d8;
+  --view-muted: #a1a1aa;
+  --view-table-head: #202027;
+  --view-expanded: #1f1f25;
+  --view-shadow: 0 1px 2px rgb(0 0 0 / 0.22);
 }
 
 .page-card,
 .table-card {
-  border: 1px solid #eef2f7;
+  border: 1px solid var(--view-border-soft);
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  box-shadow: var(--view-shadow);
 }
 
 :deep(.page-card .n-card-header__main) {
@@ -410,9 +438,9 @@ onMounted(fetchPayments)
   min-height: 104px;
   align-items: center;
   gap: 14px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--view-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--view-surface);
   padding: 16px;
 }
 
@@ -433,14 +461,14 @@ onMounted(fetchPayments)
 .metric-card p,
 .metric-card small {
   margin: 0;
-  color: #64748b;
+  color: var(--view-muted);
   font-size: 12px;
 }
 
 .metric-card strong {
   display: block;
   margin: 3px 0;
-  color: #111827;
+  color: var(--view-text);
   font-size: 22px;
   font-weight: 800;
 }
@@ -458,6 +486,21 @@ onMounted(fetchPayments)
 .metric-failed .metric-icon {
   background: #fee2e2;
   color: #b91c1c;
+}
+
+.payment-page.is-dark .metric-revenue .metric-icon {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.payment-page.is-dark .metric-pending .metric-icon {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+}
+
+.payment-page.is-dark .metric-failed .metric-icon {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
 }
 
 .payment-toolbar {
@@ -491,14 +534,20 @@ onMounted(fetchPayments)
   white-space: nowrap;
 }
 
+.payment-page.is-dark .toolbar-count {
+  border-color: rgba(59, 130, 246, 0.28);
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+}
+
 .toolbar-count svg {
   width: 15px;
   height: 15px;
 }
 
 :deep(.n-data-table-th) {
-  background: #f8fafc !important;
-  color: #475569 !important;
+  background: var(--view-table-head) !important;
+  color: var(--view-muted) !important;
   font-size: 12px !important;
   font-weight: 700 !important;
 }
@@ -508,7 +557,7 @@ onMounted(fetchPayments)
 }
 
 :deep(.is-expanded-row td) {
-  background: #fcfcfd !important;
+  background: var(--view-expanded) !important;
 }
 
 :deep(.payment-code-cell),
@@ -527,7 +576,7 @@ onMounted(fetchPayments)
 :deep(.movie-cell strong),
 :deep(.amount-cell strong) {
   display: block;
-  color: #111827;
+  color: var(--view-text);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
@@ -537,7 +586,7 @@ onMounted(fetchPayments)
 :deep(.movie-cell span),
 :deep(.amount-cell span) {
   display: block;
-  color: #64748b;
+  color: var(--view-muted);
   font-size: 12px;
   overflow-wrap: anywhere;
 }
@@ -582,6 +631,21 @@ onMounted(fetchPayments)
   color: #0369a1;
 }
 
+.payment-page.is-dark :deep(.provider-vnpay) {
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+}
+
+.payment-page.is-dark :deep(.provider-momo) {
+  background: rgba(236, 72, 153, 0.16);
+  color: #f9a8d4;
+}
+
+.payment-page.is-dark :deep(.provider-zalopay) {
+  background: rgba(14, 165, 233, 0.18);
+  color: #7dd3fc;
+}
+
 :deep(.status-confirmed) {
   background: #dcfce7 !important;
   color: #15803d !important;
@@ -602,18 +666,38 @@ onMounted(fetchPayments)
   color: #1d4ed8 !important;
 }
 
+.payment-page.is-dark :deep(.status-confirmed) {
+  background: rgba(34, 197, 94, 0.16) !important;
+  color: #86efac !important;
+}
+
+.payment-page.is-dark :deep(.status-pending) {
+  background: rgba(245, 158, 11, 0.16) !important;
+  color: #fcd34d !important;
+}
+
+.payment-page.is-dark :deep(.status-cancelled) {
+  background: rgba(239, 68, 68, 0.16) !important;
+  color: #fca5a5 !important;
+}
+
+.payment-page.is-dark :deep(.status-refunded) {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: #93c5fd !important;
+}
+
 :deep(.payment-detail) {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
-  background: #f8fafc;
+  background: var(--view-surface-soft);
   padding: 16px 24px 20px;
 }
 
 :deep(.detail-block) {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--view-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--view-surface);
   padding: 16px;
 }
 
@@ -626,7 +710,7 @@ onMounted(fetchPayments)
 
 :deep(.detail-heading h4) {
   margin: 0;
-  color: #1f2937;
+  color: var(--view-body);
   font-size: 13px;
   font-weight: 800;
 }
@@ -645,7 +729,7 @@ onMounted(fetchPayments)
 }
 
 :deep(.detail-block dt) {
-  color: #64748b;
+  color: var(--view-muted);
   font-size: 12px;
 }
 
@@ -655,7 +739,7 @@ onMounted(fetchPayments)
   gap: 6px;
   min-width: 0;
   margin: 0;
-  color: #111827;
+  color: var(--view-text);
   font-size: 12px;
   font-weight: 700;
   text-align: right;
@@ -665,6 +749,10 @@ onMounted(fetchPayments)
   width: 14px;
   height: 14px;
   color: #2563eb;
+}
+
+.payment-page.is-dark :deep(.inline-icon svg) {
+  color: #93c5fd;
 }
 
 @media (max-width: 1200px) {

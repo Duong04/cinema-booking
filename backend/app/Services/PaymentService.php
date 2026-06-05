@@ -19,7 +19,8 @@ class PaymentService
         private BookingStatusLogRepositoryInterface $bookingStatusLogRepository,
         private PaymentRepositoryInterface $paymentRepository,
         private PaymentAttemptRepositoryInterface $paymentAttemptRepository,
-        private MembershipService $membershipService
+        private MembershipService $membershipService,
+        private BookingNotificationService $bookingNotificationService
     ) {
     }
 
@@ -157,15 +158,18 @@ class PaymentService
             $this->membershipService->addPointsForConfirmedBooking($booking->fresh());
 
             DB::commit();
-
-            return [
-                'payment' => $payment->fresh(),
-                'booking' => $booking->fresh(['showtime.movie', 'showtime.room.cinema', 'items', 'combos', 'payment']),
-            ];
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
+
+        $confirmedBooking = $booking->fresh(['user:id,name,email', 'showtime.movie', 'showtime.room.cinema', 'items', 'combos', 'payment']);
+        $this->bookingNotificationService->sendConfirmedTicket($confirmedBooking);
+
+        return [
+            'payment' => $payment->fresh(),
+            'booking' => $confirmedBooking,
+        ];
     }
 
 }

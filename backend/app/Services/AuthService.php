@@ -21,7 +21,7 @@ class AuthService {
         $data['is_active'] = false;
         $data['email_verify_token'] = Str::random(60);
         $data['token_expired_at'] = now()->addHours(24);
-        $data['role_id'] = '019d06bd-ff12-71c8-8234-aa2cc7733011';
+        $data['role_id'] = '019e71f8-88d5-71a6-a375-73b077353440';
 
         $user = DB::transaction(function () use ($data) {
             $user = $this->userRepository->create($data);

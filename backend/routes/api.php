@@ -19,6 +19,7 @@ use App\Http\Controllers\Apis\V1\UploadController;
 use App\Http\Controllers\Apis\V1\ComboController;
 use App\Http\Controllers\Apis\V1\BookingController;
 use App\Http\Controllers\Apis\V1\PaymentController;
+use App\Http\Controllers\Apis\V1\StatisticController;
 use App\Http\Controllers\Apis\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/', 'create')->middleware('permission.action:users,create');
         Route::get('/{id}', 'show')->middleware('permission.action:users,view');
         Route::put('/{id}', 'update')->middleware('permission.action:users,update');
+    });
+
+    Route::prefix('statistics')->controller(StatisticController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
+        Route::get('/dashboard', 'dashboard')->middleware('permission.action:dashboard,view');
     });
 
     Route::prefix('roles')->controller(RoleController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
@@ -152,8 +157,8 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('seat-holds')->controller(SeatHoldController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
         Route::get('/showtimes/{showtimeId}', 'getListShowtime')->middleware('permission.action:seat-holds,view');
-        Route::post('/hold', 'hold')->middleware('permission.action:seat-holds,create');
-        Route::post('/release', 'release')->middleware('permission.action:seat-holds,delete');
+        Route::post('/hold', 'hold');
+        Route::post('/release', 'release');
     });
 
     Route::prefix('bookings')->controller(BookingController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
@@ -175,9 +180,9 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('payments')->controller(PaymentController::class)->middleware('auth:sanctum', 'check.active')->group(function () {
         Route::get('/', 'paginate')->middleware('permission.action:payments,view');
-        Route::post('/', 'create')->middleware('permission.action:payments,create');
-        Route::get('/{id}', 'show')->middleware('permission.action:payments,view');
-        Route::post('/{id}/confirm', 'confirm')->middleware('permission.action:payments,update');
+        Route::post('/', 'create');
+        Route::get('/{id}', 'show');
+        Route::post('/{id}/confirm', 'confirm');
     });
 
     Route::prefix('combos')->controller(ComboController::class)->middleware('auth:sanctum', 'check.active')->group(function () {

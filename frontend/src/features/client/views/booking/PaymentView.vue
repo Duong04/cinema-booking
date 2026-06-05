@@ -82,6 +82,9 @@ async function confirmPayment() {
     savePaymentResult(resultSummary)
     router.push({
       name: 'booking-payment-result',
+      query: {
+        payment_id: response.data.payment.id,
+      },
       state: toHistoryState({
         booking: resultSummary,
       }),

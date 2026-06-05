@@ -33,7 +33,8 @@ class BookingService
         private ComboRepositoryInterface $comboRepository, 
         private PromotionRepositoryInterface $promotionRepository, 
         private PromotionUsageRepositoryInterface $promotionUsageRepository,
-        private MembershipService $membershipService
+        private MembershipService $membershipService,
+        private BookingNotificationService $bookingNotificationService
     ) {
     }
 
@@ -80,6 +81,9 @@ class BookingService
             ->groupBy('combo_id')
             ->map(fn($items) => (int) $items->sum('quantity'))
             ->filter(fn($quantity) => $quantity > 0);
+
+        $freshBooking = null;
+        $shouldSendTicketEmail = false;
 
         try {
             DB::beginTransaction();
@@ -292,11 +296,18 @@ class BookingService
 
             DB::commit();
 
-            return $booking->fresh()->load($this->detailRelations());
+            $freshBooking = $booking->fresh()->load($this->detailRelations());
+            $shouldSendTicketEmail = ($payload['status'] ?? null) === 'confirmed' && $oldStatus !== 'confirmed';
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
+
+        if ($shouldSendTicketEmail && $freshBooking) {
+            $this->bookingNotificationService->sendConfirmedTicket($freshBooking);
+        }
+
+        return $freshBooking;
     }
 
     public function cancel($data, $id)

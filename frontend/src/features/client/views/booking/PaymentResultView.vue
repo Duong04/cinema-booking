@@ -1,24 +1,67 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { CheckCircle, Home, Ticket } from 'lucide-vue-next'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { CheckCircle, Home, Loader2, Ticket } from 'lucide-vue-next'
 import { useBookingFlow } from '@/features/client/composables/useBookingFlow'
-import { readPaymentResult } from '@/features/client/utils/payment-summary'
+import { buildBookingSummaryFromBooking, readPaymentResult, savePaymentResult } from '@/features/client/utils/payment-summary'
+import { paymentService } from '@/features/client/services/payment.service'
 import type {
   BookingResultSummary,
   PaymentResultRouteState,
 } from '@/features/client/types/booking-payment.type'
 
 const router = useRouter()
+const route = useRoute()
 const { clearBooking, formatVND } = useBookingFlow()
 const routeState = computed(() => window.history.state as PaymentResultRouteState | null)
 const storedBooking = readPaymentResult()
-const booking = computed<BookingResultSummary | null>(() => routeState.value?.booking ?? storedBooking)
+const loadedBooking = ref<BookingResultSummary | null>(null)
+const hasPaymentFallback = computed(() => typeof route.query.payment_id === 'string')
+const loading = ref(hasPaymentFallback.value && !routeState.value?.booking && !storedBooking)
+const error = ref('')
+const booking = computed<BookingResultSummary | null>(() => routeState.value?.booking ?? storedBooking ?? loadedBooking.value)
+
+function getErrorMessage(err: unknown, fallback: string) {
+  return err instanceof Error ? err.message : fallback
+}
+
+async function loadPaymentResult() {
+  if (booking.value) {
+    loading.value = false
+    return
+  }
+
+  const paymentId = typeof route.query.payment_id === 'string' ? route.query.payment_id : ''
+  if (!paymentId) {
+    loading.value = false
+    return
+  }
+
+  loading.value = true
+  error.value = ''
+
+  try {
+    const response = await paymentService.getById(paymentId)
+    const payment = response.data
+
+    if (payment.booking) {
+      const summary = buildBookingSummaryFromBooking(payment.booking, payment)
+      loadedBooking.value = summary
+      savePaymentResult(summary)
+    }
+  } catch (err: unknown) {
+    error.value = getErrorMessage(err, 'Không thể tải thông tin vé.')
+  } finally {
+    loading.value = false
+  }
+}
 
 function finishBooking(path: string) {
   clearBooking()
   router.push(path)
 }
+
+onMounted(loadPaymentResult)
 </script>
 
 <template>
@@ -75,6 +118,12 @@ function finishBooking(path: string) {
           Về trang chủ
         </button>
       </div>
+    </div>
+
+    <div v-else-if="loading" class="bg-zinc-900 rounded-3xl border border-white/5 p-10 text-center">
+      <Loader2 class="w-12 h-12 text-red-500 mx-auto mb-4 animate-spin" />
+      <h1 class="text-2xl font-black text-white mb-2">Dang tai thong tin ve</h1>
+      <p class="text-gray-500">Vui long cho trong giay lat.</p>
     </div>
 
     <div v-else class="bg-zinc-900 rounded-3xl border border-white/5 p-10 text-center">

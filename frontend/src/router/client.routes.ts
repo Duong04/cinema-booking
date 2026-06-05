@@ -105,6 +105,7 @@ export const clientRoutes: RouteRecordRaw[] = [
     component: () => import('@/features/client/views/booking/PaymentResultView.vue'),
     meta: {
       title: 'Cinema - Kết quả thanh toán',
+      requiresAuth: true,
     },
   },
   {

@@ -188,6 +188,7 @@ function applySeatStatusChange(event: SeatStatusChangedEvent) {
   if (event.showtime_id !== String(route.params.showtimeId)) return
 
   const changedSeatIds = new Set(event.seat_ids)
+  const isCurrentUserEvent = Boolean(event.user_id && event.user_id === authStore.user?.id)
 
   seats.value = seats.value.map((seat) => {
     if (!changedSeatIds.has(seat.id)) return seat
@@ -198,8 +199,13 @@ function applySeatStatusChange(event: SeatStatusChangedEvent) {
     }
   })
 
-  if (event.status !== 'available') {
+  if (event.status !== 'available' && !isCurrentUserEvent) {
     selectedSeats.value = selectedSeats.value.filter((seat) => !changedSeatIds.has(seat.id))
+    setSeats(selectedSeats.value)
+    return
+  }
+
+  if (isCurrentUserEvent) {
     setSeats(selectedSeats.value)
   }
 }
